@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>fire-edge 火勢遞減</title>
+<style>
+  :root{
+    --ink: #FFFFFF;
+    --ground: #0B0B0B;
+    --accent: #FF6A1A;
+    --mono: ui-monospace, "SFMono-Regular", "JetBrains Mono", Menlo, Consolas, monospace;
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin:0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ---------- 1. 火焰畫布：固定蓋在整個視窗上，只負責畫火 ---------- */
+  #fire{
+    position: fixed; inset: 0;
+    width: 100vw; height: 100vh;
+    z-index: 30;
+    pointer-events: none;
+  }
+
+  /* ---------- 2. 段落 ----------
+     data-fire = 這一段「底邊」那道火的火勢（0–1）。
+     火往上竄，所以底部留白要跟著火勢放大，不然火會蓋住內文。 */
+  .sec{
+    position: relative;
+    min-height: 100vh;
+    padding: 120px 24px calc(96px + var(--fire, 0) * 55vh);
+    display: flex; flex-direction: column; justify-content: flex-start;
+    background: var(--ground);
+  }
+  .sec:nth-of-type(even){ background: #0E0D0C; }
+  .col{ max-width: 720px; margin: 0 auto; width: 100%; }
+
+  .hero{
+    justify-content: center; text-align: center;
+    padding-top: 24px;
+  }
+  .eyebrow{
+    font-size: 10px; letter-spacing: .28em; text-transform: uppercase;
+    color: rgba(255,255,255,.55); margin: 0 0 20px;
+  }
+  .hero h1{
+    margin:0; font-size: clamp(38px, 8vw, 88px); font-weight: 800;
+    letter-spacing: -.03em; line-height: 1.02; text-wrap: balance;
+  }
+  .hero p{ margin: 22px auto 0; max-width: 46ch; font-weight: 300; color: rgba(255,255,255,.7); }
+
+  .tag{
+    display: inline-flex; gap: 10px; align-items: baseline;
+    font-size: 11px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--accent); margin: 0 0 14px;
+  }
+  .tag b{ color: rgba(255,255,255,.5); font-weight: 400; letter-spacing: .08em; }
+  .sec h2{
+    font-size: clamp(26px, 4.4vw, 44px); font-weight: 800; letter-spacing: -.02em;
+    margin: 0 0 16px; text-wrap: balance;
+  }
+  .sec p{ color: rgba(255,255,255,.66); font-weight: 300; margin: 0 0 14px; max-width: 60ch; }
+  .placeholder{ color: rgba(255,255,255,.38) !important; font-style: italic; }
+  .sec code{ background: rgba(255,255,255,.1); padding: 1px 5px; border-radius: 3px; font-size: 12px; color:#fff; }
+
+  .notes h3{ font-size: 15px; font-weight: 700; margin: 36px 0 10px; }
+  .notes ol{ padding-left: 1.3em; margin: 0; color: rgba(255,255,255,.66); font-weight: 300; }
+  .notes li{ margin: 0 0 10px; max-width: 62ch; }
+  .notes li b{ color: #fff; font-weight: 600; }
+
+  /* ---------- 3. 控制面板 ---------- */
+  .panel{
+    position: fixed; left: 16px; bottom: 16px; z-index: 100;
+    width: 300px; max-width: calc(100vw - 32px);
+    max-height: calc(100vh - 32px); overflow-y: auto;
+    background: rgba(12,12,12,.93);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,.16);
+    border-radius: 8px;
+    backdrop-filter: blur(8px);
+    font-size: 11px;
+  }
+  .panel-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 10px 12px; cursor: pointer; user-select:none;
+    letter-spacing: .16em; text-transform: uppercase; font-size: 10px;
+    color: rgba(255,255,255,.7);
+  }
+  .panel-head b{ color:#fff; letter-spacing:0; text-transform:none; font-size:12px; }
+  .panel-body{ padding: 4px 12px 14px; display: grid; gap: 11px; }
+  .panel[data-open="false"] .panel-body{ display:none; }
+  .group-title{
+    font-size: 10px; letter-spacing: .16em; text-transform: uppercase;
+    color: rgba(255,255,255,.45); padding-top: 10px; border-top: 1px solid rgba(255,255,255,.14);
+  }
+  .ctrl{ display:grid; gap:4px; }
+  .ctrl-row{ display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
+  .ctrl-row label{ color: rgba(255,255,255,.72); }
+  .ctrl-row output{ font-variant-numeric: tabular-nums; color: var(--accent); }
+  input[type="range"]{ width:100%; accent-color: var(--accent); margin:0; }
+  .toggles{
+    display:flex; flex-wrap: wrap; gap: 10px 14px; align-items:center;
+    padding-top: 10px; border-top: 1px solid rgba(255,255,255,.14);
+  }
+  .toggles label{ display:flex; align-items:center; gap:6px; color: rgba(255,255,255,.8); cursor:pointer; }
+  .toggles input{ accent-color: var(--accent); }
+  .readout{
+    display:flex; justify-content:space-between; font-variant-numeric: tabular-nums;
+    color: rgba(255,255,255,.5); border-top: 1px solid rgba(255,255,255,.14); padding-top: 8px;
+  }
+  .readout b{ color: rgba(255,255,255,.9); font-weight: 500; }
+  .btn-reset{
+    background: none; border: 1px solid rgba(255,255,255,.25); color:#fff;
+    font-family: var(--mono); font-size: 10px; padding: 5px 9px; border-radius: 4px; cursor: pointer;
+    letter-spacing: .08em; text-transform: uppercase; margin-left: auto;
+  }
+  .btn-reset:hover{ border-color: var(--accent); color: var(--accent); }
+  .warn{ color: #ffb38a; }
+  :focus-visible{ outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  @media (max-width: 520px){
+    .panel{ left: 8px; right: 8px; width: auto; bottom: 8px; max-height: 55vh; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="fire" aria-hidden="true"></canvas>
+
+<main>
+  <section class="sec hero" data-fire="1" data-label="Hero">
+    <div class="col">
+      <p class="eyebrow">[ POC · 火勢隨議題遞減 ]</p>
+      <h1>大火正旺</h1>
+      <p>往下捲動。每一段的底邊都燒著一道火，
+         火勢從這裡的 100% 開始，隨著議題一段段被討論而變小，到結語熄滅。</p>
+    </div>
+  </section>
+
+  <section class="sec" data-fire="0.72" data-label="議題一">
+    <div class="col">
+      <p class="tag">議題一 <b>火勢 72%</b></p>
+      <h2>議題標題待定</h2>
+      <p class="placeholder">（議題內容待填。這一段結束時火還很大：火舌高、竄得快、核心偏黃白。）</p>
+    </div>
+  </section>
+
+  <section class="sec" data-fire="0.48" data-label="議題二">
+    <div class="col">
+      <p class="tag">議題二 <b>火勢 48%</b></p>
+      <h2>議題標題待定</h2>
+      <p class="placeholder">（議題內容待填。火勢過半：火舌變矮、變慢，顏色往橘色退。）</p>
+    </div>
+  </section>
+
+  <section class="sec" data-fire="0.26" data-label="議題三">
+    <div class="col">
+      <p class="tag">議題三 <b>火勢 26%</b></p>
+      <h2>議題標題待定</h2>
+      <p class="placeholder">（議題內容待填。只剩低矮的紅橘火苗，火星變少。）</p>
+    </div>
+  </section>
+
+  <section class="sec" data-fire="0.08" data-label="議題四">
+    <div class="col">
+      <p class="tag">議題四 <b>火勢 8%</b></p>
+      <h2>議題標題待定</h2>
+      <p class="placeholder">（議題內容待填。幾乎熄滅，只剩貼地的暗紅餘燼和零星火星。）</p>
+    </div>
+  </section>
+
+  <section class="sec notes" data-fire="0" data-label="結語">
+    <div class="col">
+      <p class="tag">結語 <b>火勢 0%</b></p>
+      <h2>火熄了</h2>
+      <p class="placeholder">（結語內容待填。）</p>
+
+      <h3>這版和 ink-edge 差在哪</h3>
+      <ol>
+        <li><b>從 SVG filter 換成 WebGL shader。</b>ink-edge 的邊緣是一張靜態噪聲把白塊邊界扭曲，不會自己動，所以看起來像燒過後的焦痕。火需要每一幀都在變形，SVG filter 每幀重算 feTurbulence 太重，改用 shader 才跑得動。</li>
+        <li><b>隨機造型來自三層噪聲。</b>往上捲動的 fbm 噪聲決定火焰本體；另一組噪聲拿來扭曲取樣座標（domain warp），讓火舌會捲、會分岔；第三組低頻噪聲沿著水平方向改變每一段的火焰高度，做出高低不一的火舌。</li>
+        <li><b>火勢是一個 0–1 的數字。</b>每一段 <code>data-fire</code> 同時控制火焰高度、竄升速度、最高溫度（黃白 → 橘 → 暗紅）、光暈強度和火星數量，所以只要改一個數字就能調整整條「由旺到熄」的曲線。</li>
+        <li><b>段落底部留白跟著火勢縮小。</b>火越大，底部留的空間越多，避免火蓋住內文。</li>
+      </ol>
+
+      <h3>待討論</h3>
+      <ol>
+        <li>火勢要照段落分級（現在的做法），還是跟著整篇的捲動進度連續變小？</li>
+        <li>底色要維持全黑，還是隨火勢變小慢慢轉成灰白，呼應「火熄、煙散」？</li>
+        <li>手機效能：現在用半解析度渲染。實際上線前要在中低階手機上量 FPS，必要時再降解析度或只在火進入畫面時才畫。</li>
+      </ol>
+    </div>
+  </section>
+</main>
+
+<!-- 控制面板 -->
+<div class="panel" id="panel" data-open="true">
+  <div class="panel-head" id="panelHead">
+    <b>fire-edge 參數</b>
+    <span id="panelToggle">收合 −</span>
+  </div>
+  <div class="panel-body">
+    <div class="ctrl">
+      <div class="ctrl-row"><label for="gain">火勢總倍率</label><output id="gainOut">—</output></div>
+      <input type="range" id="gain" min="0" max="1.5" step="0.01">
+    </div>
+    <div class="ctrl">
+      <div class="ctrl-row"><label for="height">火焰高度（滿火勢）</label><output id="heightOut">—</output></div>
+      <input type="range" id="height" min="10" max="90" step="1">
+    </div>
+    <div class="ctrl">
+      <div class="ctrl-row"><label for="scale">火舌尺度</label><output id="scaleOut">—</output></div>
+      <input type="range" id="scale" min="40" max="300" step="5">
+    </div>
+    <div class="ctrl">
+      <div class="ctrl-row"><label for="warp">紊流（捲曲程度）</label><output id="warpOut">—</output></div>
+      <input type="range" id="warp" min="0" max="2.5" step="0.05">
+    </div>
+    <div class="ctrl">
+      <div class="ctrl-row"><label for="speed">竄升速度</label><output id="speedOut">—</output></div>
+      <input type="range" id="speed" min="0" max="2.5" step="0.05">
+    </div>
+    <div class="ctrl">
+      <div class="ctrl-row"><label for="sparks">火星密度</label><output id="sparksOut">—</output></div>
+      <input type="range" id="sparks" min="0" max="1" step="0.05">
+    </div>
+    <div class="ctrl">
+      <div class="ctrl-row"><label for="res">渲染解析度</label><output id="resOut">—</output></div>
+      <input type="range" id="res" min="0.25" max="1" step="0.05">
+    </div>
+
+    <div class="group-title">各段火勢（data-fire）</div>
+    <div id="perSection" style="display:grid;gap:11px"></div>
+
+    <div class="toggles">
+      <label><input type="checkbox" id="pause"> 暫停</label>
+      <button class="btn-reset" id="reset" type="button">重設</button>
+    </div>
+    <div class="readout">
+      <span>fps <b id="fpsOut">—</b></span>
+      <span>畫面中的火 <b id="liveOut">—</b></span>
+    </div>
+    <div class="warn" id="warn" hidden></div>
+  </div>
+</div>
+
+<script src="./fire-edge.js"></script>
+</body>
+</html>
