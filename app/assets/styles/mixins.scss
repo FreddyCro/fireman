@@ -1,0 +1,40 @@
+@use 'sass:map';
+
+// ── RWD 斷點與 mixin ────────────────────────────────────────────────
+// 依 CLAUDE.md：RWD 寫在 BEM element 內部、用 rwd-xxx mixin 包住，同一 class
+// 只定義一次、各斷點集中同處。斷點值對齊 app/utils/constants.ts
+// （由 test/breakpoints.spec.ts 對帳）。
+//
+// 新寫的樣式一律 mobile-first：基底＝mob 稿，再用 rwd-min 往大螢幕覆蓋。
+//   .block__element {
+//     font-size: 16px;                                 // mob 稿（≤767）
+//     @include rwd-min('tablet') { font-size: 20px; }  // pad 稿（768–1279）
+//     @include rwd-min('pc') { font-size: 24px; }      // pc 稿（≥1280）
+//   }
+$breakpoints: (
+  'mobile': 414px,  // MOBILE_BREAKPOINTS
+  'tablet': 768px,  // TABLET_BREAKPOINTS
+  'pc': 1280px,     // PC_BREAKPOINTS
+  'ultra': 1920px,  // ULTRA_BREAKPOINTS
+);
+
+@function bp($name) {
+  @if map.has-key($breakpoints, $name) {
+    @return map.get($breakpoints, $name);
+  }
+  @return $name; // 允許直接傳入自訂像素值
+}
+
+// 「此斷點（含）以下」— desktop-first 覆蓋
+@mixin rwd-max($name) {
+  @media screen and (max-width: #{bp($name) - 0.02px}) {
+    @content;
+  }
+}
+
+// 「此斷點（含）以上」— mobile-first 覆蓋
+@mixin rwd-min($name) {
+  @media screen and (min-width: #{bp($name)}) {
+    @content;
+  }
+}

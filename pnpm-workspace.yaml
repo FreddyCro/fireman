@@ -1,0 +1,4 @@
+# @vueuse/core@8 帶 vue-demi（有 postinstall），Vite + Vue3 不需要它的 build，設為忽略以跳過。
+# pnpm 10.15+ 的 build 放行/忽略清單改讀此檔（取代 package.json 的 pnpm 欄位）。
+ignoredBuiltDependencies:
+  - vue-demi
