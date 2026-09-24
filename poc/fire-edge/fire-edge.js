@@ -3,10 +3,11 @@
  *
  * 對應設計師 feedback：
  *   1. ink-edge 像「燒成灰燼」的焦邊 → 改成會動、有溫度色階、火舌高低不一的大火。
- *   2. 火勢要從前面旺到後面逐漸變小 → 每一段的 data-fire（0–1）決定那段底邊的火勢。
+ *   2. 火勢要從前面旺到後面逐漸變小 → 整頁只有「同一團火」，固定在視窗底部，
+ *      隨著捲動連續變小。每一段的 data-fire（0–1）是一個關鍵影格，
+ *      視窗中心走到哪兩段之間，火勢就在那兩段的值之間內插。
  *
- * 架構：一張 position:fixed 的全視窗 canvas，一個 fragment shader。
- * 每一幀把「畫面中各段的底邊 y 座標 + 火勢」傳進 shader，shader 在每道邊界往上畫火。
+ * 架構：一張 position:fixed 的全視窗 canvas，一個 fragment shader，火根貼在視窗底邊。
  * 不依賴任何外部函式庫。
  */
 (function () {
@@ -211,7 +212,6 @@
 
   function setSectionFire(sec, v) {
     sec.dataset.fire = String(v);
-    sec.style.setProperty('--fire', String(v));   // 底部留白跟著火勢
     var tag = sec.querySelector('.tag b');
     if (tag) tag.textContent = '火勢 ' + Math.round(v * 100) + '%';
   }
@@ -239,13 +239,36 @@
   var fpsOut = document.getElementById('fpsOut');
   var liveOut = document.getElementById('liveOut');
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (reduce) pauseBox.checked = true; // 減少動態：火焰定格，但捲動時仍會跟著邊界移動
+  if (reduce) pauseBox.checked = true; // 減少動態：火焰定格，但火勢仍會跟著捲動變小
 
   var bY = new Float32Array(MAX_BOUNDS);
   var bI = new Float32Array(MAX_BOUNDS);
   var time = 3.0;
   var last = performance.now();
   var frames = 0, fpsT = last;
+  var current = -1; // 平滑後的火勢（-1 = 尚未初始化）
+
+  // ---------------------------------------------------------------
+  // 捲動 → 火勢
+  //   每段的錨點 = 段落中心；參考點 = 視窗中心。
+  //   參考點落在第 i-1 段與第 i 段的錨點之間時，在兩段的 data-fire 之間線性內插。
+  //   開頁時視窗中心正好是 hero 中心 → 火勢 = hero 的值；過了最後一段的中心就停在最後一段的值。
+  // ---------------------------------------------------------------
+  function targetIntensity() {
+    var ref = window.innerHeight / 2;
+    var prev = null;
+    for (var i = 0; i < sections.length; i++) {
+      var r = sections[i].getBoundingClientRect();
+      var pt = { y: r.top + r.height / 2, v: parseFloat(sections[i].dataset.fire) || 0 };
+      if (ref <= pt.y) {
+        if (!prev) return pt.v;
+        var k = (ref - prev.y) / (pt.y - prev.y);
+        return prev.v + (pt.v - prev.v) * k;
+      }
+      prev = pt;
+    }
+    return prev ? prev.v : 0;
+  }
 
   function frame(now) {
     var dt = Math.min(0.1, (now - last) / 1000);
@@ -253,18 +276,15 @@
     if (!pauseBox.checked) time = (time + dt) % 1000;
 
     var maxH = state.height / 100 * vh;
-    var count = 0, live = [];
-    for (var i = 0; i < sections.length && count < MAX_BOUNDS; i++) {
-      var I = Math.min(1, (parseFloat(sections[i].dataset.fire) || 0) * state.gain);
-      if (I <= 0) continue;
-      var bottom = sections[i].getBoundingClientRect().bottom;
-      var H = maxH * (0.08 + 0.92 * I);
-      // 只把在畫面內（含火焰往上竄的範圍）的邊界送進 shader
-      if (bottom < -80 || bottom - H * 2 > vh) continue;
-      bY[count] = bottom;
-      bI[count] = I;
-      count++;
-      live.push(sections[i].dataset.label + ' ' + Math.round(I * 100) + '%');
+    // 平滑：滾輪一格一格跳時，火勢不要跟著一格一格跳
+    var target = targetIntensity();
+    current = current < 0 ? target : current + (target - current) * (1 - Math.exp(-dt * 6));
+    var I = Math.min(1, current * state.gain);
+    var count = 0;
+    if (I > 0.002) {
+      bY[0] = vh + 8;   // 火根略低於視窗底邊，底部那條亮帶藏在畫面外
+      bI[0] = I;
+      count = 1;
     }
 
     if (gl) {
@@ -290,7 +310,7 @@
     if (now - fpsT > 500) {
       fpsOut.textContent = Math.round(frames * 1000 / (now - fpsT));
       frames = 0; fpsT = now;
-      liveOut.textContent = live.length ? live.join('、') : '無';
+      liveOut.textContent = Math.round(I * 100) + '%';
     }
     requestAnimationFrame(frame);
   }
@@ -355,6 +375,10 @@
       sectionInputs[i].out.textContent = Math.round(initialFire[i] * 100) + '%';
     });
     resize();
+  });
+
+  document.getElementById('front').addEventListener('change', function (e) {
+    document.body.classList.toggle('fire-front', e.target.checked);
   });
 
   var panel = document.getElementById('panel');

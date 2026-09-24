@@ -22,25 +22,28 @@
     overflow-x: hidden;
   }
 
-  /* ---------- 1. 火焰畫布：固定蓋在整個視窗上，只負責畫火 ---------- */
+  /* ---------- 1. 火焰畫布：固定在視窗上，整頁只有這一團火 ----------
+     預設在文字後方（z-index 0 < main 的 1），面板可切到文字前方。 */
   #fire{
     position: fixed; inset: 0;
     width: 100vw; height: 100vh;
-    z-index: 30;
+    z-index: 0;
     pointer-events: none;
   }
+  main{ position: relative; z-index: 1; }
+  body.fire-front #fire{ z-index: 30; }
 
   /* ---------- 2. 段落 ----------
-     data-fire = 這一段「底邊」那道火的火勢（0–1）。
-     火往上竄，所以底部留白要跟著火勢放大，不然火會蓋住內文。 */
+     data-fire = 視窗中心走到這一段中心時的火勢（0–1），段與段之間連續內插。
+     段落不能有自己的底色，不然會把後方的火蓋掉。
+     文字加一層暗色陰影，火在後方時仍讀得到。 */
   .sec{
     position: relative;
     min-height: 100vh;
-    padding: 120px 24px calc(96px + var(--fire, 0) * 55vh);
-    display: flex; flex-direction: column; justify-content: flex-start;
-    background: var(--ground);
+    padding: 120px 24px;
+    display: flex; flex-direction: column; justify-content: center;
+    text-shadow: 0 0 18px rgba(0,0,0,.85), 0 0 4px rgba(0,0,0,.9);
   }
-  .sec:nth-of-type(even){ background: #0E0D0C; }
   .col{ max-width: 720px; margin: 0 auto; width: 100%; }
 
   .hero{
@@ -140,8 +143,8 @@
     <div class="col">
       <p class="eyebrow">[ POC · 火勢隨議題遞減 ]</p>
       <h1>大火正旺</h1>
-      <p>往下捲動。每一段的底邊都燒著一道火，
-         火勢從這裡的 100% 開始，隨著議題一段段被討論而變小，到結語熄滅。</p>
+      <p>往下捲動。畫面底部這團火會跟著捲動逐漸變小：
+         從這裡的 100% 開始，隨著議題一段段被討論而減弱，到結語熄滅。</p>
     </div>
   </section>
 
@@ -149,7 +152,7 @@
     <div class="col">
       <p class="tag">議題一 <b>火勢 72%</b></p>
       <h2>議題標題待定</h2>
-      <p class="placeholder">（議題內容待填。這一段結束時火還很大：火舌高、竄得快、核心偏黃白。）</p>
+      <p class="placeholder">（議題內容待填。讀到這一段時火還很大：火舌高、竄得快、核心偏黃白。）</p>
     </div>
   </section>
 
@@ -187,13 +190,14 @@
       <ol>
         <li><b>從 SVG filter 換成 WebGL shader。</b>ink-edge 的邊緣是一張靜態噪聲把白塊邊界扭曲，不會自己動，所以看起來像燒過後的焦痕。火需要每一幀都在變形，SVG filter 每幀重算 feTurbulence 太重，改用 shader 才跑得動。</li>
         <li><b>隨機造型來自三層噪聲。</b>往上捲動的 fbm 噪聲決定火焰本體；另一組噪聲拿來扭曲取樣座標（domain warp），讓火舌會捲、會分岔；第三組低頻噪聲沿著水平方向改變每一段的火焰高度，做出高低不一的火舌。</li>
-        <li><b>火勢是一個 0–1 的數字。</b>每一段 <code>data-fire</code> 同時控制火焰高度、竄升速度、最高溫度（黃白 → 橘 → 暗紅）、光暈強度和火星數量，所以只要改一個數字就能調整整條「由旺到熄」的曲線。</li>
-        <li><b>段落底部留白跟著火勢縮小。</b>火越大，底部留的空間越多，避免火蓋住內文。</li>
+        <li><b>整頁只有同一團火。</b>火固定在視窗底部，跟 ink-edge 一樣是單一個效果；變的只有火勢。</li>
+        <li><b>火勢是一個 0–1 的數字，隨捲動連續變化。</b>每一段 <code>data-fire</code> 是一個關鍵影格：視窗中心走到兩段之間，火勢就在兩段的值之間內插，再做一點平滑，滾輪一格一格跳時火不會跟著跳。這個數字同時控制火焰高度、竄升速度、最高溫度（黃白 → 橘 → 暗紅）、斷續程度和火星數量。</li>
+        <li><b>火在文字後方。</b>段落拿掉底色、文字加暗色陰影，火從字的後面燒上來；面板可以切到「火在文字前方」比較。</li>
       </ol>
 
       <h3>待討論</h3>
       <ol>
-        <li>火勢要照段落分級（現在的做法），還是跟著整篇的捲動進度連續變小？</li>
+        <li>火在文字後方還是前方？前方比較有衝擊力，但大火時會蓋住下半部的內文。</li>
         <li>底色要維持全黑，還是隨火勢變小慢慢轉成灰白，呼應「火熄、煙散」？</li>
         <li>手機效能：現在用半解析度渲染。實際上線前要在中低階手機上量 FPS，必要時再降解析度或只在火進入畫面時才畫。</li>
       </ol>
@@ -237,16 +241,17 @@
       <input type="range" id="res" min="0.25" max="1" step="0.05">
     </div>
 
-    <div class="group-title">各段火勢（data-fire）</div>
+    <div class="group-title">各段火勢關鍵影格（data-fire）</div>
     <div id="perSection" style="display:grid;gap:11px"></div>
 
     <div class="toggles">
       <label><input type="checkbox" id="pause"> 暫停</label>
+      <label><input type="checkbox" id="front"> 火在文字前方</label>
       <button class="btn-reset" id="reset" type="button">重設</button>
     </div>
     <div class="readout">
       <span>fps <b id="fpsOut">—</b></span>
-      <span>畫面中的火 <b id="liveOut">—</b></span>
+      <span>目前火勢 <b id="liveOut">—</b></span>
     </div>
     <div class="warn" id="warn" hidden></div>
   </div>
