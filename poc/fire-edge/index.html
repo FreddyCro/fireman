@@ -192,6 +192,7 @@
         <li><b>隨機造型來自三層噪聲。</b>往上捲動的 fbm 噪聲決定火焰本體；另一組噪聲拿來扭曲取樣座標（domain warp），讓火舌會捲、會分岔；第三組低頻噪聲沿著水平方向改變每一段的火焰高度，做出高低不一的火舌。</li>
         <li><b>整頁只有同一團火。</b>火固定在視窗底部，跟 ink-edge 一樣是單一個效果；變的只有火勢。</li>
         <li><b>火勢是一個 0–1 的數字，隨捲動連續變化。</b>每一段 <code>data-fire</code> 是一個關鍵影格：視窗中心走到兩段之間，火勢就在兩段的值之間內插，再做一點平滑，滾輪一格一格跳時火不會跟著跳。這個數字同時控制火焰高度、竄升速度、最高溫度（黃白 → 橘 → 暗紅）、斷續程度和火星數量。</li>
+        <li><b>火變小時仍然往上走。</b>火焰紋理和火星貼著頁面捲動，往下捲時跟內容一起往上走；火勢變小是「範圍收窄」，高度降低的同時從左右兩側往中間收，往上走的火頭超出範圍就淡掉，看起來是往上飄散，不是往下縮回去。面板的「隨捲動上竄」與「收窄程度」可以分別調整或關掉比較。</li>
         <li><b>火在文字後方。</b>段落拿掉底色、文字加暗色陰影，火從字的後面燒上來；面板可以切到「火在文字前方」比較。</li>
       </ol>
 
@@ -235,6 +236,14 @@
     <div class="ctrl">
       <div class="ctrl-row"><label for="sparks">火星密度</label><output id="sparksOut">—</output></div>
       <input type="range" id="sparks" min="0" max="1" step="0.05">
+    </div>
+    <div class="ctrl">
+      <div class="ctrl-row"><label for="follow">隨捲動上竄</label><output id="followOut">—</output></div>
+      <input type="range" id="follow" min="0" max="1.5" step="0.05">
+    </div>
+    <div class="ctrl">
+      <div class="ctrl-row"><label for="narrow">收窄程度</label><output id="narrowOut">—</output></div>
+      <input type="range" id="narrow" min="0" max="1" step="0.05">
     </div>
     <div class="ctrl">
       <div class="ctrl-row"><label for="res">渲染解析度</label><output id="resOut">—</output></div>

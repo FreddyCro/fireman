@@ -7,6 +7,11 @@
  *      隨著捲動連續變小。每一段的 data-fire（0–1）是一個關鍵影格，
  *      視窗中心走到哪兩段之間，火勢就在那兩段的值之間內插。
  *
+ *   3. 火變小時不能像「被往下推」（火頭往下退、內容卻往上走，方向打架）→
+ *      a. 火焰紋理跟著頁面捲動：往下捲，火舌與火星跟內容一起往上走。
+ *      b. 變小 = 範圍收窄：高度降低的同時，從左右兩側往中間收。
+ *      c. 往上走的火頭超出新的火勢範圍就淡掉，看起來是往上飄散，而不是往下縮回去。
+ *
  * 架構：一張 position:fixed 的全視窗 canvas，一個 fragment shader，火根貼在視窗底邊。
  * 不依賴任何外部函式庫。
  */
@@ -23,6 +28,8 @@
     warp: 1.1,     // domain warp 強度：越大火舌越捲、越會分岔
     speed: 1,      // 竄升速度倍率
     sparks: 0.6,   // 火星密度
+    follow: 1,     // 隨捲動上竄：1 = 火焰紋理與內容同速往上走，0 = 不跟捲動
+    narrow: 1,     // 收窄程度：1 = 火小時只剩中間一叢，0 = 永遠橫跨全寬
     res: 0.5       // 渲染解析度（相對 CSS px）；火焰本來就柔，半解析度看不出差別
   };
   var state = Object.assign({}, DEFAULTS);
@@ -49,6 +56,11 @@
     'uniform float u_warp;',
     'uniform float u_speed;',
     'uniform float u_sparks;',
+    'uniform float u_phase;',          // 火焰相位：JS 每幀累加 dt × 速度（見 frame()）
+    'uniform float u_sphase;',         // 火星相位：同上
+    'uniform float u_scroll;',         // 平滑後的捲動量 × follow（CSS px）
+    'uniform float u_cx;',             // 火勢中心 x（CSS px）
+    'uniform float u_halfW;',          // 火勢半寬（CSS px）
 
     // 不用 sin 的 hash，行動裝置上精度比較穩
     'float hash(vec2 p){',
@@ -96,20 +108,29 @@
     '    float H = u_maxH * (0.08 + 0.92 * I);',
     '    if (up < -40.0 || up > H * 2.0) continue;',
     '    float fi = float(i);',
-    '    float t = u_time * u_speed * (0.45 + 0.75 * I);', // 火小 → 燒得慢
+    // ⚠️ 不能寫成 u_time × f(火勢)：捲動改變火勢時整張紋理會瞬間滑一大段，
+    //    火勢變小時還是往「下」滑，看起來像時間倒轉。改由 JS 逐幀累加相位。
+    '    float t = u_phase;',
 
     // 火舌：沿 x 方向的低頻噪聲改變局部高度，做出高低不一的火舌
     '    float tongue = fbm3(vec2(x / (u_scale * 2.4) + fi * 11.3, t * 0.35 + fi * 3.1));',
-    '    float h = up / (H * (0.15 + 1.6 * tongue));', // 0 = 火根，1 = 名目火焰頂
+    // 收窄：離火勢中心越遠，火越矮、越稀；邊緣用噪聲打散，不要是一條直線
+    '    float edgeN = fbm3(vec2(y / (u_scale * 1.2), t * 0.6 + fi)) - 0.5;',
+    '    float dx = abs(x - u_cx) + edgeN * u_scale * 1.4;',
+    '    float wmask = 1.0 - smoothstep(u_halfW * 0.45, u_halfW, dx);',
+    '    if (wmask <= 0.0) continue;',
+    '    float h = up / (H * (0.15 + 1.6 * tongue) * (0.3 + 0.7 * wmask));', // 0 = 火根，1 = 名目火焰頂
 
     // 火焰本體：垂直拉長、往上捲動的 fbm，取樣座標再被另一組噪聲扭曲（domain warp）
-    '    vec2 p = vec2(x / u_scale, y / (u_scale * 1.7)) + vec2(fi * 7.7, t * 1.3);',
+    // 取樣座標加上捲動量：紋理貼著頁面，往下捲時火舌跟內容一起往上走
+    '    vec2 p = vec2(x / u_scale, (y + u_scroll) / (u_scale * 1.7)) + vec2(fi * 7.7, t * 1.3);',
     '    vec2 q = vec2(fbm3(p * 0.9 + vec2(0.0, t * 0.4)), fbm3(p * 0.9 + vec2(5.2, 1.3 + t * 0.5)));',
     '    float n = fbm(p + u_warp * (q - 0.5) * 2.2);',
     '    float f = n * 1.7 - 0.3 - h;',     // 火根處幾乎全滿，越往上只剩噪聲峰值
     // 斷續度：火勢越小，越只剩零星幾叢在燒（滿火勢時 = 一整排連續的火）
     '    float clump = fbm3(vec2(x / (u_scale * 3.5) + fi * 5.1, t * 0.12));',
-    '    f -= (1.0 - I) * 1.5 * smoothstep(0.66, 0.35, clump);',
+    '    f -= (1.0 - I) * 0.8 * smoothstep(0.66, 0.35, clump);',  // 寬度已經在收窄，斷續度減半
+    '    f -= (1.0 - wmask) * 1.2;',
     // 火根不要是一條筆直的亮帶：邊界上下用噪聲把火根也打散
     '    f -= smoothstep(0.0, -40.0, up) * (0.9 - n);',
 
@@ -129,8 +150,7 @@
     '    for (int L = 0; L < 2; L++){',
     '      float fl = float(L);',
     '      float cell = 22.0 + fl * 16.0;',
-    '      float rise = (90.0 + 60.0 * fl) * u_speed * (0.5 + 0.7 * I);',
-    '      vec2 sc = vec2(x + fi * 37.0, y + u_time * rise) / cell;',
+    '      vec2 sc = vec2(x + fi * 37.0, y + u_scroll + u_sphase * (90.0 + 60.0 * fl)) / cell;',
     '      vec2 id = floor(sc);',
     '      float r = hash(id + fi * 17.0 + fl * 91.0);',
     '      if (r < u_sparks * I * 0.18){',
@@ -138,7 +158,7 @@
     '        cc.x += 0.2 * sin(u_time * 2.0 + r * 60.0);',
     '        float d = length(fract(sc) - cc) * cell;',
     '        float life = 1.0 - clamp(up / (H * 2.0), 0.0, 1.0);',
-    '        sp += smoothstep(2.6, 0.0, d) * life * step(0.0, up);',
+    '        sp += smoothstep(2.6, 0.0, d) * life * step(0.0, up) * wmask;',
     '      }',
     '    }',
     '    c  += vec3(1.0, 0.7, 0.3) * sp;',
@@ -200,7 +220,7 @@
     var aPos = gl.getAttribLocation(prog, 'a_pos');
     gl.enableVertexAttribArray(aPos);
     gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
-    ['u_res', 'u_rs', 'u_time', 'u_bY', 'u_bI', 'u_count', 'u_maxH', 'u_scale', 'u_warp', 'u_speed', 'u_sparks']
+    ['u_res', 'u_rs', 'u_time', 'u_bY', 'u_bI', 'u_count', 'u_maxH', 'u_scale', 'u_warp', 'u_speed', 'u_sparks', 'u_scroll', 'u_cx', 'u_halfW', 'u_phase', 'u_sphase']
       .forEach(function (n) { U[n] = gl.getUniformLocation(prog, n); });
   }
 
@@ -247,6 +267,8 @@
   var last = performance.now();
   var frames = 0, fpsT = last;
   var current = -1; // 平滑後的火勢（-1 = 尚未初始化）
+  var phase = 0, sphase = 0;   // 火焰／火星相位（逐幀累加，火小 → 燒得慢）
+  var scrollS = window.scrollY; // 平滑後的捲動量，滾輪一格一格跳時紋理不要跟著跳
 
   // ---------------------------------------------------------------
   // 捲動 → 火勢
@@ -280,6 +302,14 @@
     var target = targetIntensity();
     current = current < 0 ? target : current + (target - current) * (1 - Math.exp(-dt * 6));
     var I = Math.min(1, current * state.gain);
+    scrollS += (window.scrollY - scrollS) * (1 - Math.exp(-dt * 12));
+    if (!pauseBox.checked) {
+      phase  = (phase  + dt * state.speed * (0.45 + 0.75 * I)) % 1000;
+      sphase = (sphase + dt * state.speed * (0.5 + 0.7 * I)) % 1000;
+    }
+    // 收窄：滿火勢時半寬 = 1.2 倍視窗寬（兩側確實燒到畫面外），火小時只剩中間一叢
+    var full = 1.2, small = 0.22 + (full - 0.22) * Math.pow(I, 0.8); // 火小時最窄仍留約 44% 視窗寬
+    var halfW = vw * (full + (small - full) * state.narrow);
     var count = 0;
     if (I > 0.002) {
       bY[0] = vh + 8;   // 火根略低於視窗底邊，底部那條亮帶藏在畫面外
@@ -302,6 +332,11 @@
         gl.uniform1f(U.u_warp, state.warp);
         gl.uniform1f(U.u_speed, state.speed);
         gl.uniform1f(U.u_sparks, state.sparks);
+        gl.uniform1f(U.u_scroll, scrollS * state.follow);
+        gl.uniform1f(U.u_phase, phase);
+        gl.uniform1f(U.u_sphase, sphase);
+        gl.uniform1f(U.u_cx, vw / 2);
+        gl.uniform1f(U.u_halfW, halfW);
         gl.drawArrays(gl.TRIANGLES, 0, 3);
       }
     }
@@ -325,6 +360,8 @@
     { key: 'warp',   fmt: function (v) { return v.toFixed(2); } },
     { key: 'speed',  fmt: function (v) { return v.toFixed(2) + '×'; } },
     { key: 'sparks', fmt: function (v) { return Math.round(v * 100) + '%'; } },
+    { key: 'follow', fmt: function (v) { return Math.round(v * 100) + '%'; } },
+    { key: 'narrow', fmt: function (v) { return Math.round(v * 100) + '%'; } },
     { key: 'res',    fmt: function (v) { return Math.round(v * 100) + '%'; } }
   ];
 
