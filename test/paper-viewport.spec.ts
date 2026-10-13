@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { coverTransform, needsRelayout, type ViewportInfo } from '../app/utils/paper-scroll/viewport';
+import { coverTransform, fitCanvas, needsRelayout, type ViewportInfo } from '../app/utils/paper-scroll/viewport';
 
 const base: ViewportInfo = { width: 390, stageHeight: 844, safeHeight: 740, dpr: 2 };
 
@@ -15,6 +15,36 @@ describe('needsRelayout', () => {
     const next = { ...base, stageHeight: 780, safeHeight: 700 };
     expect(needsRelayout(base, next, true)).toBe(false);
     expect(needsRelayout(base, next, false)).toBe(true);
+  });
+});
+
+describe('fitCanvas', () => {
+  // node 沒有 canvas，用最小假物件；fitCanvas 只碰 width/height/style/getContext().setTransform
+  const fakeCanvas = (w: number, h: number, cssW: string, cssH: string) => {
+    const calls: number[][] = [];
+    const c = {
+      width: w,
+      height: h,
+      style: { width: cssW, height: cssH },
+      getContext: () => ({ setTransform: (...a: number[]) => calls.push(a) }),
+    };
+    return { c: c as unknown as HTMLCanvasElement, calls };
+  };
+
+  it('尺寸完全沒變就不動', () => {
+    const { c, calls } = fakeCanvas(780, 1688, '390px', '844px');
+    expect(fitCanvas(c, base)).toBe(false);
+    expect(calls).toEqual([]);
+  });
+
+  it('瀏覽器縮放：裝置像素數相同但 CSS 尺寸與 dpr 變了，仍要更新 style 與 transform', () => {
+    // 100% → 150%：1920×1080@1 與 1280×720@1.5 的 canvas.width/height 都是 1920×1080
+    const { c, calls } = fakeCanvas(1920, 1080, '1920px', '1080px');
+    const zoomed: ViewportInfo = { width: 1280, stageHeight: 720, safeHeight: 720, dpr: 1.5 };
+    expect(fitCanvas(c, zoomed)).toBe(true);
+    expect(c.style.width).toBe('1280px');
+    expect(c.style.height).toBe('720px');
+    expect(calls).toEqual([[1.5, 0, 0, 1.5, 0, 0]]);
   });
 });
 

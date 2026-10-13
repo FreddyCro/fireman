@@ -89,15 +89,22 @@ export function watchViewport(onChange: (vp: ViewportInfo) => void, wait = 150):
   };
 }
 
-/** 尺寸沒變就不動（重設 canvas.width 會清空畫布）；回傳是否有改 */
+/**
+ * 尺寸沒變就不動（重設 canvas.width 會清空畫布）；回傳是否有改。
+ * 要同時比 CSS 尺寸：瀏覽器縮放時 dpr 與 CSS 尺寸反向變動，裝置像素數可能剛好相同。
+ */
 export function fitCanvas(canvas: HTMLCanvasElement, vp: ViewportInfo): boolean {
   const w = Math.round(vp.width * vp.dpr);
   const h = Math.round(vp.stageHeight * vp.dpr);
-  if (canvas.width === w && canvas.height === h) return false;
-  canvas.width = w;
-  canvas.height = h;
-  canvas.style.width = `${vp.width}px`;
-  canvas.style.height = `${vp.stageHeight}px`;
+  const cssW = `${vp.width}px`;
+  const cssH = `${vp.stageHeight}px`;
+  if (canvas.width === w && canvas.height === h && canvas.style.width === cssW && canvas.style.height === cssH) {
+    return false;
+  }
+  if (canvas.width !== w) canvas.width = w;
+  if (canvas.height !== h) canvas.height = h;
+  canvas.style.width = cssW;
+  canvas.style.height = cssH;
   canvas.getContext('2d')?.setTransform(vp.dpr, 0, 0, vp.dpr, 0, 0);
   return true;
 }

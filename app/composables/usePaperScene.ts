@@ -33,6 +33,7 @@ export function usePaperScene(opts: UsePaperSceneOptions) {
   let io: IntersectionObserver | null = null;
   let stopWatch: (() => void) | null = null;
   let visible = false;
+  let disposed = false;
   let fpsAcc = 0;
   let fpsCount = 0;
 
@@ -76,6 +77,8 @@ export function usePaperScene(opts: UsePaperSceneOptions) {
     await Promise.all(
       sprites.map(async (s) => strips.set(s.src, await loadStrip(opts.assetUrl(s.src), s.cellW, s.frames))),
     );
+    // 載入期間元件可能已卸載（快速返回）：此時 onBeforeUnmount 已跑過，不能再掛任何東西
+    if (disposed) return;
 
     scene = new PaperScene(opts.scene, strips);
     scene.reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -110,6 +113,7 @@ export function usePaperScene(opts: UsePaperSceneOptions) {
   });
 
   onBeforeUnmount(() => {
+    disposed = true;
     gsap.ticker.remove(tick);
     trigger?.kill();
     io?.disconnect();
