@@ -1,14 +1,14 @@
 // 產生示範用的剪紙風格 sprite strip（SVG）。只是程式畫的幾何造型，用來驗證手感，
 // 正式素材由設計師交付（PNG / WebP / SVG 皆可，格式規範見 architecture 設計文件）。
 //
-//   node poc/sprite-generator/generate.mjs   → 寫入 public/demo/paper/*.svg
+//   node scripts/poc/generate-sprites.mjs   → 寫入 public/poc/paper-scroll/*.svg
 //
 // SVG 的 width/height 寫成 2×（viewBox 不變），載入時會以此一次點陣化成清晰的 2× 位圖。
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const OUT = resolve(dirname(fileURLToPath(import.meta.url)), '../../public/demo/paper');
+const OUT = resolve(dirname(fileURLToPath(import.meta.url)), '../../public/poc/paper-scroll');
 const PIXEL_RATIO = 2;
 
 export const SPRITES = {

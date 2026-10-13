@@ -1,14 +1,14 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { DOOR_OPENING, doorFireScene } from '../app/utils/paper-scroll/scenes/door-fire';
+import { DOOR_OPENING, doorFireScene } from '../app/utils/poc/paper-scroll/scenes/door-fire';
 // 產生器只在直接執行時寫檔，import 不會有副作用
-import { DOOR_OPENING_FRACTIONS } from '../poc/sprite-generator/generate.mjs';
+import { DOOR_OPENING_FRACTIONS } from '../scripts/poc/generate-sprites.mjs';
 
 // 設計師交的素材格數／尺寸若與設定不符，畫面只會錯位，不會有錯誤訊號，所以在這裡對帳。
 const sprites = new Map(doorFireScene.elements.map((e) => [e.sprite.src, e.sprite]));
 
-describe('public/demo/paper 素材與 door-fire 設定一致', () => {
+describe('public/poc/paper-scroll 素材與 door-fire 設定一致', () => {
   it.each([...sprites.values()])('$src 的格數與 viewBox 相符', (sprite) => {
     const svg = readFileSync(resolve(__dirname, '../public', `.${sprite.src}`), 'utf8');
     const cells = svg.match(/<g class="cell"/g)?.length ?? 0;

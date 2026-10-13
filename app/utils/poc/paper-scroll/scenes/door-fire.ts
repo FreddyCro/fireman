@@ -3,13 +3,13 @@
 import type { ElementConfig, SceneConfig, SpriteConfig } from '../types';
 
 const BOTTOM: [number, number] = [0.5, 1];
-const WALKER: SpriteConfig = { src: '/demo/paper/walker.svg', frames: 4, cellW: 240, cellH: 320, anchor: BOTTOM };
-const DOOR: SpriteConfig = { src: '/demo/paper/door.svg', frames: 5, cellW: 320, cellH: 420, anchor: BOTTOM };
-const FLAME: SpriteConfig = { src: '/demo/paper/flame.svg', frames: 4, cellW: 200, cellH: 260, anchor: BOTTOM };
+const WALKER: SpriteConfig = { src: '/poc/paper-scroll/walker.svg', frames: 4, cellW: 240, cellH: 320, anchor: BOTTOM };
+const DOOR: SpriteConfig = { src: '/poc/paper-scroll/door.svg', frames: 5, cellW: 320, cellH: 420, anchor: BOTTOM };
+const FLAME: SpriteConfig = { src: '/poc/paper-scroll/flame.svg', frames: 4, cellW: 200, cellH: 260, anchor: BOTTOM };
 
 /** 地面 y（設計畫布比例） */
 const GROUND = 0.8;
-/** 門開口在 door 格子中的比例，與 poc/sprite-generator/generate.mjs 的 DOOR_OPENING_FRACTIONS 一致（有測試對帳） */
+/** 門開口在 door 格子中的比例，與 scripts/poc/generate-sprites.mjs 的 DOOR_OPENING_FRACTIONS 一致（有測試對帳） */
 export const DOOR_OPENING: [number, number, number, number] = [0.125, 0.048, 0.75, 0.905];
 
 const flame = (id: string, x: number, mul: number, delay: number): ElementConfig => ({

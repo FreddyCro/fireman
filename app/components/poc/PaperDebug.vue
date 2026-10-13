@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { ModeOverride } from '~/utils/paper-scroll/scene';
-import type { ViewportInfo } from '~/utils/paper-scroll/viewport';
+import type { ModeOverride } from '~/utils/poc/paper-scroll/scene';
+import type { ViewportInfo } from '~/utils/poc/paper-scroll/viewport';
 
 defineProps<{
   target: number;

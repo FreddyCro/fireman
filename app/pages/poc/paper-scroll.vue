@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import str from '~/locales/demo-paper.json';
-import { sampleNumber } from '~/utils/paper-scroll/keyframes';
-import { doorFireScene } from '~/utils/paper-scroll/scenes/door-fire';
-import type { Keyframe } from '~/utils/paper-scroll/types';
+import str from '~/locales/poc/paper-scroll.json';
+import { sampleNumber } from '~/utils/poc/paper-scroll/keyframes';
+import { doorFireScene } from '~/utils/poc/paper-scroll/scenes/door-fire';
+import type { Keyframe } from '~/utils/poc/paper-scroll/types';
 
 useHead({ title: str.title });
 
@@ -24,14 +24,14 @@ const textStyle = (p: number) => ({
       <p>{{ str.intro }}</p>
     </section>
 
-    <PaperStage :scene="doorFireScene" :track-vh="600" debug>
+    <PocPaperStage :scene="doorFireScene" :track-vh="600" debug>
       <template #default="{ progress }">
         <div class="paper-demo__ending" :style="textStyle(progress)">
           <h2>{{ str.ending.title }}</h2>
           <p>{{ str.ending.body }}</p>
         </div>
       </template>
-    </PaperStage>
+    </PocPaperStage>
 
     <section class="paper-demo__outro">
       <p>{{ str.outro }}</p>

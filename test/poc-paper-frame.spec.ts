@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { advanceTime, loopIndex, scrollTargetRaw, stepToward } from '../app/utils/paper-scroll/frame';
+import { advanceTime, loopIndex, scrollTargetRaw, stepToward } from '../app/utils/poc/paper-scroll/frame';
 
 describe('loopIndex', () => {
   it('repeat 取餘數，負數也要正確', () => {

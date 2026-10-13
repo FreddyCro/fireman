@@ -28,15 +28,15 @@
 
 | 項目 | 位置 |
 |---|---|
-| 舞台 `height: 100vh; height: 100lvh;`（不支援 lvh 時退回 vh，手機上行為相同） | `app/components/PaperStage.vue` |
-| `measureLvh()`：用隱藏元素量 100lvh，給 canvas 尺寸用 | `app/utils/paper-scroll/viewport.ts` |
+| 舞台 `height: 100vh; height: 100lvh;`（不支援 lvh 時退回 vh，手機上行為相同） | `app/components/poc/PaperStage.vue` |
+| `measureLvh()`：用隱藏元素量 100lvh，給 canvas 尺寸用 | `app/utils/poc/paper-scroll/viewport.ts` |
 | `readViewport().safeHeight` = `documentElement.clientHeight`：安全區，重要內容放這裡面 | 同上 |
 | `needsRelayout()`：觸控裝置上只有高度變就忽略；寬度或 DPR 變才重設 canvas | 同上 |
 | `fitCanvas()`：尺寸沒變就不動（重設 `canvas.width` 會清空畫布） | 同上 |
 | ScrollTrigger `ignoreMobileResize: true`（全域） | `app/plugins/gsap-config.client.ts` |
-| ScrollTrigger `end` 用 `track.offsetHeight - stage.offsetHeight`，與 sticky 實際可黏住的距離一致 | `app/composables/usePaperScene.ts` |
+| ScrollTrigger `end` 用 `track.offsetHeight - stage.offsetHeight`，與 sticky 實際可黏住的距離一致 | `app/composables/poc/usePaperScene.ts` |
 
-除錯面板（`PaperStage` 的 `debug` prop）會畫出安全區底線，真機上可以直接看網址列蓋到哪裡。
+除錯面板（`PocPaperStage` 的 `debug` prop）會畫出安全區底線，真機上可以直接看網址列蓋到哪裡。
 
 ## 不要做的事
 

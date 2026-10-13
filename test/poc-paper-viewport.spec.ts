@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { coverTransform, fitCanvas, needsRelayout, type ViewportInfo } from '../app/utils/paper-scroll/viewport';
+import { coverTransform, fitCanvas, needsRelayout, type ViewportInfo } from '../app/utils/poc/paper-scroll/viewport';
 
 const base: ViewportInfo = { width: 390, stageHeight: 844, safeHeight: 740, dpr: 2 };
 

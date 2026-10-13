@@ -31,8 +31,8 @@ export default defineNuxtConfig({
     prerender: {
       crawlLinks: true,
       failOnError: false,
-      // 首頁沒有連到 demo 頁，crawler 抓不到，要明列
-      routes: ['/demo/paper-scroll'],
+      // 首頁沒有連到 POC 頁，crawler 抓不到，要明列（public/poc/ 的純靜態 POC 不需要）
+      routes: ['/poc/paper-scroll'],
     },
   },
 

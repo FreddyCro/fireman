@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { sampleColor, sampleNumber, sampleStep } from '../app/utils/paper-scroll/keyframes';
-import type { Keyframe } from '../app/utils/paper-scroll/types';
+import { sampleColor, sampleNumber, sampleStep } from '../app/utils/poc/paper-scroll/keyframes';
+import type { Keyframe } from '../app/utils/poc/paper-scroll/types';
 
 describe('sampleNumber', () => {
   it('線性插值', () => {

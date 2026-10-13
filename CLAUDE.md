@@ -47,7 +47,7 @@
 
 - `.env.*.example` 是各部署目標的設定，`.env` 本身不進版控（開發時從 `.env.development.example` 複製）。
 - `NUXT_URL` 的 pathname 會被 `nuxt.config.ts` 拿來當 `app.baseURL`；`NUXT_PUBLIC_APP_ASSETS_PATH` 是素材的絕對 URL 前綴（og:image 靠它組出可分享的完整網址，不要改成相對路徑）。
-- 部署用 `./deploy-gh.sh [staging|nmdap|production]`：從目前 HEAD 重開目標 branch、`pnpm generate`、輸出放 `docs/`、force push。`docs/` 是部署產物，不要手動放東西進去（POC 放 `poc/`）。
+- 部署用 `./deploy-gh.sh [staging|nmdap|production]`：從目前 HEAD 重開目標 branch、`pnpm generate`、輸出放 `docs/`、force push。`docs/` 是部署產物，不要手動放東西進去。POC 一律放各目錄的 `poc/` 子目錄（`app/pages/poc/`、`app/components/poc/`…），純靜態 HTML POC 放 `public/poc/`。
 
 ## SCSS
 

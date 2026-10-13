@@ -20,7 +20,7 @@
 ## 架構
 
 ```
-app/utils/paper-scroll/          純 TS，不碰 Vue；可在 vitest（node 環境）測
+app/utils/poc/paper-scroll/          純 TS，不碰 Vue；可在 vitest（node 環境）測
   types.ts                       場景設定檔型別
   keyframes.ts                   關鍵幀取樣、easing、顏色插值
   frame.ts                       格數邏輯：time / scroll / hold、三種循環、防車輪效應
@@ -28,14 +28,14 @@ app/utils/paper-scroll/          純 TS，不碰 Vue；可在 vitest（node 環�
   assets.ts                      載入 sprite strip → ImageBitmap（SVG 也在此一次點陣化）
   scene.ts                       PaperScene：解析 trigger、更新格數、依圖層與 clip 繪製
   scenes/door-fire.ts            示範劇本的場景設定
-app/composables/usePaperScene.ts ScrollTrigger + gsap.ticker + viewport 的生命週期
-app/components/PaperStage.vue    sticky 舞台、canvas、文字 overlay slot
-app/components/PaperDebug.vue    除錯面板
-app/pages/demo/paper-scroll.vue  示範頁
-app/locales/demo-paper.json      佔位文案
-public/demo/paper/*.svg          產生的 sprite strip
-poc/sprite-generator/generate.mjs 用 node 產生上面的 SVG（可重跑）
-test/paper-*.spec.ts             純函式與「素材↔設定一致」測試
+app/composables/poc/usePaperScene.ts ScrollTrigger + gsap.ticker + viewport 的生命週期
+app/components/poc/PaperStage.vue    sticky 舞台、canvas、文字 overlay slot
+app/components/poc/PaperDebug.vue    除錯面板
+app/pages/poc/paper-scroll.vue  示範頁
+app/locales/poc/paper-scroll.json      佔位文案
+public/poc/paper-scroll/*.svg          產生的 sprite strip
+scripts/poc/generate-sprites.mjs 用 node 產生上面的 SVG（可重跑）
+test/poc-paper-*.spec.ts             純函式與「素材↔設定一致」測試
 ```
 
 ### 時間軸：兩條互相獨立
@@ -94,7 +94,7 @@ test/paper-*.spec.ts             純函式與「素材↔設定一致」測試
 - 陰影請畫進素材，不用 canvas 即時算。
 - 構圖以 1920×1080 設計，重要元素放在中央 9:19.5 的可見欄內、安全高度之上。
 
-示範素材由 `poc/sprite-generator/generate.mjs` 產生（程式畫的剪紙幾何造型，只用來驗證手感）：
+示範素材由 `scripts/poc/generate-sprites.mjs` 產生（程式畫的剪紙幾何造型，只用來驗證手感）：
 
 | 檔案 | 格 | 格子尺寸 | 內容 |
 |---|---|---|---|
@@ -124,10 +124,10 @@ test/paper-*.spec.ts             純函式與「素材↔設定一致」測試
 
 ## 實作狀態（2026-10-13）
 
-- 依本設計實作，示範頁 `/demo/paper-scroll`，除錯面板預設開啟。唯一未做的是除錯面板的「手機可見欄」疊圖（只畫了安全區底線），待補。
+- 依本設計實作，示範頁 `/poc/paper-scroll`，除錯面板預設開啟。唯一未做的是除錯面板的「手機可見欄」疊圖（只畫了安全區底線），待補。
 - 桌機 Chrome 實測通過：正向與倒帶、快速捲動（人停在正確格）、全 time／全 scroll 切換、console 無錯誤。
 - 真機（iOS／Android 網址列）尚未驗證，見 [viewport-height.md](viewport-height.md) 的待驗證清單。
-- 專案沒有安裝 vue-tsc／typescript，型別只靠 `nuxt prepare` 與 dev server 編譯；之後若加型別檢查，先跑 `app/utils/paper-scroll/`。
+- 專案沒有安裝 vue-tsc／typescript，型別只靠 `nuxt prepare` 與 dev server 編譯；之後若加型別檢查，先跑 `app/utils/poc/paper-scroll/`。
 
 ## 驗證方式
 
