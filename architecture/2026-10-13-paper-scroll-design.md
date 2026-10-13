@@ -122,6 +122,13 @@ test/paper-*.spec.ts             純函式與「素材↔設定一致」測試
 - 舞台離開畫面或分頁隱藏時不繪製（`gsap.ticker` 本身在分頁隱藏時暫停）。
 - 示範頁加進 `nitro.prerender.routes`（首頁沒有連過去，crawler 抓不到）。
 
+## 實作狀態（2026-10-13）
+
+- 全部依本設計實作，無偏離。示範頁 `/demo/paper-scroll`，除錯面板預設開啟。
+- 桌機 Chrome 實測通過：正向與倒帶、快速捲動（人停在正確格）、全 time／全 scroll 切換、console 無錯誤。
+- 真機（iOS／Android 網址列）尚未驗證，見 [viewport-height.md](viewport-height.md) 的待驗證清單。
+- 專案沒有安裝 vue-tsc／typescript，型別只靠 `nuxt prepare` 與 dev server 編譯；之後若加型別檢查，先跑 `app/utils/paper-scroll/`。
+
 ## 驗證方式
 
 - `pnpm test`：關鍵幀、格數、viewport 純函式、trigger 解析、素材與設定一致。
