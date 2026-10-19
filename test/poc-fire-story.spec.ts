@@ -1,7 +1,8 @@
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { FIRE_STORY_TEXT, fireStoryScene } from '../app/utils/poc/paper-scroll/scenes/fire-story';
+import str from '../app/locales/poc/fire-story.json';
+import { FIRE_STORY_ROLL, FIRE_STORY_TEXT, fireStoryScene } from '../app/utils/poc/paper-scroll/scenes/fire-story';
 import { scrubTime } from '../app/utils/poc/paper-scroll/video';
 import { fitTransform, visibleDesignRect } from '../app/utils/poc/paper-scroll/viewport';
 
@@ -61,5 +62,36 @@ describe('fire-story 設定', () => {
     for (const { in: [a, b], out: [c, d] } of Object.values(FIRE_STORY_TEXT)) {
       expect(a < b && b <= c && c < d).toBe(true);
     }
+  });
+
+  // 設計師回饋（2026-10-19）：只有 2-1 保留滾動放大，其他原尺寸切換
+  it('只有 2-1 有縮放', () => {
+    for (const el of fireStoryScene.elements) {
+      const scales = el.keyframes.map((k) => k.scale).filter((s): s is number => s !== undefined);
+      const zooms = scales.some((s) => s !== 1);
+      expect(zooms, el.id).toBe(el.id === '2-1');
+    }
+  });
+
+  it('3-1 字幕的進出場落在 3-1 可見區間內', () => {
+    const el = fireStoryScene.elements.find((e) => e.id === '3-1')!;
+    const show = el.keyframes.find((k) => k.opacity === 0)!.p;
+    const hide = el.keyframes.filter((k) => k.opacity === 0).at(-1)!.p;
+    const { in: [a], out: [, d] } = FIRE_STORY_TEXT.mask;
+    expect(a).toBeGreaterThanOrEqual(show);
+    expect(d).toBeLessThanOrEqual(hide);
+  });
+
+  it('名單捲動區間就是 4-2 可見區間', () => {
+    const el = fireStoryScene.elements.find((e) => e.id === '4-2')!;
+    const show = el.keyframes.find((k) => k.opacity === 0)!.p;
+    const hide = el.keyframes.filter((k) => k.opacity === 0).at(-1)!.p;
+    expect(FIRE_STORY_ROLL).toEqual([show, hide]);
+  });
+});
+
+describe('fire-story 文案', () => {
+  it('殉職名單佔位筆數與「27名」一致', () => {
+    expect(str.roll.names).toHaveLength(Number.parseInt(str.count.number));
   });
 });

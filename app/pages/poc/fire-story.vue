@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import str from '~/locales/poc/fire-story.json';
 import { clamp01, EASE } from '~/utils/poc/paper-scroll/keyframes';
-import { FIRE_STORY_TEXT, fireStoryScene } from '~/utils/poc/paper-scroll/scenes/fire-story';
+import { FIRE_STORY_ROLL, FIRE_STORY_TEXT, fireStoryScene } from '~/utils/poc/paper-scroll/scenes/fire-story';
 
 useHead({ title: str.title });
 
@@ -24,6 +24,13 @@ function presence(cue: Cue, p: number) {
 const textStyle = (cue: Cue, p: number) => {
   const v = presence(cue, p);
   return { opacity: v, transform: `translateY(${(1 - v) * 12}px)`, visibility: v > 0 ? 'visible' : 'hidden' } as const;
+};
+
+/** 4-2 殉職名單：片尾字幕式，跟著捲動從畫面底部一路走到頂部；--t 給 CSS 算位移 */
+const rollStyle = (p: number) => {
+  const [a, b] = FIRE_STORY_ROLL;
+  const t = clamp01((p - a) / (b - a));
+  return { '--t': t, visibility: t > 0 && t < 1 ? 'visible' : 'hidden' } as const;
 };
 
 /** 標題：退場用模糊、放大、字距拉開代替粉末化（佔位，等動畫師的版本） */
@@ -54,12 +61,18 @@ const titleStyle = (p: number) => {
           <p class="fire-story__incident-date">{{ str.incident.date }}</p>
           <p class="fire-story__incident-body">{{ str.incident.body }}</p>
         </div>
+        <p class="fire-story__caption" :style="textStyle('mask', progress)">{{ str.mask }}</p>
         <p class="fire-story__line" :style="textStyle('lastWords', progress)">{{ str.lastWords }}</p>
         <p class="fire-story__caption" :style="textStyle('victim', progress)">{{ str.victim }}</p>
-        <p class="fire-story__count" :style="textStyle('count', progress)">
-          <span>{{ str.count.number }}</span>
-          <span>{{ str.count.label }}</span>
-        </p>
+        <div class="fire-story__roll" :style="rollStyle(progress)">
+          <p class="fire-story__roll-head">
+            <span>{{ str.count.number }}</span>
+            <span>{{ str.count.label }}</span>
+          </p>
+          <ul class="fire-story__roll-list">
+            <li v-for="name in str.roll.names" :key="name">{{ name }}</li>
+          </ul>
+        </div>
         <p class="fire-story__line" :style="textStyle('lesson', progress)">
           <span v-for="l in str.lesson" :key="l">{{ l }}</span>
         </p>
@@ -92,7 +105,7 @@ const titleStyle = (p: number) => {
   &__incident,
   &__line,
   &__caption,
-  &__count,
+  &__roll,
   &__title {
     position: absolute;
     left: 0;
@@ -140,14 +153,36 @@ const titleStyle = (p: number) => {
     letter-spacing: 0.1em;
   }
 
-  &__count {
-    bottom: 8cqh;
+  // 片尾字幕式名單：元素頂端貼齊容器底部，--t 0→1 時往上移「自身高度 + 容器高度」，
+  // 所以 t=1 時名單底部剛好離開容器頂端（translateY 的 % 是相對自身高度）
+  &__roll {
+    top: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4cqw;
+    text-align: center;
+    letter-spacing: 0.1em;
+    transform: translateY(calc(var(--t) * (-100% - 100cqh)));
+  }
+
+  &__roll-head {
     display: flex;
     flex-direction: column;
     gap: 1cqw;
+    margin: 0;
     font-size: 4.4cqw;
-    letter-spacing: 0.1em;
-    text-align: center;
+  }
+
+  &__roll-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6cqw;
+    margin: 0;
+    padding: 0;
+    font-size: 3.6cqw;
+    line-height: 1.6;
+    list-style: none;
   }
 
   &__title {
