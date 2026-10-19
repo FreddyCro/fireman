@@ -22,12 +22,17 @@ export interface Keyframe {
 
 export interface SpriteConfig {
   src: string;
+  /** video：src 是影片，frames 固定 1，cellW／cellH 是影片在設計畫布上的尺寸 */
+  kind?: 'image' | 'video';
   frames: number;
   cellW: number;
   cellH: number;
   /** 定位與旋轉錨點（格子的比例），預設 [0.5, 1] 底部中央 */
   anchor?: [number, number];
 }
+
+/** 影片播放方式：scroll 依進度區間 scrub（素材需逐格 keyframe）；loop 依時鐘循環播放，看不到時暫停 */
+export type PlaybackConfig = { mode: 'scroll'; range: [number, number] } | { mode: 'loop' };
 
 export interface ClipConfig {
   /** 參考元素 id，rect 是它目前繪製格子的比例 [x, y, w, h] */
@@ -62,6 +67,8 @@ export interface ElementConfig {
   /** 換格時的隨機擺動：rot 度、px 設計畫布像素 */
   jitter?: { rot?: number; px?: number };
   clip?: ClipConfig;
+  /** 僅 sprite.kind = 'video' */
+  playback?: PlaybackConfig;
   keyframes: Keyframe[];
   triggers?: Trigger[];
 }
@@ -71,8 +78,20 @@ export interface BackgroundStop {
   color: string;
 }
 
+/**
+ * cover：填滿舞台、裁掉多出來的部分。contain：整張放進舞台，其餘露出背景色。
+ * smart：cover 會裁掉超過 maxCrop 的寬或高時改用 contain（直式素材：手機 cover、桌機變置中直欄）。
+ */
+export type FitMode = 'cover' | 'contain' | 'smart';
+
 export interface SceneConfig {
   design: { w: number; h: number };
+  /** 預設 cover */
+  fit?: FitMode;
+  /** smart 模式容許 cover 裁掉的比例，預設 0.25 */
+  maxCrop?: number;
+  /** 設計畫布在舞台中的對齊，預設靠上置中 {x: 0.5, y: 0} */
+  anchor?: { x: number; y: number };
   background: BackgroundStop[];
   elements: ElementConfig[];
 }

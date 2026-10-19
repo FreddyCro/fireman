@@ -1,6 +1,7 @@
 // 照紐時的做法處理手機網址列：舞台高度用 lvh（網址列收起時的高度，伸縮時不變），
 // 安全高度用 documentElement.clientHeight（也不隨網址列變），
 // 觸控裝置上「只有高度變」的 resize 一律忽略。純函式放前面，DOM 相關放後面。
+import type { FitMode } from './types';
 
 export interface ViewportInfo {
   width: number;
@@ -29,11 +30,37 @@ export function coverTransform(
   stage: { w: number; h: number },
   anchor: { x: number; y: number } = { x: 0.5, y: 0 },
 ): CoverTransform {
-  const scale = Math.max(stage.w / design.w, stage.h / design.h);
+  return fitTransform(design, stage, 'cover', anchor);
+}
+
+/** 設計畫布 → 舞台的縮放，fit 規則見 FitMode */
+export function fitTransform(
+  design: { w: number; h: number },
+  stage: { w: number; h: number },
+  fit: FitMode = 'cover',
+  anchor: { x: number; y: number } = { x: 0.5, y: 0 },
+  maxCrop = 0.25,
+): CoverTransform {
+  const cover = Math.max(stage.w / design.w, stage.h / design.h);
+  const contain = Math.min(stage.w / design.w, stage.h / design.h);
+  // cover 時被裁的那一軸只看得到 contain/cover 這麼多
+  const scale = fit === 'contain' || (fit === 'smart' && 1 - contain / cover > maxCrop) ? contain : cover;
   return {
     scale,
     offsetX: (stage.w - design.w * scale) * anchor.x,
     offsetY: (stage.h - design.h * scale) * anchor.y,
+  };
+}
+
+/** 設計畫布在舞台上實際看得到的矩形（舞台 CSS px），文字 overlay 對齊用 */
+export function visibleDesignRect(t: CoverTransform, design: { w: number; h: number }, stage: { w: number; h: number }) {
+  const x = Math.max(0, t.offsetX);
+  const y = Math.max(0, t.offsetY);
+  return {
+    x,
+    y,
+    w: Math.min(stage.w, t.offsetX + design.w * t.scale) - x,
+    h: Math.min(stage.h, t.offsetY + design.h * t.scale) - y,
   };
 }
 

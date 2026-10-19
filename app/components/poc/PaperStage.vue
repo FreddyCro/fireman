@@ -14,7 +14,7 @@ const stage = ref<HTMLElement | null>(null);
 const canvas = ref<HTMLCanvasElement | null>(null);
 const assetUrl = useAssetUrl();
 
-const { target, progress, fps, viewport, elements, showClips, setOverride } = usePaperScene({
+const { target, progress, fps, viewport, designRect, elements, showClips, setOverride } = usePaperScene({
   track,
   stage,
   canvas,
@@ -25,13 +25,19 @@ const { target, progress, fps, viewport, elements, showClips, setOverride } = us
 const override = ref<ModeOverride>('config');
 watch(override, setOverride);
 const showSafe = ref(true);
+
+// overlay 只蓋在看得到的設計畫布上（contain 時是置中直欄），文字可用 cqw／cqh 跟著縮放
+const overlayStyle = computed(() => {
+  const r = designRect.value;
+  return r ? { left: `${r.x}px`, top: `${r.y}px`, width: `${r.w}px`, height: `${r.h}px` } : { inset: 0 };
+});
 </script>
 
 <template>
   <div ref="track" class="paper-stage" :style="{ '--paper-track': trackVh }">
     <div ref="stage" class="paper-stage__stage">
       <canvas ref="canvas" class="paper-stage__canvas" />
-      <div class="paper-stage__overlay"><slot :progress="progress" /></div>
+      <div class="paper-stage__overlay" :style="overlayStyle"><slot :progress="progress" /></div>
       <div
         v-if="debug && showSafe && viewport"
         class="paper-stage__safe"
@@ -74,7 +80,7 @@ const showSafe = ref(true);
 
   &__overlay {
     position: absolute;
-    inset: 0;
+    container-type: size;
     pointer-events: none;
   }
 

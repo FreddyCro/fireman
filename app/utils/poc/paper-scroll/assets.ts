@@ -21,3 +21,28 @@ export async function loadStrip(url: string, cellW: number, frames: number): Pro
   }
   return { source, pixelRatio: img.naturalWidth / (cellW * frames) };
 }
+
+/**
+ * 載入影片（muted + playsinline 才能在 iOS 自動播放）。先 play 一下再暫停：
+ * iOS Safari 不播放就不會解碼第一格，loadeddata 永遠等不到。
+ */
+export async function loadVideo(url: string, cellW: number): Promise<LoadedStrip> {
+  const video = document.createElement('video');
+  video.muted = true;
+  video.playsInline = true;
+  video.loop = true;
+  video.preload = 'auto';
+  video.setAttribute('muted', '');
+  video.setAttribute('playsinline', '');
+  video.src = url;
+  const loaded = new Promise<void>((resolve, reject) => {
+    if (video.readyState >= 2) return resolve();
+    video.addEventListener('loadeddata', () => resolve(), { once: true });
+    video.addEventListener('error', () => reject(video.error), { once: true });
+  });
+  void video.play().catch(() => {});
+  await loaded;
+  video.pause();
+  video.currentTime = 0;
+  return { source: video, pixelRatio: video.videoWidth / cellW, video };
+}

@@ -3,7 +3,8 @@
 import { advanceTime, loopIndex, scrollTargetRaw, stepToward } from './frame';
 import { sampleColor, sampleNumber, sampleStep } from './keyframes';
 import type { ClipConfig, ElementConfig, SceneConfig, SpriteConfig } from './types';
-import { coverTransform } from './viewport';
+import { syncVideo } from './video';
+import { fitTransform, type CoverTransform } from './viewport';
 
 export type ModeOverride = 'config' | 'time' | 'scroll';
 
@@ -11,6 +12,8 @@ export interface LoadedStrip {
   source: CanvasImageSource;
   /** 圖檔實際像素 ÷ 設定的 cellW×frames；交 2× 圖不用改設定 */
   pixelRatio: number;
+  /** sprite.kind = 'video' 時就是 source，播放由 syncVideo 控制 */
+  video?: HTMLVideoElement;
 }
 
 export interface ElementRuntime {
@@ -167,8 +170,22 @@ export class PaperScene {
         rt.jitterX = (Math.random() * 2 - 1) * (j?.px ?? 0);
         rt.jitterY = (Math.random() * 2 - 1) * (j?.px ?? 0);
       }
-      this.resolved.set(rt.config.id, { cfg, state: drawStateOf(cfg, input.progress) });
+      const state = drawStateOf(cfg, input.progress);
+      this.resolved.set(rt.config.id, { cfg, state });
+      const video = this.strips.get(cfg.sprite.src)?.video;
+      if (video && cfg.playback) syncVideo(video, cfg.playback, input.progress, state.opacity > 0.001, this.reduceMotion);
     }
+  }
+
+  /** 設計畫布 → 舞台（CSS px）的變換 */
+  transform(stage: { w: number; h: number }): CoverTransform {
+    const { design, fit, anchor, maxCrop } = this.config;
+    return fitTransform(design, stage, fit, anchor, maxCrop);
+  }
+
+  /** 卸載時停掉影片 */
+  dispose() {
+    for (const s of this.strips.values()) s.video?.pause();
   }
 
   private clipFor(clip: ClipConfig): Rect | null {
@@ -185,9 +202,13 @@ export class PaperScene {
     ctx.save();
     ctx.fillStyle = sampleColor(this.config.background, p);
     ctx.fillRect(0, 0, stage.w, stage.h);
-    const t = coverTransform(design, stage);
+    const t = this.transform(stage);
     ctx.translate(t.offsetX, t.offsetY);
     ctx.scale(t.scale, t.scale);
+    // contain 時放大的元素不能溢出設計畫布（cover 時設計畫布本來就蓋滿舞台，裁不到看得見的部分）
+    ctx.beginPath();
+    ctx.rect(0, 0, design.w, design.h);
+    ctx.clip();
 
     const order = sortByLayer(
       this.runtimes.map((rt) => ({ rt, layer: this.resolved.get(rt.config.id)?.state.layer ?? 0 })),

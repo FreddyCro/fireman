@@ -3,10 +3,10 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import type { Ref } from 'vue';
-import { loadStrip } from '~/utils/poc/paper-scroll/assets';
+import { loadStrip, loadVideo } from '~/utils/poc/paper-scroll/assets';
 import { PaperScene, type LoadedStrip, type ModeOverride } from '~/utils/poc/paper-scroll/scene';
 import type { SceneConfig } from '~/utils/poc/paper-scroll/types';
-import { fitCanvas, watchViewport, type ViewportInfo } from '~/utils/poc/paper-scroll/viewport';
+import { fitCanvas, visibleDesignRect, watchViewport, type ViewportInfo } from '~/utils/poc/paper-scroll/viewport';
 
 export interface UsePaperSceneOptions {
   track: Ref<HTMLElement | null>;
@@ -25,6 +25,8 @@ export function usePaperScene(opts: UsePaperSceneOptions) {
   const fps = ref(0);
   const ready = ref(false);
   const viewport = ref<ViewportInfo | null>(null);
+  /** 設計畫布在舞台上看得到的範圍（CSS px） */
+  const designRect = ref<{ x: number; y: number; w: number; h: number } | null>(null);
   const elements = ref<{ id: string; mode: string; frame: number }[]>([]);
   const showClips = ref(false);
 
@@ -75,16 +77,24 @@ export function usePaperScene(opts: UsePaperSceneOptions) {
     const strips = new Map<string, LoadedStrip>();
     const sprites = [...new Map(opts.scene.elements.map((e) => [e.sprite.src, e.sprite])).values()];
     await Promise.all(
-      sprites.map(async (s) => strips.set(s.src, await loadStrip(opts.assetUrl(s.src), s.cellW, s.frames))),
+      sprites.map(async (s) => {
+        const url = opts.assetUrl(s.src);
+        strips.set(s.src, s.kind === 'video' ? await loadVideo(url, s.cellW) : await loadStrip(url, s.cellW, s.frames));
+      }),
     );
     // 載入期間元件可能已卸載（快速返回）：此時 onBeforeUnmount 已跑過，不能再掛任何東西
-    if (disposed) return;
+    if (disposed) {
+      for (const s of strips.values()) s.video?.pause();
+      return;
+    }
 
     scene = new PaperScene(opts.scene, strips);
     scene.reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     stopWatch = watchViewport((vp) => {
       viewport.value = vp;
+      const stageSize = { w: vp.width, h: vp.stageHeight };
+      if (scene) designRect.value = visibleDesignRect(scene.transform(stageSize), opts.scene.design, stageSize);
       if (fitCanvas(canvas, vp)) ScrollTrigger.refresh();
     });
 
@@ -118,7 +128,8 @@ export function usePaperScene(opts: UsePaperSceneOptions) {
     trigger?.kill();
     io?.disconnect();
     stopWatch?.();
+    scene?.dispose();
   });
 
-  return { target, progress, fps, ready, viewport, elements, showClips, setOverride };
+  return { target, progress, fps, ready, viewport, designRect, elements, showClips, setOverride };
 }

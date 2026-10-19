@@ -1,1 +1,0 @@
-import{L as e,S as t,d as n,kt as r,m as i,st as a}from"./DYcvzxaR.js";var o={title:`fireman`},s={class:`index-page`},c={class:`index-page__title`},l=t({__name:`index`,setup(t){return(t,l)=>(e(),i(`div`,s,[n(`h1`,c,r(a(o).title),1)]))}});export{l as default};

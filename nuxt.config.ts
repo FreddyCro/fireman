@@ -32,7 +32,7 @@ export default defineNuxtConfig({
       crawlLinks: true,
       failOnError: false,
       // 首頁沒有連到 POC 頁，crawler 抓不到，要明列（public/poc/ 的純靜態 POC 不需要）
-      routes: ['/poc/paper-scroll'],
+      routes: ['/poc/paper-scroll', '/poc/fire-story'],
     },
   },
 
