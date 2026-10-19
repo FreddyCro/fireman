@@ -14,7 +14,7 @@ const stage = ref<HTMLElement | null>(null);
 const canvas = ref<HTMLCanvasElement | null>(null);
 const assetUrl = useAssetUrl();
 
-const { target, progress, fps, viewport, designRect, elements, showClips, setOverride } = usePaperScene({
+const { target, progress, fps, viewport, designRect, elements, showClips, sequence, setOverride } = usePaperScene({
   track,
   stage,
   canvas,
@@ -37,7 +37,7 @@ const overlayStyle = computed(() => {
   <div ref="track" class="paper-stage" :style="{ '--paper-track': trackVh }">
     <div ref="stage" class="paper-stage__stage">
       <canvas ref="canvas" class="paper-stage__canvas" />
-      <div class="paper-stage__overlay" :style="overlayStyle"><slot :progress="progress" /></div>
+      <div class="paper-stage__overlay" :style="overlayStyle"><slot :progress="progress" :sequence="sequence" /></div>
       <div
         v-if="debug && showSafe && viewport"
         class="paper-stage__safe"

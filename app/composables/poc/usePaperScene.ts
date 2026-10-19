@@ -5,6 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import type { Ref } from 'vue';
 import { loadStrip, loadVideo } from '~/utils/poc/paper-scroll/assets';
 import { PaperScene, type LoadedStrip, type ModeOverride } from '~/utils/poc/paper-scroll/scene';
+import type { SequenceState } from '~/utils/poc/paper-scroll/sequence';
 import type { SceneConfig } from '~/utils/poc/paper-scroll/types';
 import { fitCanvas, visibleDesignRect, watchViewport, type ViewportInfo } from '~/utils/poc/paper-scroll/viewport';
 
@@ -29,6 +30,8 @@ export function usePaperScene(opts: UsePaperSceneOptions) {
   const designRect = ref<{ x: number; y: number; w: number; h: number } | null>(null);
   const elements = ref<{ id: string; mode: string; frame: number }[]>([]);
   const showClips = ref(false);
+  /** 影片序列狀態（場景沒有 sequence 時停在初始值）；給頁面決定文字何時出現 */
+  const sequence = ref<SequenceState | null>(null);
 
   let scene: PaperScene | null = null;
   let trigger: ScrollTrigger | null = null;
@@ -54,7 +57,9 @@ export function usePaperScene(opts: UsePaperSceneOptions) {
     progress.value = Math.abs(diff) < 1e-4 ? target.value : progress.value + diff * k;
 
     const distance = Math.max(1, track.offsetHeight - stage.offsetHeight);
-    scene.update({ progress: progress.value, scrollPx: progress.value * distance, dtMs });
+    scene.update({ progress: progress.value, scrollPx: progress.value * distance, dtMs, nowMs: performance.now() });
+    // 狀態物件只在區或子狀態改變時換新，比對 identity 就不會每幀觸發重繪
+    if (scene.sequence !== sequence.value) sequence.value = scene.sequence;
     const ctx = canvas.getContext('2d');
     if (ctx) scene.draw(ctx, { w: stage.clientWidth, h: stage.clientHeight }, { clips: showClips.value });
 
@@ -131,5 +136,5 @@ export function usePaperScene(opts: UsePaperSceneOptions) {
     scene?.dispose();
   });
 
-  return { target, progress, fps, ready, viewport, designRect, elements, showClips, setOverride };
+  return { target, progress, fps, ready, viewport, designRect, elements, showClips, sequence, setOverride };
 }
