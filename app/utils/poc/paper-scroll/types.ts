@@ -31,8 +31,25 @@ export interface SpriteConfig {
   anchor?: [number, number];
 }
 
-/** 影片播放方式：scroll 依進度區間 scrub（素材需逐格 keyframe）；loop 依時鐘循環播放，看不到時暫停 */
-export type PlaybackConfig = { mode: 'scroll'; range: [number, number] } | { mode: 'loop' };
+/**
+ * 影片播放方式：scroll 依進度區間 scrub（素材需逐格 keyframe）；loop 依時鐘循環播放，看不到時暫停；
+ * trigger 由場景的 sequence 控制播放與重置（見 sequence.ts）
+ */
+export type PlaybackConfig = { mode: 'scroll'; range: [number, number] } | { mode: 'loop' } | { mode: 'trigger' };
+
+/** 序列的一段：捲動進度正向越過 trigger 時從頭播放 play，播完接 then（通常是 loop 影片）；沒有 then 就淡到背景 */
+export interface SequenceStep {
+  trigger: number;
+  play: string;
+  then?: string;
+}
+
+export interface SequenceConfig {
+  /** 依 trigger 遞增 */
+  steps: SequenceStep[];
+  /** 交叉淡化毫秒數，預設 400 */
+  fade?: number;
+}
 
 export interface ClipConfig {
   /** 參考元素 id，rect 是它目前繪製格子的比例 [x, y, w, h] */
@@ -94,4 +111,6 @@ export interface SceneConfig {
   anchor?: { x: number; y: number };
   background: BackgroundStop[];
   elements: ElementConfig[];
+  /** 「捲到定點自動播放、播完接下一段」的影片序列；成員元素的 opacity 由它覆寫 */
+  sequence?: SequenceConfig;
 }
