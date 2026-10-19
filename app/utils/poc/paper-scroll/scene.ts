@@ -2,8 +2,9 @@
 // draw() 依圖層排序後畫到 canvas。所有狀態都是進度的函數，往回捲自然可逆。
 import { advanceTime, loopIndex, scrollTargetRaw, stepToward } from './frame';
 import { sampleColor, sampleNumber, sampleStep } from './keyframes';
+import { INITIAL_SEQUENCE, advanceSequence, sequenceOpacities, type SequenceState } from './sequence';
 import type { ClipConfig, ElementConfig, SceneConfig, SpriteConfig } from './types';
-import { syncVideo } from './video';
+import { applySequenceEvent, syncVideo, videoEnded } from './video';
 import { fitTransform, type CoverTransform } from './viewport';
 
 export type ModeOverride = 'config' | 'time' | 'scroll';
@@ -33,6 +34,8 @@ export interface TickInput {
   progress: number;
   scrollPx: number;
   dtMs: number;
+  /** 序列用的時鐘（ms），通常是 performance.now()；沒有 sequence 的場景可不給 */
+  nowMs?: number;
 }
 
 export interface DrawState {
@@ -140,12 +143,16 @@ export class PaperScene {
   reduceMotion = false;
   progress = 0;
   readonly runtimes: ElementRuntime[];
+  /** 影片序列目前的狀態（沒有 sequence 的場景永遠是 INITIAL_SEQUENCE）；物件只在狀態改變時換新 */
+  sequence: SequenceState = INITIAL_SEQUENCE;
   private resolved = new Map<string, Resolved>();
+  private srcOf: Map<string, string>;
 
   constructor(
     readonly config: SceneConfig,
     private strips: Map<string, LoadedStrip>,
   ) {
+    this.srcOf = new Map(config.elements.map((e) => [e.id, e.sprite.src]));
     this.runtimes = config.elements.map((e) => ({
       config: e,
       acc: 0,
@@ -160,6 +167,7 @@ export class PaperScene {
 
   update(input: TickInput) {
     this.progress = input.progress;
+    const overrides = this.advanceSequence(input);
     for (const rt of this.runtimes) {
       const cfg = resolveConfig(rt.config, input.progress, this.override);
       const frame = nextFrame(rt, cfg, input, this.reduceMotion);
@@ -171,10 +179,45 @@ export class PaperScene {
         rt.jitterY = (Math.random() * 2 - 1) * (j?.px ?? 0);
       }
       const state = drawStateOf(cfg, input.progress);
+      const o = overrides?.get(rt.config.id);
+      if (o !== undefined) state.opacity = o;
       this.resolved.set(rt.config.id, { cfg, state });
       const video = this.strips.get(cfg.sprite.src)?.video;
       if (video && cfg.playback) syncVideo(video, cfg.playback, input.progress, state.opacity > 0.001, this.reduceMotion);
     }
+  }
+
+  private videoOf(id: string) {
+    const src = this.srcOf.get(id);
+    return src ? this.strips.get(src)?.video : undefined;
+  }
+
+  /** 推進序列、套用播放指令，回傳成員元素的 opacity 覆寫；沒有 sequence 回 null */
+  private advanceSequence(input: TickInput): Map<string, number> | null {
+    const cfg = this.config.sequence;
+    if (!cfg) return null;
+    const now = input.nowMs ?? 0;
+    const { state, events } = advanceSequence(this.sequence, cfg, {
+      p: input.progress,
+      now,
+      // 找不到影片（載入失敗）就當播完，序列才不會卡在 playing
+      ended: (id) => {
+        const v = this.videoOf(id);
+        return !v || videoEnded(v);
+      },
+      reduceMotion: this.reduceMotion,
+    });
+    this.sequence = state;
+    for (const ev of events) {
+      const v = this.videoOf(ev.id);
+      if (v) applySequenceEvent(v, ev.type);
+    }
+    return sequenceOpacities(cfg, state, now);
+  }
+
+  /** 給測試與除錯 */
+  stateOf(id: string): DrawState | undefined {
+    return this.resolved.get(id)?.state;
   }
 
   /** 設計畫布 → 舞台（CSS px）的變換 */

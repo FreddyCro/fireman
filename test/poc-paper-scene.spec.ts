@@ -6,10 +6,11 @@ import {
   drawStateOf,
   nextFrame,
   resolveConfig,
+  PaperScene,
   sortByLayer,
   type ElementRuntime,
 } from '../app/utils/poc/paper-scroll/scene';
-import type { ElementConfig } from '../app/utils/poc/paper-scroll/types';
+import type { ElementConfig, SceneConfig } from '../app/utils/poc/paper-scroll/types';
 
 const sprite = { src: 'a.svg', frames: 4, cellW: 240, cellH: 320 };
 
@@ -126,5 +127,40 @@ describe('sortByLayer', () => {
       { id: 'd', layer: 1 },
     ]).map((e) => e.id);
     expect(out).toEqual(['b', 'd', 'a', 'c']);
+  });
+});
+
+describe('PaperScene + sequence', () => {
+  const vid = (id: string): ElementConfig => ({
+    id,
+    sprite: { src: `${id}.mp4`, kind: 'video', frames: 1, cellW: 10, cellH: 10 },
+    frameMode: 'hold',
+    holdFrame: 0,
+    playback: { mode: 'trigger' },
+    keyframes: [{ p: 0, x: 0.5, y: 0.5, opacity: 0 }],
+  });
+  const base: SceneConfig = {
+    design: { w: 100, h: 100 },
+    background: [{ p: 0, color: '#000' }],
+    elements: [vid('a'), vid('b')],
+  };
+
+  it('沒有 sequence 時 opacity 完全照關鍵幀', () => {
+    const s = new PaperScene(base, new Map());
+    s.update({ progress: 0.9, scrollPx: 0, dtMs: 16, nowMs: 0 });
+    expect(s.stateOf('a')?.opacity).toBe(0);
+    expect(s.sequence.step).toBe(-1);
+  });
+
+  it('有 sequence 時覆寫 opacity；影片不存在視為播完，序列不會卡住', () => {
+    const cfg: SceneConfig = { ...base, sequence: { steps: [{ trigger: 0.5, play: 'a', then: 'b' }], fade: 100 } };
+    const s = new PaperScene(cfg, new Map());
+    s.update({ progress: 0.6, scrollPx: 0, dtMs: 16, nowMs: 0 }); // 進區，playing
+    expect(s.stateOf('a')?.opacity).toBe(1);
+    s.update({ progress: 0.6, scrollPx: 0, dtMs: 16, nowMs: 16 }); // 無影片 → ended
+    expect(s.sequence.phase).toBe('ended');
+    s.update({ progress: 0.6, scrollPx: 0, dtMs: 16, nowMs: 216 }); // 淡化完成
+    expect(s.stateOf('a')?.opacity).toBe(0);
+    expect(s.stateOf('b')?.opacity).toBe(1);
   });
 });

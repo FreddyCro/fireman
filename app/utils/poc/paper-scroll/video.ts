@@ -17,6 +17,7 @@ export function syncVideo(
   visible: boolean,
   reduceMotion: boolean,
 ) {
+  if (playback.mode === 'trigger') return; // 由場景的 sequence 控制播放與重置（見 sequence.ts）
   if (playback.mode === 'loop') {
     if (visible && !reduceMotion) {
       if (video.paused) void video.play().catch(() => {});
@@ -28,4 +29,16 @@ export function syncVideo(
   if (video.seeking || !Number.isFinite(video.duration)) return;
   const t = scrubTime(playback.range, p, video.duration);
   if (Math.abs(video.currentTime - t) > 1 / 120) video.currentTime = t;
+}
+
+/** sequence 的指令：play 從頭播放；reset 暫停並回到第一格 */
+export function applySequenceEvent(video: HTMLVideoElement, type: 'play' | 'reset') {
+  if (!video.paused) video.pause();
+  video.currentTime = 0;
+  if (type === 'play') void video.play().catch(() => {});
+}
+
+/** 原速播到底了（非 loop 影片播完會自己停在最後一格） */
+export function videoEnded(video: HTMLVideoElement): boolean {
+  return video.ended || (Number.isFinite(video.duration) && video.currentTime >= video.duration - 1 / 60);
 }
