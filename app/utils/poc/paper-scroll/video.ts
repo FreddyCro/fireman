@@ -31,14 +31,27 @@ export function syncVideo(
   if (Math.abs(video.currentTime - t) > 1 / 120) video.currentTime = t;
 }
 
-/** sequence 的指令：play 從頭播放；reset 暫停並回到第一格 */
+/**
+ * sequence 的指令：play 從頭播放；reset 暫停並回到第一格。
+ * loadVideo 預設 loop = true（給 loop 模式用），有 loop 的影片 ended 永遠是 false、播到底會跳回 0，
+ * 所以 trigger 影片一拿到序列指令就把 loop 關掉，播完才會停在最後一格。
+ */
 export function applySequenceEvent(video: HTMLVideoElement, type: 'play' | 'reset') {
+  video.loop = false;
   if (!video.paused) video.pause();
   video.currentTime = 0;
   if (type === 'play') void video.play().catch(() => {});
 }
 
-/** 原速播到底了（非 loop 影片播完會自己停在最後一格） */
-export function videoEnded(video: HTMLVideoElement): boolean {
-  return video.ended || (Number.isFinite(video.duration) && video.currentTime >= video.duration - 1 / 60);
+/** duration 還不知道時（metadata 未到）時間保險用的片長 */
+const FALLBACK_DURATION_S = 5;
+
+/**
+ * 原速播到底了。elapsedMs 是進區後經過的時間：play() 被瀏覽器拒絕或解碼卡住時影片會停在第 0 格，
+ * 超過「片長 + 1 秒」就當播完，序列才不會永遠卡在 playing。
+ */
+export function videoEnded(video: HTMLVideoElement, elapsedMs: number): boolean {
+  const duration = Number.isFinite(video.duration) ? video.duration : FALLBACK_DURATION_S;
+  if (video.ended || (Number.isFinite(video.duration) && video.currentTime >= duration - 0.05)) return true;
+  return elapsedMs > duration * 1000 + 1000;
 }

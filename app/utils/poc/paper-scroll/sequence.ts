@@ -1,5 +1,6 @@
 // C4 的「捲到定點自動播放、播完接下一段」：以捲動進度分區、區內以時間分段。
 // 規則：正向進區從頭播；反向退回直接顯示播完狀態、不淡化；退到第一個觸發點以下全部重置。
+// 交叉淡化一律「上層淡入、下層撐著到淡化結束」，不會硬切也不會中途變暗。
 // 全部是純函式，影片的 play／reset 以 events 交給 PaperScene 套用。
 import { clamp01 } from './keyframes';
 import type { SequenceConfig, SequenceStep } from './types';
@@ -12,6 +13,8 @@ export interface SequenceState {
   phase: SequencePhase;
   /** 進入目前 phase 的時刻（ms），算交叉淡化用；-Infinity = 不淡化 */
   since: number;
+  /** 正向進區時畫面上原本的元素 id（前一區的 then 或還在播的 play），淡入期間撐著；沒有 = 從區外進來 */
+  from?: string;
 }
 
 export interface SequenceEvent {
@@ -37,6 +40,13 @@ export function stepFor(steps: SequenceStep[], p: number): number {
   return s;
 }
 
+/** 進區前畫面上的元素：前一區播完是它的 then，還在播就是它的 play */
+function visibleBefore(prev: SequenceState, steps: SequenceStep[]): string | undefined {
+  if (prev.step < 0) return undefined;
+  const st = steps[prev.step]!;
+  return prev.phase === 'ended' ? st.then : st.play;
+}
+
 export function advanceSequence(
   prev: SequenceState,
   cfg: SequenceConfig,
@@ -48,7 +58,11 @@ export function advanceSequence(
     if (input.reduceMotion) {
       return { state: { step: s, phase: 'ended', since: -Infinity }, events: [{ type: 'reset', id: step.play }] };
     }
-    return { state: { step: s, phase: 'playing', since: input.now }, events: [{ type: 'play', id: step.play }] };
+    const from = visibleBefore(prev, cfg.steps);
+    return {
+      state: from ? { step: s, phase: 'playing', since: input.now, from } : { step: s, phase: 'playing', since: input.now },
+      events: [{ type: 'play', id: step.play }],
+    };
   }
   if (s < prev.step) {
     const events: SequenceEvent[] = [];
@@ -67,18 +81,21 @@ export function sequenceOpacities(cfg: SequenceConfig, state: SequenceState, now
   if (state.step < 0) return out;
   const fade = cfg.fade ?? 400;
   const t = fade > 0 ? clamp01((now - state.since) / fade) : 1;
+  const holding = t < 1 ? 1 : 0; // 下層撐到淡化結束
   for (const st of cfg.steps) {
     out.set(st.play, 0);
     if (st.then) out.set(st.then, 0);
   }
   const cur = cfg.steps[state.step]!;
   if (state.phase === 'playing') {
-    out.set(cur.play, 1);
-    const prevThen = cfg.steps[state.step - 1]?.then;
-    if (prevThen) out.set(prevThen, 1 - t);
+    // 從區外進來的（例如 4-1 已用關鍵幀淡入）直接是 1，不然會閃黑
+    out.set(cur.play, state.from ? t : 1);
+    if (state.from) out.set(state.from, holding);
+  } else if (cur.then) {
+    out.set(cur.then, t);
+    out.set(cur.play, holding);
   } else {
-    out.set(cur.play, 1 - t);
-    if (cur.then) out.set(cur.then, t);
+    out.set(cur.play, 1 - t); // 沒有下一段：淡到背景
   }
   return out;
 }

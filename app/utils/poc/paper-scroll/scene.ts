@@ -200,10 +200,10 @@ export class PaperScene {
     const { state, events } = advanceSequence(this.sequence, cfg, {
       p: input.progress,
       now,
-      // 找不到影片（載入失敗）就當播完，序列才不會卡在 playing
+      // 找不到影片（載入失敗）就當播完；有影片則連同「進區後經過的時間」一起判斷，play() 被拒絕也不會卡在 playing
       ended: (id) => {
         const v = this.videoOf(id);
-        return !v || videoEnded(v);
+        return !v || videoEnded(v, now - this.sequence.since);
       },
       reduceMotion: this.reduceMotion,
     });

@@ -69,28 +69,55 @@ describe('advanceSequence', () => {
   });
 });
 
+// 評審發現：區與區之間要「上層淡入、下層撐著」才是交叉淡化；上層直接 1 會硬切，下層同時淡出會有亮度凹陷。
+// from 記的是進區前畫面上的那個元素，淡入期間它保持 1。
+describe('advanceSequence 的 from', () => {
+  it('從區 0 播完（4-2 顯示中）進區 1：from 是 4-2', () => {
+    const r = advanceSequence({ step: 0, phase: 'ended', since: 0 }, cfg, { p: 0.9, now: 1000, ended: notEnded });
+    expect(r.state).toEqual({ step: 1, phase: 'playing', since: 1000, from: '4-2' });
+  });
+
+  it('4-1 還在播就越過 T3：from 是 4-1（它還在畫面上）', () => {
+    const r = advanceSequence({ step: 0, phase: 'playing', since: 0 }, cfg, { p: 0.9, now: 1000, ended: notEnded });
+    expect(r.state.from).toBe('4-1');
+  });
+
+  it('從區外直接進區：沒有 from', () => {
+    expect(advanceSequence(INITIAL_SEQUENCE, cfg, { p: 0.9, now: 1000, ended: notEnded }).state.from).toBeUndefined();
+  });
+});
+
 describe('sequenceOpacities', () => {
   it('尚未進區：不覆寫（走關鍵幀）', () => {
     expect(sequenceOpacities(cfg, INITIAL_SEQUENCE, 0).size).toBe(0);
   });
 
-  it('區 0 播放中：4-1 顯示，其他隱藏', () => {
-    const o = sequenceOpacities(cfg, { step: 0, phase: 'playing', since: 0 }, 100);
+  it('從區外進區 0（4-1 已用關鍵幀淡入）：4-1 立刻是 1，不會閃黑', () => {
+    const o = sequenceOpacities(cfg, { step: 0, phase: 'playing', since: 100 }, 100);
     expect([o.get('4-1'), o.get('4-2'), o.get('4-3')]).toEqual([1, 0, 0]);
   });
 
-  it('區 0 播完：400ms 內 4-1 淡出、4-2 淡入', () => {
-    const o = sequenceOpacities(cfg, { step: 0, phase: 'ended', since: 1000 }, 1200);
-    expect(o.get('4-1')).toBeCloseTo(0.5);
-    expect(o.get('4-2')).toBeCloseTo(0.5);
-    expect(o.get('4-3')).toBe(0);
+  it('區 0 播完：4-2（上層）400ms 淡入，4-1 撐到淡化結束才歸 0', () => {
+    const mid = sequenceOpacities(cfg, { step: 0, phase: 'ended', since: 1000 }, 1200);
+    expect(mid.get('4-2')).toBeCloseTo(0.5);
+    expect(mid.get('4-1')).toBe(1);
+    expect(mid.get('4-3')).toBe(0);
+    const done = sequenceOpacities(cfg, { step: 0, phase: 'ended', since: 1000 }, 1400);
+    expect([done.get('4-1'), done.get('4-2')]).toEqual([0, 1]);
   });
 
-  it('區 1 播放中：4-3 顯示，前一區的 4-2 淡出', () => {
-    const o = sequenceOpacities(cfg, { step: 1, phase: 'playing', since: 1000 }, 1100);
-    expect(o.get('4-3')).toBe(1);
-    expect(o.get('4-2')).toBeCloseTo(0.75);
-    expect(o.get('4-1')).toBe(0);
+  it('區 1 播放中（從 4-2 進來）：4-3 淡入，4-2 撐到淡化結束', () => {
+    const mid = sequenceOpacities(cfg, { step: 1, phase: 'playing', since: 1000, from: '4-2' }, 1100);
+    expect(mid.get('4-3')).toBeCloseTo(0.25);
+    expect(mid.get('4-2')).toBe(1);
+    expect(mid.get('4-1')).toBe(0);
+    const done = sequenceOpacities(cfg, { step: 1, phase: 'playing', since: 1000, from: '4-2' }, 1400);
+    expect([done.get('4-2'), done.get('4-3')]).toEqual([0, 1]);
+  });
+
+  it('直接跳進區 1（沒有 from）：4-3 立刻是 1，4-2 從頭到尾都是 0', () => {
+    const o = sequenceOpacities(cfg, { step: 1, phase: 'playing', since: 1000 }, 1000);
+    expect([o.get('4-1'), o.get('4-2'), o.get('4-3')]).toEqual([0, 0, 1]);
   });
 
   it('區 1 播完（沒有 then）：4-3 淡到背景；since = -Infinity 時立即完成', () => {
