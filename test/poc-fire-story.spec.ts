@@ -8,6 +8,7 @@ import {
   FIRE_STORY_TEXT,
   c4Done,
   c4Mid,
+  exitPresence,
   fireStoryAutoScene,
   fireStoryScene,
 } from '../app/utils/poc/paper-scroll/scenes/fire-story';
@@ -147,6 +148,18 @@ describe('B 版序列', () => {
     expect(c4Done({ step: 1, phase: 'playing', since: 0 }, fireStoryAutoScene)).toBe(false);
     expect(c4Done({ step: 1, phase: 'ended', since: 0 }, fireStoryAutoScene)).toBe(true);
     expect(c4Done(null, fireStoryAutoScene)).toBe(false);
+  });
+});
+
+describe('exitPresence（B 版教訓文字：進場靠時間，只有退場看捲動）', () => {
+  it('退場區間之前是 1、之後是 0、中間遞減', () => {
+    const [c, d] = FIRE_STORY_TEXT.lesson.out;
+    expect(exitPresence('lesson', 0)).toBe(1);
+    expect(exitPresence('lesson', c)).toBe(1);
+    expect(exitPresence('lesson', (c + d) / 2)).toBeGreaterThan(0);
+    expect(exitPresence('lesson', (c + d) / 2)).toBeLessThan(1);
+    expect(exitPresence('lesson', d)).toBe(0);
+    expect(exitPresence('lesson', 1)).toBe(0);
   });
 });
 

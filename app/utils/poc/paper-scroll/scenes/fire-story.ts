@@ -3,6 +3,7 @@
 //   scrub（A 版 /poc/fire-story）：4-1、4-3 跟著捲動 scrub，4-2 loop。
 //   trigger（B 版 /poc/fire-story-auto）：捲到定點自動原速播放、播完接下一段，由 sequence 控制。
 // 文字在頁面的 DOM overlay。分鏡進度見 architecture/2026-10-19-fire-story-design.md 與 2026-10-19-fire-story-auto-design.md。
+import { clamp01, EASE } from '../keyframes';
 import type { SequenceState } from '../sequence';
 import type { ElementConfig, Keyframe, PlaybackConfig, SceneConfig, SpriteConfig } from '../types';
 
@@ -68,6 +69,15 @@ export const FIRE_STORY_TEXT = {
   /** 標題：out 段是粉末化消失（佔位效果，等動畫師交件） */
   title: { in: [0.96, 0.97], out: [0.985, 0.998] },
 } satisfies Record<string, { in: [number, number]; out: [number, number] }>;
+
+/**
+ * 只看退場的存在感（1 → 0）：B 版的教訓文字在 4-3 播完後靠時間在原地淡入（CSS transition），
+ * 進度只決定它何時退場，所以不看 in 區間
+ */
+export function exitPresence(cue: keyof typeof FIRE_STORY_TEXT, p: number): number {
+  const [c, d] = FIRE_STORY_TEXT[cue].out;
+  return 1 - EASE.in(clamp01((p - c) / (d - c)));
+}
 
 /** A 版 4-2 殉職名單片尾式捲動的進度區間 = 4-2 的可見區間；名單從畫面底部一路捲到頂部消失 */
 export const FIRE_STORY_ROLL: [number, number] = [0.8, 0.87];

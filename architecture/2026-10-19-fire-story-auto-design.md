@@ -51,7 +51,9 @@
   - B 版名單捲動位置區間 `FIRE_STORY_AUTO_ROLL = [0.78, 0.86]`。
 - 頁面內容抽成 `app/components/poc/FireStoryPage.vue`（prop `variant`），`fire-story.vue` 與新的 `fire-story-auto.vue` 是薄殼。
   - B 版名單：位置由捲動決定，但 **4-2 顯示後才可見**（區 0 ended 或已進區 1）。
-  - B 版 C4 之後的文字（教訓、標題）：`p` 到位 **且** 區 1 ended 才出現；否則捲得慢會先黑再等字、捲得快會字疊在火上。
+  - B 版 C4 之後的文字：
+    - **教訓**：區 1 ended 後**在原地由時間淡入**（4-3 淡黑 400ms 後再 600ms，用 CSS transition，不靠捲動也不靠每幀重繪），退場仍由捲動的 `out` 區間決定。這是為了補 4-3 播完到文字之間的黑畫面，而且不搶捲軸（自動捲到文字區塊會有 scroll hijacking、手機手勢衝突、回頭被再帶走一次等問題，見 2026-10-20 討論）。
+    - **標題**：`p` 到位 **且** 區 1 ended 才出現，退場照舊。
   - 兩版 intro 各放一個切到另一版的連結。
 - `nuxt.config.ts` prerender 加 `/poc/fire-story-auto`。
 

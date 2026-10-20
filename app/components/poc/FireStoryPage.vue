@@ -8,6 +8,7 @@ import {
   FIRE_STORY_TEXT,
   c4Done,
   c4Mid,
+  exitPresence,
   fireStoryAutoScene,
   fireStoryScene,
   type FireStoryVariant,
@@ -55,6 +56,16 @@ const rollStyle = (p: number, seq: Seq) => {
   return { '--t': t, visibility: on ? 'visible' : 'hidden' } as const;
 };
 
+/**
+ * 教訓文字。A 版照進度進出場。B 版進場不看進度：4-3 播完後由外層 .fire-story__lesson--on 的 CSS transition
+ * 在原地淡入（不靠每幀重繪，停著不捲也會出現），這裡只負責跟著捲動退場。
+ */
+const lessonStyle = (p: number, seq: Seq) => {
+  if (props.variant === 'scrub') return textStyle('lesson', p);
+  const v = c4Done(seq, scene) ? exitPresence('lesson', p) : 0;
+  return { opacity: v, visibility: v > 0 ? 'visible' : 'hidden' } as const;
+};
+
 /** 標題：退場用模糊、放大、字距拉開代替粉末化（佔位，等動畫師的版本）。B 版要等 4-3 播完 */
 const titleStyle = (p: number, seq: Seq) => {
   const { out: [c, d] } = FIRE_STORY_TEXT.title;
@@ -99,9 +110,11 @@ const titleStyle = (p: number, seq: Seq) => {
             <li v-for="name in str.roll.names" :key="name">{{ name }}</li>
           </ul>
         </div>
-        <p class="fire-story__line" :style="textStyle('lesson', progress, c4Done(sequence, scene))">
-          <span v-for="l in str.lesson" :key="l">{{ l }}</span>
-        </p>
+        <div class="fire-story__lesson" :class="{ 'fire-story__lesson--on': c4Done(sequence, scene) }">
+          <p class="fire-story__line" :style="lessonStyle(progress, sequence)">
+            <span v-for="l in str.lesson" :key="l">{{ l }}</span>
+          </p>
+        </div>
         <h2 class="fire-story__title" :style="titleStyle(progress, sequence)">{{ str.pageTitle }}</h2>
       </template>
     </PocPaperStage>
@@ -187,6 +200,21 @@ const titleStyle = (p: number, seq: Seq) => {
     font-size: 3.6cqw;
     line-height: 1.9;
     letter-spacing: 0.1em;
+  }
+
+  // B 版教訓文字的時間淡入層：4-3 淡黑（400ms）後再花 600ms 淡入；關閉時立刻開始淡出。
+  // 內層 .fire-story__line 的 inline opacity 只管跟著捲動退場，兩層分開才不會讓 transition 拖慢捲動驅動的變化。
+  &__lesson {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 600ms ease;
+
+    &--on {
+      opacity: 1;
+      transition-delay: 400ms;
+    }
   }
 
   // 片尾字幕式名單：元素頂端貼齊容器底部，--t 0→1 時往上移「自身高度 + 容器高度」，
