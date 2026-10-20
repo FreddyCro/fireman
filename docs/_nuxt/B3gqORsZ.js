@@ -1,0 +1,1 @@
+import{L as e,f as t}from"./DYcvzxaR.js";import{t as n}from"./BDNMzG2s.js";import{t as r}from"./C3wqmZjC.js";var i={};function a(n,i){let a=r;return e(),t(a,{variant:`trigger`})}var o=n(i,[[`render`,a]]);export{o as default};
