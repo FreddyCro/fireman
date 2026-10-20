@@ -104,6 +104,22 @@ describe('fire-story 文字區間', () => {
   });
 });
 
+// 設計師回饋（2026-10-20）：4-1→4-2、4-2→4-3 不要淡入淡出，直接接下一段影片
+describe('C4 影片之間直接切換', () => {
+  it('A 版：4-2、4-3 的出現是硬切（0 → 1 的進度差不超過 0.0001）', () => {
+    for (const id of ['4-2', '4-3']) {
+      const kfs = fireStoryScene.elements.find((e) => e.id === id)!.keyframes;
+      const off = kfs.find((k) => k.opacity === 0)!.p;
+      const on = kfs.find((k) => k.opacity === 1)!.p;
+      expect(on - off, id).toBeLessThanOrEqual(0.0001);
+    }
+  });
+
+  it('B 版：序列的 fade 為 0', () => {
+    expect(fireStoryAutoScene.sequence!.fade).toBe(0);
+  });
+});
+
 describe('B 版序列', () => {
   const seq = fireStoryAutoScene.sequence!;
 

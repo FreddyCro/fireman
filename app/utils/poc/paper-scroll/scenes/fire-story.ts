@@ -25,6 +25,8 @@ const video = (name: string): SpriteConfig => ({
 interface SlideOpts {
   /** 淡入區間；沒有就是一開始就在 */
   fadeIn?: [number, number];
+  /** 在此進度硬切出現（不淡入）；設計師要影片之間直接接 */
+  cutIn?: number;
   /** 一開始隱藏，顯示與否交給 sequence */
   hidden?: boolean;
   /** 下一張完全蓋住後就不畫（opacity 0），省繪製 */
@@ -44,7 +46,10 @@ function slide(id: string, sprite: SpriteConfig, o: SlideOpts): ElementConfig {
     else kfs.push(k);
   };
   if (o.hidden) push({ p: 0, opacity: 0 });
-  else if (o.fadeIn) {
+  else if (o.cutIn !== undefined) {
+    push({ p: o.cutIn, opacity: 0 });
+    push({ p: o.cutIn + 0.0001, opacity: 1 });
+  } else if (o.fadeIn) {
     push({ p: o.fadeIn[0], opacity: 0 });
     push({ p: o.fadeIn[1], opacity: 1, ease: 'inOut' });
   } else push({ p: 0, opacity: 1 });
@@ -120,10 +125,11 @@ function c4(variant: FireStoryVariant): Pick<SceneConfig, 'elements' | 'sequence
           hideAt: 0.81,
           playback: { mode: 'scroll', range: [0.73, 0.8] },
         }),
-        slide('4-2', video('4-2'), { layer: 13, fadeIn: [0.8, 0.81], hideAt: 0.87, playback: { mode: 'loop' } }),
+        // 設計師回饋（2026-10-20）：影片之間直接切，不淡入淡出。上一支留到 hideAt 才隱藏沒關係，被不透明的下一支蓋住
+        slide('4-2', video('4-2'), { layer: 13, cutIn: 0.8, hideAt: 0.87, playback: { mode: 'loop' } }),
         slide('4-3', video('4-3'), {
           layer: 14,
-          fadeIn: [0.86, 0.87],
+          cutIn: 0.86,
           hideAt: 0.95,
           playback: { mode: 'scroll', range: [0.865, 0.91] },
         }),
@@ -142,7 +148,8 @@ function c4(variant: FireStoryVariant): Pick<SceneConfig, 'elements' | 'sequence
         { trigger: AUTO_T1, play: '4-1', then: '4-2' },
         { trigger: AUTO_T3, play: '4-3' },
       ],
-      fade: 400,
+      // 設計師回饋（2026-10-20）：影片之間直接切，不淡入淡出
+      fade: 0,
     },
   };
 }

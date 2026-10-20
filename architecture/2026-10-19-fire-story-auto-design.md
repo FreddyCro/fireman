@@ -18,8 +18,10 @@
 
 | 區 | 進入條件 | 進區時 | 影片播完後 |
 |---|---|---|---|
-| 區 0 | `p ≥ 0.75`（4-1 淡入完成處） | 4-1 從頭原速播放 | 交叉淡化到 4-2 開始 loop |
-| 區 1 | `p ≥ 0.86` | 4-3 從頭原速播放，4-2 交叉淡出 | 淡到黑底 |
+| 區 0 | `p ≥ 0.75`（4-1 淡入完成處） | 4-1 從頭原速播放 | 直接切到 4-2 開始 loop |
+| 區 1 | `p ≥ 0.86` | 4-3 從頭原速播放，直接蓋掉 4-2 | 淡到黑底（沒有下一支影片時才淡） |
+
+影片之間**不淡入淡出**（設計師 2026-10-20 回饋：不要影格重疊，直接接下一段），所以 `sequence.fade = 0`；引擎仍保留 `fade` 參數，之後要回頭比較只要改數字。A 版的 4-2、4-3 同樣改成硬切（`cutIn`）。
 
 規則：
 1. **正向進區 → 該區影片從 0 播放**。包含重新整理後直接落在區 1、或一次跳過區 0。
@@ -32,7 +34,7 @@
 ## 引擎擴充（向下相容；door-fire、A 版不受影響）
 
 - `PlaybackConfig` 加 `{ mode: 'trigger' }`：影片不自己 scrub／loop，由序列控制 `play()` 與重置；`syncVideo` 對這種模式不動作。
-- `SceneConfig.sequence?: { steps: { trigger, play, then? }[], fade?: ms }`，`steps` 依 `trigger` 遞增；`fade` 預設 400。
+- `SceneConfig.sequence?: { steps: { trigger, play, then? }[], fade?: ms }`，`steps` 依 `trigger` 遞增；`fade` 預設 400，fire-story 設 0（硬切）。
 - 新檔 `sequence.ts`（純函式）：
   - `stepFor(steps, p)`：目前所在區（`-1` = 尚未進入）。
   - `advanceSequence(prev, cfg, { p, now, ended, reduceMotion })` → `{ state, events }`；`events` 是 `play`／`reset` 指令，由 `PaperScene` 套到影片元素。
