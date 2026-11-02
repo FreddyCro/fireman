@@ -5,11 +5,12 @@
 //   paced（C 版 /poc/fire-story-paced）：B 版的播放方式 + 紐時式節奏（觸發點沒有文字、區段比影片長），跑道較長。
 // 文字在頁面的 DOM overlay。分鏡進度見 architecture/2026-10-19-fire-story-design.md、2026-10-19-fire-story-auto-design.md
 // 與 2026-10-22-fire-story-paced-design.md。
-import { clamp01, EASE } from '../keyframes';
-import type { SequenceState } from '../sequence';
-import type { ElementConfig, Keyframe, PlaybackConfig, SceneConfig, SpriteConfig } from '../types';
+import { clamp01, EASE } from '../../../paper-scroll/keyframes';
+import type { SequenceState } from '../../../paper-scroll/sequence';
+import type { ElementConfig, Keyframe, PlaybackConfig, SceneConfig, SpriteConfig } from '../../../paper-scroll/types';
 
-const DIR = '/poc/fire-story';
+// 素材已移到正式的 hero 目錄，與 /poc/fire-story* 共用
+const DIR = '/img/hero';
 const W = 1080;
 const H = 1920;
 const CENTER: [number, number] = [0.5, 0.5];

@@ -1,8 +1,8 @@
 <!-- sticky 舞台 + canvas。跑道高度 trackVh（vh），舞台 100lvh；文字 overlay 由 slot 提供並拿到 progress。 -->
 <script setup lang="ts">
-import type { ModeOverride } from '~/utils/poc/paper-scroll/scene';
-import { usePaperScene } from '~/composables/poc/usePaperScene';
-import type { SceneConfig } from '~/utils/poc/paper-scroll/types';
+import type { ModeOverride } from '~/utils/paper-scroll/scene';
+import { usePaperScene } from '~/composables/usePaperScene';
+import type { SceneConfig } from '~/utils/paper-scroll/types';
 
 const props = withDefaults(defineProps<{ scene: SceneConfig; trackVh?: number; debug?: boolean }>(), {
   trackVh: 600,
@@ -43,7 +43,7 @@ const overlayStyle = computed(() => {
         class="paper-stage__safe"
         :style="{ height: `${viewport.safeHeight}px` }"
       />
-      <PocPaperDebug
+      <PaperDebug
         v-if="debug"
         v-model:override="override"
         v-model:show-safe="showSafe"

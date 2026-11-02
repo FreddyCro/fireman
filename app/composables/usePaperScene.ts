@@ -3,11 +3,11 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import type { Ref } from 'vue';
-import { loadStrip, loadVideo } from '~/utils/poc/paper-scroll/assets';
-import { PaperScene, type LoadedStrip, type ModeOverride } from '~/utils/poc/paper-scroll/scene';
-import type { SequenceState } from '~/utils/poc/paper-scroll/sequence';
-import type { SceneConfig } from '~/utils/poc/paper-scroll/types';
-import { fitCanvas, visibleDesignRect, watchViewport, type ViewportInfo } from '~/utils/poc/paper-scroll/viewport';
+import { loadStrip, loadVideo } from '~/utils/paper-scroll/assets';
+import { PaperScene, type LoadedStrip, type ModeOverride } from '~/utils/paper-scroll/scene';
+import type { SequenceState } from '~/utils/paper-scroll/sequence';
+import type { SceneConfig } from '~/utils/paper-scroll/types';
+import { fitCanvas, visibleDesignRect, watchViewport, type ViewportInfo } from '~/utils/paper-scroll/viewport';
 
 export interface UsePaperSceneOptions {
   track: Ref<HTMLElement | null>;

@@ -9,8 +9,8 @@ import {
   PaperScene,
   sortByLayer,
   type ElementRuntime,
-} from '../app/utils/poc/paper-scroll/scene';
-import type { ElementConfig, SceneConfig } from '../app/utils/poc/paper-scroll/types';
+} from '../app/utils/paper-scroll/scene';
+import type { ElementConfig, SceneConfig } from '../app/utils/paper-scroll/types';
 
 const sprite = { src: 'a.svg', frames: 4, cellW: 240, cellH: 320 };
 

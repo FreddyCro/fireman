@@ -5,8 +5,8 @@ import {
   sequenceOpacities,
   stepFor,
   type SequenceState,
-} from '../app/utils/poc/paper-scroll/sequence';
-import type { SequenceConfig } from '../app/utils/poc/paper-scroll/types';
+} from '../app/utils/paper-scroll/sequence';
+import type { SequenceConfig } from '../app/utils/paper-scroll/types';
 
 const cfg: SequenceConfig = {
   steps: [

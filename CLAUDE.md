@@ -32,12 +32,25 @@
 
 讀取 Figma 時，優先使用 Figma MCP（`mcp__claude_ai_Figma__*` 工具），避免直接呼叫 Figma API。
 
+## 元件目錄
+
+沿用 udn-75 的編號 section 資料夾慣例：
+
+- 首頁每個 section 一個資料夾：`app/components/NN.<name>/`（`01.hero`、`02.no-trapped`…），編號 ＝ 頁面順序。新增資料夾要在 `nuxt.config.ts` 的 `components` 補一筆 `pathPrefix: false`。
+- 資料夾內檔名一律以 section 名開頭：主元件 `NoTrapped.vue`，子元件 `NoTrappedChart.vue`。
+- section 的根元素是 `<section id="<name>" class="sec-<name>">`；`app/pages/index.vue` 只負責依序擺放 section。
+- 兩個以上 section 共用的元件搬到 `ui/`；section 之間不互相 import。元件只放在 section 資料夾、`ui/`、`poc/` 三處。
+- section 專用的 utils / composables 用同一個資料夾名：`app/utils/02.no-trapped/`、`app/composables/02.no-trapped/`（巢狀不會 auto-import，需明確 import）。素材放 `public/img/<name>/`（如 `public/img/hero/`）。
+- section 的樣式寫在同資料夾的 `<Name>.scss`，由元件的 script `import './Hero.scss'`；元件檔不放 `<style>`。
+- 捲動動畫引擎（canvas 幻燈片＋影片序列）：`app/utils/paper-scroll/`、`app/composables/usePaperScene.ts`、`ui/PaperStage.vue`。場景設定放各 section 的 utils（如 `app/utils/01.hero/scene.ts`），POC 場景在 `app/utils/poc/paper-scroll/scenes/`。
+- header（`ui/AppHeader.vue`）用 common-components 的 `NmdHeader` 系列，選單項目在 `locales/header.json`。
+
 ## 文案（所謂的 i18n）
 
 本專案**沒有多語系切換**，`i18n` 一詞在這裡指的是**文案外部化慣例**，且**不使用任何 i18n 套件**（無 `@nuxtjs/i18n`、無 `vue-i18n`），新增 section 時也不要引入。
 
 - 文字依 section / component 分檔放 `app/locales/*.json`，元件直接 `import str from '~/locales/section-x.json'`。
-- 共用檔：`meta.json`（SEO，在 `app.vue` 用 `useSeoMeta` 消費）、`footer.json`（製作團隊名單）。
+- 共用檔：`meta.json`（SEO，在 `app.vue` 用 `useSeoMeta` 消費）、`header.json`（漢堡選單）、`footer.json`（製作團隊名單）。
 - `meta.json` 的圖片路徑用 runtimeConfig 的 `APP_ASSETS_PATH` 組：`${ASSETS_PATH}/${meta.metaImage}`。
 - runtime 才組出來的素材路徑一律經過 `useAssetUrl()`。
 

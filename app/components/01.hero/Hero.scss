@@ -1,0 +1,117 @@
+// overlay 是 container（PaperStage），字級用 cqw 跟著畫面寬（手機滿版、桌機置中直欄）縮放
+.sec-hero {
+  background: #000;
+  color: #fff;
+
+  &__incident,
+  &__line,
+  &__caption,
+  &__roll,
+  &__title {
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin: 0;
+    padding: 0 6cqw;
+    text-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
+    will-change: opacity, transform;
+  }
+
+  &__incident {
+    top: 12cqh;
+  }
+
+  &__incident-date {
+    margin: 0 0 6cqw;
+    font-family: 'Noto Serif TC', 'Songti TC', 'PMingLiU', serif;
+    font-size: 7cqw;
+    letter-spacing: 0.08em;
+    text-align: center;
+  }
+
+  &__incident-body {
+    margin: 0;
+    font-size: 4cqw;
+    line-height: 2;
+    letter-spacing: 0.12em;
+  }
+
+  &__line {
+    top: 50%;
+    display: flex;
+    flex-direction: column;
+    gap: 2cqw;
+    font-size: 4cqw;
+    letter-spacing: 0.12em;
+    text-align: center;
+    translate: 0 -50%;
+  }
+
+  &__caption {
+    bottom: 8cqh;
+    font-size: 3.6cqw;
+    line-height: 1.9;
+    letter-spacing: 0.1em;
+  }
+
+  // 教訓文字的時間淡入層：4-3 淡黑（400ms）後再花 600ms 淡入；關閉時立刻開始淡出。
+  // 內層 .sec-hero__line 的 inline opacity 只管跟著捲動退場，兩層分開才不會讓 transition 拖慢捲動驅動的變化。
+  &__lesson {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 600ms ease;
+
+    &--on {
+      opacity: 1;
+      transition-delay: 400ms;
+    }
+  }
+
+  // 片尾字幕式名單：元素頂端貼齊容器底部，--t 0→1 時往上移「自身高度 + 容器高度」，
+  // 所以 t=1 時名單底部剛好離開容器頂端（translateY 的 % 是相對自身高度）
+  &__roll {
+    top: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4cqw;
+    text-align: center;
+    letter-spacing: 0.1em;
+    transform: translateY(calc(var(--t) * (-100% - 100cqh)));
+  }
+
+  &__roll-head {
+    display: flex;
+    flex-direction: column;
+    gap: 1cqw;
+    margin: 0;
+    font-size: 4.4cqw;
+  }
+
+  &__roll-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6cqw;
+    margin: 0;
+    padding: 0;
+    font-size: 3.6cqw;
+    line-height: 1.6;
+    list-style: none;
+  }
+
+  &__title {
+    top: 50%;
+    font-family: 'Noto Serif TC', 'Songti TC', 'PMingLiU', serif;
+    font-size: 15cqw;
+    font-weight: 900;
+    line-height: 1.15;
+    text-align: center;
+    writing-mode: vertical-rl;
+    margin: 0 auto;
+    width: fit-content;
+    padding: 0;
+    translate: 0 -50%;
+  }
+}

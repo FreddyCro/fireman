@@ -1,7 +1,7 @@
 <!-- fire-story 各版本共用的頁面內容：variant 決定 C4 用 scrub（A）、trigger（B）或 paced（C）場景、文字時間軸，以及幾處文字的顯示門檻。 -->
 <script setup lang="ts">
 import str from '~/locales/poc/fire-story.json';
-import { clamp01, EASE } from '~/utils/poc/paper-scroll/keyframes';
+import { clamp01, EASE } from '~/utils/paper-scroll/keyframes';
 import {
   FIRE_STORY_TRACK_VH,
   c4Done,
@@ -15,7 +15,7 @@ import {
   type FireStoryCue,
   type FireStoryVariant,
 } from '~/utils/poc/paper-scroll/scenes/fire-story';
-import type { SequenceState } from '~/utils/poc/paper-scroll/sequence';
+import type { SequenceState } from '~/utils/paper-scroll/sequence';
 
 const props = defineProps<{ variant: FireStoryVariant }>();
 
@@ -100,7 +100,7 @@ const titleStyle = (p: number, seq: Seq) => {
       </ul>
     </section>
 
-    <PocPaperStage :scene="scene" :track-vh="trackVh" :debug="debug">
+    <PaperStage :scene="scene" :track-vh="trackVh" :debug="debug">
       <template #default="{ progress, sequence }">
         <div class="fire-story__incident" :style="textStyle('incident', progress)">
           <p class="fire-story__incident-date">{{ str.incident.date }}</p>
@@ -125,7 +125,7 @@ const titleStyle = (p: number, seq: Seq) => {
         </div>
         <h2 class="fire-story__title" :style="titleStyle(progress, sequence)">{{ str.pageTitle }}</h2>
       </template>
-    </PocPaperStage>
+    </PaperStage>
 
     <section class="fire-story__outro">
       <p>{{ str.outro }}</p>

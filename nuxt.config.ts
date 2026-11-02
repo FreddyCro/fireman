@@ -21,6 +21,15 @@ export default defineNuxtConfig({
   },
 
   components: [
+    // 首頁各 section 一個編號資料夾（沿用 udn-75 慣例）：編號 ＝ 頁面順序，檔案總管也照這個順序排。
+    // 資料夾內檔名一律以 section 名開頭（NoTrapped.vue、NoTrappedChart.vue…），
+    // pathPrefix: false 讓元件名只取檔名，不帶 02.no-trapped 這種前綴。
+    // 中間要插段落時用字母後綴（如 02a.xxx）：'.' < 'a'，會排在 02.xxx 之後、03.xxx 之前。
+    { path: '~/components/01.hero', pathPrefix: false },
+    { path: '~/components/02.no-trapped', pathPrefix: false },
+    { path: '~/components/03.violation', pathPrefix: false },
+    { path: '~/components/04.manpower', pathPrefix: false },
+    { path: '~/components/05.ending', pathPrefix: false },
     // ui/：跨 section 共用的無語意元件。pathPrefix: false 讓元件名只取檔名，
     // 否則會被最後那筆 '~/components'（預設 pathPrefix: true）命名成 <UiXxx>。
     { path: '~/components/ui', pathPrefix: false },

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applySequenceEvent, videoEnded } from '../app/utils/poc/paper-scroll/video';
+import { applySequenceEvent, videoEnded } from '../app/utils/paper-scroll/video';
 
 // node 沒有 HTMLVideoElement，用最小假物件；只碰 loop／paused／currentTime／duration／ended／play／pause
 function fakeVideo(over: Partial<{ ended: boolean; paused: boolean; loop: boolean; currentTime: number; duration: number }> = {}) {
