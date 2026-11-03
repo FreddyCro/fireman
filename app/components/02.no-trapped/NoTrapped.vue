@@ -29,7 +29,7 @@ const cases = CASES.map((c) => {
 
     <p>導致火災殉職的因素相當複雜，本專題訪問張賢龢博士、消防員工作權益促進會(以下簡稱消促會)秘書長林昶志與副理事長鄭少書，從進入火場原則、廠房工安到人力調度與日常勤務，綜合探討如何記取教訓、降低風險、保住人命。</p>
 
-    <h2 class="sec-no-trapped__title">{{ str.title }}</h2>
+    <BlurTitle class="sec-no-trapped__title" :svg="str.titleSvg" :alt="str.title" :label="str.titleLabel" pin />
     <NoTrappedCase v-for="(c, i) in cases" :key="c.id" :data="c" :reverse="i % 2 === 1" />
   </section>
 </template>

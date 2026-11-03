@@ -1,0 +1,80 @@
+// 滾動 blur 大標（ui/BlurTitle.vue）。小標白底黑字置中，大標 SVG 置中縮放。
+// pin 模式：根元素是 --track vh 高的跑道，stage sticky 貼頂、100svh、內容垂直置中。
+.blur-title {
+  text-align: center;
+
+  &--pin {
+    height: calc(var(--track) * 1vh);
+  }
+
+  &__stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 0 16px;
+
+    @include rwd-min('tablet') {
+      gap: 20px;
+    }
+  }
+
+  &--pin &__stage {
+    position: sticky;
+    top: 0;
+    justify-content: center;
+    box-sizing: border-box;
+    height: 100vh;
+    height: 100svh;
+  }
+
+  &__label {
+    margin: 0;
+    padding: 4px 10px;
+    font-size: 13px;
+    line-height: 1.5;
+    letter-spacing: 0.05em;
+    color: #000;
+    background: #fff;
+
+    @include rwd-min('tablet') {
+      padding: 5px 14px;
+      font-size: 15px;
+    }
+  }
+
+  &__title {
+    width: 100%;
+    max-width: 320px;
+    margin: 0;
+
+    @include rwd-min('tablet') {
+      max-width: 520px;
+    }
+
+    @include rwd-min('pc') {
+      max-width: 640px;
+    }
+  }
+
+  &__img {
+    display: block;
+    width: 100%;
+    height: auto;
+    will-change: filter;
+  }
+
+  // 沒有 SVG 時的文字版
+  &__text {
+    display: block;
+    font-family: 'Noto Serif TC', 'Songti TC', 'PMingLiU', serif;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.4;
+    will-change: filter;
+
+    @include rwd-min('tablet') {
+      font-size: 36px;
+    }
+  }
+}

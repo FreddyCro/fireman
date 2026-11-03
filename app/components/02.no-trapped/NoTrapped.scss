@@ -6,20 +6,20 @@ $orange: #f07a2c;
   padding: 64px 16px;
   color: #fff;
   background: #000;
-  overflow: hidden;
+  // 擋 scrapbook 旋轉素材撐出橫向捲軸。用 clip 而不是 hidden：hidden 會把 section 變成
+  // scroll container，裡面的 position: sticky（圖表 pin）就失效。
+  overflow-x: clip;
 
   @include rwd-min('tablet') {
     padding: 96px 40px;
   }
 
+  // 大標改用 ui/BlurTitle（SVG + 滾動 blur），這裡只管與案例的間距
   &__title {
     margin: 0 0 48px;
-    font-family: $serif;
-    font-size: 28px;
-    text-align: center;
 
     @include rwd-min('tablet') {
-      font-size: 36px;
+      margin-bottom: 64px;
     }
   }
 
