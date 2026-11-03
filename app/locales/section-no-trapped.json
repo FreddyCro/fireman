@@ -1,3 +1,115 @@
 {
-  "title": "無人受困的火場"
+  "title": "無人受困的火場",
+  "cases": [
+    {
+      "id": "taichung",
+      "date": "2019年10月3日",
+      "title": ["台中大雅工廠火災無人受困", "仍派員入內"],
+      "body": "凌晨1點48分，台中大雅一處鐵皮工廠發生火災，現場已確認「無人受困」，指揮官仍派消防員入內搜尋火源，不到10分鐘濃煙瞬間聚集，2人受困火場不幸殉職。",
+      "count": { "number": "2", "label": "人殉職" },
+      "aspect": { "mob": "4/5", "pc": "6/5" },
+      "media": [
+        {
+          "type": "image",
+          "src": "/img/scrapbook/case1/firefighter_p02_pic02_1030.png",
+          "alt": "2019年10月4日聯合報剪報〈沒人受困 也要控制火勢〉",
+          "ratio": "746/762",
+          "mob": { "x": 4, "y": 30, "w": 70, "r": -4 },
+          "pc": { "x": 4, "y": 6, "w": 52, "r": -4 }
+        },
+        {
+          "type": "image",
+          "src": "/img/scrapbook/case1/firefighter_p02_pic01_1030.jpg",
+          "alt": "台中大雅鐵皮工廠火災現場",
+          "ratio": "674/380",
+          "mob": { "x": 30, "y": 2, "w": 66, "r": 3 },
+          "pc": { "x": 46, "y": 2, "w": 50, "r": 3 }
+        },
+        {
+          "type": "video",
+          "src": "/img/scrapbook/case1/firefighter_p02_video0103_1030.mp4",
+          "alt": "台中大雅鐵皮工廠火災現場影片",
+          "ratio": "16/9",
+          "mob": { "x": 10, "y": 64, "w": 80, "r": -2 },
+          "pc": { "x": 30, "y": 54, "w": 62, "r": -2 }
+        }
+      ]
+    },
+    {
+      "id": "pingtung",
+      "date": "2023年9月22日",
+      "title": ["屏東明揚國際", "堆放超量化學品釀火災"],
+      "body": "下午5點31分，明揚國際倉庫爆發大火，因明揚公司違法堆放超出安全管制量30倍化學品「C40-P發泡劑」於倉庫，且室溫超過安全存放溫度，4位消防員入內搶救受困民眾，遭爆裂波震飛、火焰燒身及飛濺物擊傷，送醫後不治身亡。",
+      "count": { "number": "4", "label": "人殉職" },
+      "aspect": { "mob": "4/5", "pc": "6/5" },
+      "media": [
+        {
+          "type": "video",
+          "src": "/img/scrapbook/case2/firefighter_p03_video0103_1030.mp4",
+          "alt": "明揚國際倉庫火災空拍影片",
+          "ratio": "3/2",
+          "mob": { "x": 40, "y": 0, "w": 58, "r": 2 },
+          "pc": { "x": 52, "y": 0, "w": 46, "r": 2 }
+        },
+        {
+          "type": "image",
+          "src": "/img/scrapbook/case2/firefighter_p03_pic0102_1030.png",
+          "alt": "明揚國際後火災案專案報告：消防人員經爆炸引發火災波及而死亡",
+          "ratio": "1377/504",
+          "mob": { "x": 2, "y": 24, "w": 92, "r": -3 },
+          "pc": { "x": 4, "y": 30, "w": 72, "r": -3 }
+        },
+        {
+          "type": "image",
+          "src": "/img/scrapbook/case2/firefighter_p03_pic0101_1030.jpg",
+          "alt": "明揚國際倉庫火災現場",
+          "ratio": "909/618",
+          "mob": { "x": 8, "y": 52, "w": 84, "r": 2 },
+          "pc": { "x": 30, "y": 52, "w": 58, "r": 2 }
+        }
+      ]
+    },
+    {
+      "id": "taoyuan",
+      "date": "2018年4月28日",
+      "title": ["桃園敬鵬工業破壞防火區劃", "造成火勢輕易延燒"],
+      "body": "晚間21點28分，敬鵬工廠冒出熊熊火焰，敬鵬工業違法將排風管貫穿牆面，擅自破壞防火區劃，以及到場後才發現存放不明溶劑，消防員獲取資訊與現況不符而受困火場，最終無法及時撤出導致6人罹難。",
+      "count": { "number": "6", "label": "人殉職" },
+      "aspect": { "mob": "2/3", "pc": "6/5" },
+      "media": [
+        {
+          "type": "video",
+          "src": "/img/scrapbook/case3/firefighter_p03_video0204_1030.mp4",
+          "alt": "敬鵬工廠火災現場影片",
+          "ratio": "16/9",
+          "mob": { "x": 10, "y": 0, "w": 72, "r": -2 },
+          "pc": { "x": 56, "y": 52, "w": 42, "r": 3 }
+        },
+        {
+          "type": "image",
+          "src": "/img/scrapbook/case3/firefighter_p03_pic0201_1030.png",
+          "alt": "全方位檢討策進專案報告：違章建築及防火區劃的破壞導致火災蔓延",
+          "ratio": "904/550",
+          "mob": { "x": 2, "y": 20, "w": 94, "r": 2 },
+          "pc": { "x": 2, "y": 0, "w": 62, "r": -2 }
+        },
+        {
+          "type": "image",
+          "src": "/img/scrapbook/case3/firefighter_p03_pic0202_1030.jpg",
+          "alt": "破壞防火區劃的排風管貫穿至室外",
+          "ratio": "550/767",
+          "mob": { "x": 52, "y": 56, "w": 44, "r": 3 },
+          "pc": { "x": 0, "y": 44, "w": 32, "r": 2 }
+        },
+        {
+          "type": "image",
+          "src": "/img/scrapbook/case3/firefighter_p03_pic0203_1030.jpg",
+          "alt": "敬鵬工廠火災現場",
+          "ratio": "410/610",
+          "mob": { "x": 6, "y": 60, "w": 40, "r": -4 },
+          "pc": { "x": 34, "y": 42, "w": 28, "r": -4 }
+        }
+      ]
+    }
+  ]
 }
