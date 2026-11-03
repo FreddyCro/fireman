@@ -2,6 +2,24 @@
   "title": "Fires With No One Trapped",
   "titleLabel": "Fireground command should put firefighter safety first",
   "titleSvg": "",
+  "chart": {
+    "_chart": "Pinned chart: switches to slides[1] past the halfway point; fires / deaths are legend labels (with numbers)",
+    "slides": {
+      "before": {
+        "title": "Major fires fell year after year in the previous decade",
+        "fires": "Major fires: 35,085",
+        "deaths": "Firefighter deaths: 17"
+      },
+      "after": {
+        "title": "Fewer major fires in the past decade, yet more firefighters died?",
+        "fires": "Major fires: 14,234",
+        "deaths": "Firefighter deaths: 27"
+      }
+    },
+    "alt": "Chart of major fires and firefighter deaths by year",
+    "note": "Note: On January 1, 2017, the National Fire Agency revised its fire classification standard and broadened the scope of statistics. A1: fires causing deaths. A2: fires causing injuries, involving disputes or arson, or with causes under investigation.",
+    "source": "Source: National Fire Agency statistical yearbooks"
+  },
   "zoomClose": "Close",
   "cases": {
     "taichung": {
