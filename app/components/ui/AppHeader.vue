@@ -7,10 +7,10 @@ import {
   NmdMenuItem,
   NmdProgressbar,
 } from '@udn-digital-center/common-components';
-import { shareURL_fb, shareURL_twitter, useLineShareUrl } from '@/utils/share';
-import strHeader from '@/locales/header.json';
+import { useShareUrls } from '@/utils/share';
 
-const lineHref = useLineShareUrl();
+const share = useShareUrls();
+const strHeader = useCopy().header;
 </script>
 
 <template>
@@ -19,9 +19,9 @@ const lineHref = useLineShareUrl();
     <NmdHeader>
       <ClientOnly>
         <NmdHeaderShare
-          :facebook="{ href: shareURL_fb }"
-          :line="{ href: lineHref, target: '_blank' }"
-          :twitter="{ href: shareURL_twitter }"
+          :facebook="{ href: share.fb }"
+          :line="{ href: share.line.value, target: '_blank' }"
+          :twitter="{ href: share.twitter }"
           twitter-icon="x"
         />
       </ClientOnly>

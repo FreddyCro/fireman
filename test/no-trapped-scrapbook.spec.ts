@@ -1,15 +1,27 @@
-// 02 無人受困的火場：scrapbook 素材與放大框計算
+// 02 無人受困的火場：scrapbook 素材、版面與文案對應、放大框計算
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import str from '../app/locales/section-no-trapped.json';
+import en from '../app/locales/en/section-no-trapped.json';
+import zh from '../app/locales/zh/section-no-trapped.json';
+import { CASES } from '../app/utils/02.no-trapped/cases';
 import { ZOOM_EXTRA, ZOOM_MARGIN, zoomRect } from '../app/utils/02.no-trapped/scrapbook';
 
-const media = str.cases.flatMap((c) => c.media);
+const media = CASES.flatMap((c) => c.media);
 
 describe('scrapbook 素材', () => {
   it.each(media)('$src 存在', (m) => {
     expect(existsSync(resolve(__dirname, '../public', `.${m.src}`))).toBe(true);
+  });
+
+  it.each([
+    ['zh', zh],
+    ['en', en],
+  ] as const)('%s：每個案例都有文案，每個素材都有 alt', (_, copy) => {
+    expect(Object.keys(copy.cases).sort()).toEqual(CASES.map((c) => c.id).sort());
+    for (const c of CASES) {
+      expect(Object.keys(copy.cases[c.id].alt).sort()).toEqual(c.media.map((m) => m.id).sort());
+    }
   });
 });
 

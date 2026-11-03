@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import str from '~/locales/section-ending.json';
+const str = useCopy().ending;
 </script>
 
 <template>

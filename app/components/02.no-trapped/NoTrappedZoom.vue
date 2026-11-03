@@ -21,6 +21,7 @@ const props = defineProps<{ item: ScrapbookItem | null; origin: ZoomOrigin | nul
 const emit = defineEmits<{ closed: [] }>();
 
 const assetUrl = useAssetUrl();
+const str = useCopy().noTrapped;
 const dialog = ref<HTMLDialogElement | null>(null);
 const figure = ref<HTMLElement | null>(null);
 const rect = ref<Rect | null>(null);
@@ -112,7 +113,7 @@ onBeforeUnmount(() => document.documentElement.classList.remove('is-zoom-open'))
         playsinline
         controls
       />
-      <button type="button" class="no-trapped-zoom__close" aria-label="關閉" @click="close">
+      <button type="button" class="no-trapped-zoom__close" :aria-label="str.zoomClose" @click="close">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
           <path d="M7 7l10 10M17 7L7 17" />
         </svg>

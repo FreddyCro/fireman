@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import str from '~/locales/section-manpower.json';
+const str = useCopy().manpower;
 </script>
 
 <template>

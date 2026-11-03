@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import str from '~/locales/section-violation.json';
+const str = useCopy().violation;
 </script>
 
 <template>

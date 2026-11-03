@@ -43,18 +43,22 @@
 - section 專用的 utils / composables 用同一個資料夾名：`app/utils/02.no-trapped/`、`app/composables/02.no-trapped/`（巢狀不會 auto-import，需明確 import）。素材放 `public/img/<name>/`（如 `public/img/hero/`）。
 - section 的樣式寫在同資料夾的 `<Name>.scss`，由元件的 script `import './Hero.scss'`；元件檔不放 `<style>`。
 - 捲動動畫引擎（canvas 幻燈片＋影片序列）：`app/utils/paper-scroll/`、`app/composables/usePaperScene.ts`、`ui/PaperStage.vue`。場景設定放各 section 的 utils（如 `app/utils/01.hero/scene.ts`），POC 場景在 `app/utils/poc/paper-scroll/scenes/`。
-- header（`ui/AppHeader.vue`）用 common-components 的 `NmdHeader` 系列，選單項目在 `locales/header.json`。
+- header（`ui/AppHeader.vue`）用 common-components 的 `NmdHeader` 系列，選單項目在 `locales/{zh,en}/header.json`。
 
-## 文案（所謂的 i18n）
+## 文案與中英文（i18n）
 
-本專案**沒有多語系切換**，`i18n` 一詞在這裡指的是**文案外部化慣例**，且**不使用任何 i18n 套件**（無 `@nuxtjs/i18n`、無 `vue-i18n`），新增 section 時也不要引入。
+中文在 `/`、英文在 `/en`，用 `@nuxtjs/i18n`（`prefix_except_default`）處理路由、`<html lang>`、hreflang。**沒有動態切換**，不偵測瀏覽器語言，也不放語系切換鈕。
 
-- 文字依 section / component 分檔放 `app/locales/*.json`，元件直接 `import str from '~/locales/section-x.json'`。
-- 共用檔：`meta.json`（SEO，在 `app.vue` 用 `useSeoMeta` 消費）、`header.json`（漢堡選單）、`footer.json`（製作團隊名單）。
+- **文案不走 vue-i18n 的 messages**（不用 `$t` / `tm` / `rt`）：依 section / component 分檔放 `app/locales/zh/*.json` 與 `app/locales/en/*.json`（兩邊檔名、結構相同），元件用 `const str = useCopy().noTrapped` 取目前語系的那份。新增檔案要在 `app/composables/useCopy.ts` 的 zh、en 各補一筆。
+- `test/copy.spec.ts` 會檢查中英文的檔案、key 結構一致，且英文沒有殘留中文；`_` 開頭的 key 是備註，不檢查。
+- 只放文案；中英文共用的版面資料（素材路徑、位置、角度）放 section 的 utils，以 id 對應文案（例：`app/utils/02.no-trapped/cases.ts`）。
+- 共用檔：`meta.json`（SEO，在 `app.vue` 用 `useSeoMeta` 消費；分享網址由 `useShareUrls()` 依語系組）、`header.json`（漢堡選單）、`footer.json`（製作團隊名單；`NmdAuthor` 的 slot 名就是顯示的職稱）。
 - `meta.json` 的圖片路徑用 runtimeConfig 的 `APP_ASSETS_PATH` 組：`${ASSETS_PATH}/${meta.metaImage}`。
 - runtime 才組出來的素材路徑一律經過 `useAssetUrl()`。
+- POC 頁只有中文：page 加 `definePageMeta({ i18n: false })`，文案仍直接 import `app/locales/poc/*.json`。
+- `/en` 沒有連結可讓 crawler 抓到，已列在 `nuxt.config.ts` 的 `nitro.prerender.routes`。
 
-目的是把中文文案與排版分離，方便編輯校稿。
+目的是把文案與排版分離，方便編輯校稿。
 
 ## 環境變數與部署
 

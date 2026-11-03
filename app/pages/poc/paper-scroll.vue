@@ -4,6 +4,9 @@ import { sampleNumber } from '~/utils/paper-scroll/keyframes';
 import { doorFireScene } from '~/utils/poc/paper-scroll/scenes/door-fire';
 import type { Keyframe } from '~/utils/paper-scroll/types';
 
+// POC 只有中文版，不產生 /en/poc/*
+definePageMeta({ i18n: false });
+
 useHead({ title: str.title });
 
 // 結尾文字：黑底停頓後淡入、微微上移（y 這裡是 px）

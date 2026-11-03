@@ -8,14 +8,19 @@ export interface ScrapbookPlace {
   r: number;
 }
 
-export interface ScrapbookItem {
+/** 素材版面（中英文共用），id 對應文案裡的 alt */
+export interface ScrapbookLayout {
+  id: string;
   type: 'image' | 'video';
   src: string;
-  alt: string;
   /** CSS aspect-ratio，如 "746/762"；先佔好高度，影片載入前不會跳版 */
   ratio: string;
   mob: ScrapbookPlace;
   pc: ScrapbookPlace;
+}
+
+export interface ScrapbookItem extends ScrapbookLayout {
+  alt: string;
 }
 
 export interface Rect {

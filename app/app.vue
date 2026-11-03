@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import meta from '~/locales/meta.json';
 import { useTracking } from '~/utils/tracking';
 
+const meta = useCopy().meta;
 const config = useRuntimeConfig();
 const APP_MODE = config.public.APP_MODE;
 const ASSETS_PATH = config.public.APP_ASSETS_PATH;
@@ -18,6 +18,14 @@ useSeoMeta({
   keywords: meta.metaKeywords,
   robots: APP_MODE === 'production' ? 'index, follow' : 'noindex, nofollow',
 });
+
+// <html lang>、hreflang（/ ↔ /en 互指）、og:locale；POC 頁（i18n: false）不輸出
+const i18nHead = useLocaleHead();
+useHead(() => ({
+  htmlAttrs: { lang: i18nHead.value.htmlAttrs.lang },
+  link: i18nHead.value.link,
+  meta: i18nHead.value.meta,
+}));
 
 // favicon（UDN）
 useHead({

@@ -1,10 +1,19 @@
 <script setup lang="ts">
-import str from '~/locales/section-no-trapped.json';
-import type { ScrapbookItem } from '~/utils/02.no-trapped/scrapbook';
+import { CASES } from '~/utils/02.no-trapped/cases';
 import './NoTrapped.scss';
 
-// JSON 的 type 推不出字面值聯集，在這裡收斂成 ScrapbookItem
-const cases = str.cases.map((c) => ({ ...c, media: c.media as ScrapbookItem[] }));
+const str = useCopy().noTrapped;
+
+// 版面（CASES）與文案以 id 對應，素材 alt 依素材 id 取
+const cases = CASES.map((c) => {
+  const copy = str.cases[c.id];
+  return {
+    ...copy,
+    id: c.id,
+    aspect: c.aspect,
+    media: c.media.map((m) => ({ ...m, alt: copy.alt[m.id as keyof typeof copy.alt] ?? '' })),
+  };
+});
 </script>
 
 <template>
