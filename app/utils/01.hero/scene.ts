@@ -1,5 +1,6 @@
 // Hero「消防員之死」分鏡，來自 POC C 版（/poc/fire-story-paced，設計見 architecture/2026-10-22-fire-story-paced-design.md）。
 // C1～C3 是整張不透明的直式插畫，以幻燈片交叉淡化串接（只有 2-1 有 zoom）；
+// 3-6 之後插一支橫式影片（3-6v，設計師測試中）：綁捲動 scrub、所有載具都 cover 滿版，前後硬切；
 // C4 是動畫師交的影片：捲到觸發點自動原速播放、播完接下一段，由 sequence 控制，影片之間硬切。
 // 文字在 Hero.vue 的 DOM overlay，與幻燈片同一條進度軸。
 //
@@ -14,7 +15,7 @@ const H = 1920;
 const CENTER: [number, number] = [0.5, 0.5];
 
 /** 跑道長度（vh）；捲動距離 = 跑道 − 一個畫面（舞台 100lvh） */
-export const HERO_TRACK_VH = 2200;
+export const HERO_TRACK_VH = 2600;
 const DIST = HERO_TRACK_VH - 100;
 
 /** 捲動位置（vh）→ 進度 p */
@@ -25,12 +26,12 @@ const range = (a: number, b: number): [number, number] => [at(a), at(b)];
 const EPS = 0.0001;
 
 const image = (name: string): SpriteConfig => ({ src: `${DIR}/${name}.webp`, frames: 1, cellW: W, cellH: H, anchor: CENTER });
-const video = (name: string): SpriteConfig => ({
+const video = (name: string, cellW = W, cellH = H): SpriteConfig => ({
   src: `${DIR}/${name}.mp4`,
   kind: 'video',
   frames: 1,
-  cellW: W,
-  cellH: H,
+  cellW,
+  cellH,
   anchor: CENTER,
 });
 
@@ -38,6 +39,8 @@ const video = (name: string): SpriteConfig => ({
 interface SlideOpts {
   /** 淡入區間；沒有就是一開始就在 */
   fadeIn?: [number, number];
+  /** 在這個位置硬切出現（之前隱藏） */
+  cutIn?: number;
   /** 一開始隱藏，顯示與否交給 sequence */
   hidden?: boolean;
   /** 下一張完全蓋住後就不畫（opacity 0），省繪製 */
@@ -46,6 +49,7 @@ interface SlideOpts {
   zoom?: [number, number][];
   layer: number;
   playback?: PlaybackConfig;
+  cover?: ElementConfig['cover'];
 }
 
 /** 一張滿版的幻燈片：疊在上一張上面淡入，被下一張蓋滿後隱藏 */
@@ -57,7 +61,11 @@ function slide(id: string, sprite: SpriteConfig, o: SlideOpts): ElementConfig {
     else kfs.push(k);
   };
   if (o.hidden) push({ p: 0, opacity: 0 });
-  else if (o.fadeIn) {
+  else if (o.cutIn !== undefined) {
+    push({ p: 0, opacity: 0 });
+    push({ p: at(o.cutIn) - EPS, opacity: 0 });
+    push({ p: at(o.cutIn), opacity: 1 });
+  } else if (o.fadeIn) {
     push({ p: at(o.fadeIn[0]), opacity: 0 });
     push({ p: at(o.fadeIn[1]), opacity: 1, ease: 'inOut' });
   } else push({ p: 0, opacity: 1 });
@@ -68,11 +76,15 @@ function slide(id: string, sprite: SpriteConfig, o: SlideOpts): ElementConfig {
   for (const [vh, scale] of o.zoom ?? []) push({ p: at(vh), scale, ease: 'inOut' });
   kfs.sort((a, b) => a.p - b.p);
   kfs[0] = { ...kfs[0]!, x: 0.5, y: 0.5, layer: o.layer };
-  return { id, sprite, frameMode: 'hold', holdFrame: 0, playback: o.playback, keyframes: kfs };
+  return { id, sprite, frameMode: 'hold', holdFrame: 0, playback: o.playback, cover: o.cover, keyframes: kfs };
 }
 
-/** 4-1 淡入完成、觸發播放（3 秒）；C4 的段落都以這裡為起點排 */
-const T1 = 1275;
+/** 3-6v 硬切出現、開始 scrub 的位置 */
+const V0 = 1275;
+/** 3-6v 的 scrub 長度：8.5 秒 205 格，約每 2vh 一格 */
+const V_LEN = 400;
+/** 3-6v 到最後一格、硬切 4-1 並觸發播放（3 秒）；C4 的段落都以這裡為起點排 */
+const T1 = V0 + V_LEN;
 /** 觸發 4-3（3 秒），硬切蓋掉 4-2 loop。區 0 拉到 400vh，參考紐時 6 秒影片配約 360vh */
 const T3 = T1 + 400;
 
@@ -117,11 +129,19 @@ export const heroScene: SceneConfig = {
     slide('3-4', image('3-4'), { layer: 9, fadeIn: [901, 969], hideAt: 1054 }),
     slide('3-5', image('3-5'), { layer: 10, fadeIn: [986, 1054], hideAt: 1207 }),
     // 3-6 與 2-2 是同一張圖
-    slide('3-6', image('2-2'), { layer: 11, fadeIn: [1139, 1207], hideAt: T1 }),
-    // C4：4-1 用關鍵幀從 3-6 淡入，越過 T1 後交給序列；4-2、4-3 完全由序列控制
-    slide('4-1', video('4-1'), { layer: 12, fadeIn: [1224, T1], playback: { mode: 'trigger' } }),
-    slide('4-2', video('4-2'), { layer: 13, hidden: true, playback: { mode: 'loop' } }),
-    slide('4-3', video('4-3'), { layer: 14, hidden: true, playback: { mode: 'trigger' } }),
+    slide('3-6', image('2-2'), { layer: 11, fadeIn: [1139, 1207], hideAt: V0 }),
+    // 3-6v 橫式影片（測試）：前後硬切、捲動 scrub；不跟場景的 smart，桌機滿版、平板手機高度頂滿左右裁
+    slide('3-6v', video('3-6-test', 1920, 1080), {
+      layer: 12,
+      cutIn: V0,
+      hideAt: T1,
+      cover: 'stage',
+      playback: { mode: 'scroll', range: range(V0, T1) },
+    }),
+    // C4：4-1 在 T1 硬切蓋掉 3-6v，越過 T1 後交給序列；4-2、4-3 完全由序列控制
+    slide('4-1', video('4-1'), { layer: 13, cutIn: T1, playback: { mode: 'trigger' } }),
+    slide('4-2', video('4-2'), { layer: 14, hidden: true, playback: { mode: 'loop' } }),
+    slide('4-3', video('4-3'), { layer: 15, hidden: true, playback: { mode: 'trigger' } }),
   ],
   sequence: {
     steps: [

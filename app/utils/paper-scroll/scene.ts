@@ -120,6 +120,11 @@ export function cellRect(sprite: SpriteConfig, state: DrawState, design: { w: nu
   return { x: state.x * design.w - ax * w, y: state.y * design.h - ay * h, w, h };
 }
 
+/** cover: 'stage' 元素的縮放：格子蓋滿舞台（CSS px） */
+export function stageCoverScale(sprite: SpriteConfig, stage: { w: number; h: number }): number {
+  return Math.max(stage.w / sprite.cellW, stage.h / sprite.cellH);
+}
+
 export function clipRect(clip: ClipConfig, ref: Rect, expand: number): Rect {
   const [fx, fy, fw, fh] = clip.rect;
   const w = ref.w * fw;
@@ -246,12 +251,14 @@ export class PaperScene {
     ctx.fillStyle = sampleColor(this.config.background, p);
     ctx.fillRect(0, 0, stage.w, stage.h);
     const t = this.transform(stage);
-    ctx.translate(t.offsetX, t.offsetY);
-    ctx.scale(t.scale, t.scale);
-    // contain 時放大的元素不能溢出設計畫布（cover 時設計畫布本來就蓋滿舞台，裁不到看得見的部分）
-    ctx.beginPath();
-    ctx.rect(0, 0, design.w, design.h);
-    ctx.clip();
+    /** 設計畫布座標；contain 時放大的元素不能溢出設計畫布（cover 時設計畫布本來就蓋滿舞台，裁不到看得見的部分） */
+    const enterDesign = () => {
+      ctx.translate(t.offsetX, t.offsetY);
+      ctx.scale(t.scale, t.scale);
+      ctx.beginPath();
+      ctx.rect(0, 0, design.w, design.h);
+      ctx.clip();
+    };
 
     const order = sortByLayer(
       this.runtimes.map((rt) => ({ rt, layer: this.resolved.get(rt.config.id)?.state.layer ?? 0 })),
@@ -265,6 +272,17 @@ export class PaperScene {
       const clip = r.cfg.clip ? this.clipFor(r.cfg.clip) : null;
 
       ctx.save();
+      if (r.cfg.cover === 'stage') {
+        const s = stageCoverScale(r.cfg.sprite, stage) * r.state.scale;
+        ctx.globalAlpha = r.state.opacity;
+        ctx.translate(stage.w / 2, stage.h / 2);
+        ctx.scale(s, s);
+        const pr = strip.pixelRatio;
+        ctx.drawImage(strip.source, rt.frame * cellW * pr, 0, cellW * pr, cellH * pr, -cellW / 2, -cellH / 2, cellW, cellH);
+        ctx.restore();
+        continue;
+      }
+      enterDesign();
       if (clip) {
         ctx.beginPath();
         ctx.rect(clip.x, clip.y, clip.w, clip.h);

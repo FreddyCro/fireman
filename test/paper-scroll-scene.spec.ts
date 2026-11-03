@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   cellRect,
+  stageCoverScale,
   clipExpand,
   clipRect,
   drawStateOf,
@@ -162,5 +163,19 @@ describe('PaperScene + sequence', () => {
     s.update({ progress: 0.6, scrollPx: 0, dtMs: 16, nowMs: 216 }); // 淡化完成
     expect(s.stateOf('a')?.opacity).toBe(0);
     expect(s.stateOf('b')?.opacity).toBe(1);
+  });
+});
+
+describe('stageCoverScale', () => {
+  const landscape = { src: 'v.mp4', kind: 'video' as const, frames: 1, cellW: 1920, cellH: 1080 };
+
+  it('桌機寬螢幕：寬度蓋滿', () => {
+    expect(stageCoverScale(landscape, { w: 2560, h: 1080 })).toBeCloseTo(2560 / 1920);
+  });
+
+  it('手機直立：高度頂滿、左右裁', () => {
+    const s = stageCoverScale(landscape, { w: 390, h: 844 });
+    expect(s).toBeCloseTo(844 / 1080);
+    expect(1920 * s).toBeGreaterThan(390);
   });
 });

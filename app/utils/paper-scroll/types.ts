@@ -86,6 +86,11 @@ export interface ElementConfig {
   clip?: ClipConfig;
   /** 僅 sprite.kind = 'video' */
   playback?: PlaybackConfig;
+  /**
+   * stage：不跟場景的 fit，格子自己 cover 整個舞台、置中裁切（例：桌機直式窄欄中間插一支橫式滿版影片）。
+   * x、y 不作用，scale、opacity 照常；不受設計畫布的裁切範圍限制
+   */
+  cover?: 'stage';
   keyframes: Keyframe[];
   triggers?: Trigger[];
 }

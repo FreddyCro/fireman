@@ -98,3 +98,20 @@ describe('hero 文案', () => {
     expect(str.roll.names).toHaveLength(Number.parseInt(str.count.number));
   });
 });
+
+describe('hero 3-6v 捲動影片（設計師測試）', () => {
+  const el = heroScene.elements.find((e) => e.id === '3-6v')!;
+
+  it('綁捲動 scrub，播到最後一格就是第一個觸發點（硬切 4-1）', () => {
+    expect(el.cover).toBe('stage');
+    expect(el.playback?.mode).toBe('scroll');
+    const range = el.playback!.mode === 'scroll' ? el.playback!.range : [0, 0];
+    expect(range[1]).toBe(t1);
+    expect(vh(range[1]) - vh(range[0])).toBe(400);
+  });
+
+  it('scrub 區間內沒有文字', () => {
+    const [a, b] = el.playback!.mode === 'scroll' ? el.playback!.range : [0, 0];
+    for (const { in: [i], out: [, o] } of Object.values(HERO_TEXT)) expect(o <= a || i >= b).toBe(true);
+  });
+});
