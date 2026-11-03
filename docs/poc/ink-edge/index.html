@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ink-edge 火線效果復刻</title>
+<style>
+  :root{
+    --ink: #FFFFFF;
+    --ground: #0B0B0B;
+    --ground-soft: #171717;
+    --accent: #E4007C;
+    --line: rgba(0,0,0,.12);
+    --mono: ui-monospace, "SFMono-Regular", "JetBrains Mono", Menlo, Consolas, monospace;
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin:0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ---------- 1. 外層 wrapper（對應原站的 q 元件） ---------- */
+  .wrap{ position: relative; }
+  .stage{ position: relative; }
+
+  /* ---------- 2. Hero：黑底 ---------- */
+  .hero{
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+    background:
+      radial-gradient(1200px 600px at 50% 10%, #1a1a1a 0%, transparent 70%),
+      var(--ground);
+  }
+  .hero::after{
+    /* 點陣紋理，方便看出墨層是「蓋在內容之上」 */
+    content:"";
+    position:absolute; inset:0;
+    background-image: radial-gradient(rgba(255,255,255,.14) 1px, transparent 1px);
+    background-size: 22px 22px;
+    pointer-events:none;
+  }
+  .eyebrow{
+    font-size: 10px; letter-spacing: .28em; text-transform: uppercase;
+    color: rgba(255,255,255,.55); margin: 0 0 20px;
+  }
+  .hero h1{
+    margin:0; font-size: clamp(34px, 7vw, 76px); font-weight: 800;
+    letter-spacing: -.03em; line-height: 1.02; text-wrap: balance;
+  }
+  .hero p{
+    margin: 22px auto 0; max-width: 46ch; font-weight: 300;
+    color: rgba(255,255,255,.66);
+  }
+  .hero code{ color:#fff; background:rgba(255,255,255,.12); padding:1px 5px; border-radius:3px; font-size:12px; }
+  .scroll-hint{
+    position:absolute; bottom: 28px; left:50%; transform: translateX(-50%);
+    font-size: 10px; letter-spacing: .24em; text-transform: uppercase;
+    color: rgba(255,255,255,.4);
+  }
+
+  /* ---------- 3. 墨層：整個效果的本體 ---------- */
+  .ink-layer{
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 100vh;
+    z-index: 40;
+    overflow: hidden;          /* 把外擴的部分裁掉 */
+    pointer-events: none;
+  }
+  .ink-filtered{
+    position: absolute;
+    top: -300px; left: -300px; right: -300px; bottom: -300px;  /* 外擴 > 位移量 */
+    filter: url(#ink-edge);
+    will-change: transform;
+  }
+  .ink-filtered.no-bleed{ top:0; left:0; right:0; bottom:0; }
+  .ink-filtered.no-filter{ filter: none; }
+  .ink-fill{
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%; height: 100%;
+    background: var(--ink);
+    transform-origin: bottom;
+    transform: scaleY(0);
+    will-change: transform;
+  }
+
+  /* ---------- 4. 下一段：白底內容 ---------- */
+  .next{
+    position: relative;
+    background: var(--ink);
+    color: #171717;
+    padding: 96px 24px 160px;
+  }
+  .col{ max-width: 760px; margin: 0 auto; }
+  .next h2{
+    font-size: clamp(24px, 4vw, 40px); font-weight: 800; letter-spacing: -.02em;
+    margin: 0 0 8px; text-wrap: balance;
+  }
+  .next h3{ font-size: 15px; font-weight: 700; margin: 40px 0 10px; letter-spacing:-.01em; }
+  .next p{ color: #444; font-weight: 300; margin: 0 0 14px; }
+  .next code{ background: rgba(0,0,0,.06); padding: 1px 5px; border-radius: 3px; font-size: 12px; }
+  .lede{ font-size: 15px; color: #222; }
+
+  ol.steps{ counter-reset: s; list-style: none; padding: 0; margin: 24px 0 0; }
+  ol.steps li{
+    display: grid; grid-template-columns: 34px 1fr; gap: 14px;
+    padding: 16px 0; border-top: 1px solid var(--line);
+  }
+  ol.steps li::before{
+    counter-increment: s; content: counter(s, decimal-leading-zero);
+    font-size: 11px; color: var(--accent); font-weight: 700; padding-top: 3px;
+  }
+  ol.steps b{ display:block; font-size: 13px; margin-bottom: 4px; }
+  ol.steps span{ color:#555; font-weight: 300; font-size: 13px; }
+
+  /* ---------- 5. 分解圖：filter 每一步 ---------- */
+  .pipeline{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px; margin-top: 20px;
+  }
+  .tile{ margin: 0; }
+  .tile figcaption{
+    font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+    color: #777; margin-top: 8px;
+  }
+  .tile figcaption b{ display:block; color:#171717; letter-spacing: 0; text-transform:none; font-size: 12px; }
+  .tile-box{
+    position: relative; height: 150px; overflow: hidden;
+    background: var(--ground-soft); border-radius: 2px;
+  }
+  .tile-inner{ position:absolute; top:-70px; left:-70px; right:-70px; bottom:-70px; }
+  .tile-fill{
+    position:absolute; left:0; right:0; bottom:70px; height:62px; background: var(--ink);
+  }
+
+  /* ---------- 6. 控制面板 ---------- */
+  .panel{
+    position: fixed; left: 16px; bottom: 16px; z-index: 100;
+    width: 290px; max-width: calc(100vw - 32px);
+    background: rgba(12,12,12,.93);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,.16);
+    border-radius: 8px;
+    backdrop-filter: blur(8px);
+    font-size: 11px;
+  }
+  .panel-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 10px 12px; cursor: pointer; user-select:none;
+    letter-spacing: .16em; text-transform: uppercase; font-size: 10px;
+    color: rgba(255,255,255,.7);
+  }
+  .panel-head b{ color:#fff; letter-spacing:0; text-transform:none; font-size:12px; }
+  .panel-body{ padding: 4px 12px 14px; display: grid; gap: 11px; }
+  .panel[data-open="false"] .panel-body{ display:none; }
+  .ctrl{ display:grid; gap:4px; }
+  .ctrl-row{ display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
+  .ctrl-row label{ color: rgba(255,255,255,.72); }
+  .ctrl-row output{ font-variant-numeric: tabular-nums; color: var(--accent); }
+  input[type="range"]{ width:100%; accent-color: var(--accent); margin:0; }
+  .toggles{
+    display:flex; flex-wrap: wrap; gap: 10px 14px; align-items:center;
+    padding-top: 10px; border-top: 1px solid rgba(255,255,255,.14);
+  }
+  .toggles label{ display:flex; align-items:center; gap:6px; color: rgba(255,255,255,.8); cursor:pointer; }
+  .toggles input{ accent-color: var(--accent); }
+  .readout{
+    display:flex; justify-content:space-between; font-variant-numeric: tabular-nums;
+    color: rgba(255,255,255,.5); border-top: 1px solid rgba(255,255,255,.14); padding-top: 8px;
+  }
+  .readout b{ color: rgba(255,255,255,.9); font-weight: 500; }
+  .btn-reset{
+    background: none; border: 1px solid rgba(255,255,255,.25); color:#fff;
+    font-family: var(--mono); font-size: 10px; padding: 5px 9px; border-radius: 4px; cursor: pointer;
+    letter-spacing: .08em; text-transform: uppercase; margin-left: auto;
+  }
+  .btn-reset:hover{ border-color: var(--accent); color: var(--accent); }
+  :focus-visible{ outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  @media (max-width: 520px){
+    .panel{ left: 8px; right: 8px; width: auto; bottom: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== filter 定義：0x0 的 SVG，只是拿來放 defs ========== -->
+<svg width="0" height="0" aria-hidden="true" style="position:absolute;pointer-events:none">
+  <defs>
+    <!-- 主效果：與 weevolveit.com 的 #ink-edge 完全相同 -->
+    <filter id="ink-edge" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence id="f-turb" type="fractalNoise" baseFrequency="0.015 0.02" numOctaves="3" seed="7" result="noise"/>
+      <feDisplacementMap id="f-disp" in="SourceGraphic" in2="noise" scale="220" xChannelSelector="R" yChannelSelector="G" result="displaced"/>
+      <feGaussianBlur id="f-pre" in="displaced" stdDeviation="1.8" result="presmooth"/>
+      <feComponentTransfer in="presmooth" result="cut">
+        <feFuncA id="f-cut" type="discrete" tableValues="0 0 0 0 0 1 1 1 1 1"/>
+      </feComponentTransfer>
+      <feGaussianBlur id="f-post" in="cut" stdDeviation="0.4"/>
+    </filter>
+
+    <!-- 分解圖用（參數依小圖尺寸等比縮小） -->
+    <filter id="step-2" x="-30%" y="-30%" width="160%" height="160%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.05 0.06" numOctaves="3" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="60" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="step-3" x="-30%" y="-30%" width="160%" height="160%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.05 0.06" numOctaves="3" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="60" xChannelSelector="R" yChannelSelector="G" result="d"/>
+      <feGaussianBlur in="d" stdDeviation="1.6"/>
+    </filter>
+    <filter id="step-4" x="-30%" y="-30%" width="160%" height="160%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.05 0.06" numOctaves="3" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="60" xChannelSelector="R" yChannelSelector="G" result="d"/>
+      <feGaussianBlur in="d" stdDeviation="1.6" result="p"/>
+      <feComponentTransfer in="p">
+        <feFuncA type="discrete" tableValues="0 0 0 0 0 1 1 1 1 1"/>
+      </feComponentTransfer>
+    </filter>
+    <filter id="step-5" x="-30%" y="-30%" width="160%" height="160%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.05 0.06" numOctaves="3" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="60" xChannelSelector="R" yChannelSelector="G" result="d"/>
+      <feGaussianBlur in="d" stdDeviation="1.6" result="p"/>
+      <feComponentTransfer in="p" result="c">
+        <feFuncA type="discrete" tableValues="0 0 0 0 0 1 1 1 1 1"/>
+      </feComponentTransfer>
+      <feGaussianBlur in="c" stdDeviation="0.5"/>
+    </filter>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <div class="stage">
+
+    <!-- children[0]：被墨蓋住的那一段 -->
+    <section class="hero">
+      <p class="eyebrow">[ SVG filter teardown ]</p>
+      <h1>一塊白方塊<br>假裝成一灘墨</h1>
+      <p>向下捲動。真正在動的只有 <code>scaleY</code>，
+         所有鋸齒邊緣都是 <code>#ink-edge</code> 這串 filter 算出來的。</p>
+      <div class="scroll-hint">scroll ↓</div>
+    </section>
+
+    <!-- 墨層：絕對定位在 stage 底部 -->
+    <div class="ink-layer" aria-hidden="true">
+      <div class="ink-filtered" id="inkFiltered">
+        <div class="ink-fill" id="inkFill"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- children[1]：ScrollTrigger 的 trigger -->
+  <section class="next" id="trigger">
+    <div class="col">
+      <h2>拆解 #ink-edge</h2>
+      <p class="lede">白色方塊本身是筆直的矩形。之所以看起來像墨水暈開、像火線燒過，是因為整層被套了一串 SVG filter —— 而「位移一塊純色實心矩形」時，只有邊界會顯現出來。</p>
+
+      <ol class="steps">
+        <li><b>feTurbulence · fractalNoise</b><span>baseFrequency 0.015 / 0.02，週期約 50–66px，所以是大塊雲狀噪聲而不是細沙。它決定邊緣起伏的尺度。</span></li>
+        <li><b>feDisplacementMap · scale 220</b><span>用噪聲 R 通道推 x、G 通道推 y，位移量 ±110px。純色內部推來推去看不出差別，只有邊界被扭曲 —— 這是整個效果的核心。</span></li>
+        <li><b>feGaussianBlur 1.8 + feFuncA discrete</b><span>先模糊成漸層，再用 alpha 閾值切成 0 或 1。柔邊被「切」成硬邊；脫離主體的白色孤島與黑色孔洞，就是這一步產生的。</span></li>
+        <li><b>feGaussianBlur 0.4</b><span>只是給那條硬邊補抗鋸齒，不然會有階梯感。</span></li>
+      </ol>
+
+      <h3>每一步長什麼樣</h3>
+      <div class="pipeline">
+        <figure class="tile">
+          <div class="tile-box"><div class="tile-inner"><div class="tile-fill"></div></div></div>
+          <figcaption><b>原始</b>SourceGraphic</figcaption>
+        </figure>
+        <figure class="tile">
+          <div class="tile-box"><div class="tile-inner" style="filter:url(#step-2)"><div class="tile-fill"></div></div></div>
+          <figcaption><b>+ 位移</b>feDisplacementMap</figcaption>
+        </figure>
+        <figure class="tile">
+          <div class="tile-box"><div class="tile-inner" style="filter:url(#step-3)"><div class="tile-fill"></div></div></div>
+          <figcaption><b>+ 模糊</b>feGaussianBlur</figcaption>
+        </figure>
+        <figure class="tile">
+          <div class="tile-box"><div class="tile-inner" style="filter:url(#step-4)"><div class="tile-fill"></div></div></div>
+          <figcaption><b>+ 二值化</b>feFuncA discrete</figcaption>
+        </figure>
+        <figure class="tile">
+          <div class="tile-box"><div class="tile-inner" style="filter:url(#step-5)"><div class="tile-fill"></div></div></div>
+          <figcaption><b>+ 抗鋸齒</b>最終結果</figcaption>
+        </figure>
+      </div>
+
+      <h3>幾個踩得到的坑</h3>
+      <p>1. 被 filter 的必須是<b>單一純色實心區塊</b>，不然裡面的內容也會一起被扭爛。</p>
+      <p>2. 容器要<b>外擴大於位移量</b>（這裡 300px &gt; 110px），再由外層 <code>overflow:hidden</code> 裁切，否則兩側會露出直線切口 —— 把控制面板的「關閉外擴」打開就看得到。</p>
+      <p>3. <code>blur → discrete</code> 的順序不能顛倒：只有 blur 得到霧邊，只有 displacement 得到平滑波浪邊，兩者相疊才是硬質的墨痕。</p>
+      <p>4. 噪聲場固定在 filter region 座標上，白塊上緣往上掃過這片靜態噪聲，所以邊緣形狀會<b>隨高度不斷變形</b>，而不是一個固定形狀往上平移。</p>
+      <p>5. SVG filter 每幀重新光柵化整個 filter region，成本不低。原站因此加了 <code>will-change:transform</code>、<code>pointer-events:none</code>，並在手機與 <code>prefers-reduced-motion</code> 下整段跳過。</p>
+
+      <h3>捲動對應</h3>
+      <p>原站用 GSAP ScrollTrigger <code>scrub</code>，<code>start:"top bottom"</code>、<code>end:"top -25%"</code>。這份復刻用原生 scroll + rAF 算出同一條進度，再套上同一個自訂 ease：前 2% 的捲動直接跳到 18%，讓墨線一出現就有可見厚度，之後線性推到滿版。</p>
+    </div>
+  </section>
+</div>
+
+<!-- 控制面板 -->
+<div class="panel" id="panel" data-open="true">
+  <div class="panel-head" id="panelHead">
+    <b>ink-edge 參數</b>
+    <span id="panelToggle">收合 −</span>
+  </div>
+  <div class="panel-body">
+    <div class="ctrl">
+      <div class="ctrl-row"><label for="bfx">baseFrequency X</label><output id="bfxOut">—</output></div>
+      <input type="range" id="bfx" min="0.002" max="0.08" step="0.001">
+    </div>
+    <div class="ctrl">
+      <div class="ctrl-row"><label for="bfy">baseFrequency Y</label><output id="bfyOut">—</output></div>
+      <input type="range" id="bfy" min="0.002" max="0.08" step="0.001">
+    </div>
+    <div class="ctrl">
+      <div class="ctrl-row"><label for="oct">numOctaves</label><output id="octOut">—</output></div>
+      <input type="range" id="oct" min="1" max="6" step="1">
+    </div>
+    <div class="ctrl">
+      <div class="ctrl-row"><label for="scale">displacement scale</label><output id="scaleOut">—</output></div>
+      <input type="range" id="scale" min="0" max="400" step="5">
+    </div>
+    <div class="ctrl">
+      <div class="ctrl-row"><label for="pre">前置模糊 stdDeviation</label><output id="preOut">—</output></div>
+      <input type="range" id="pre" min="0" max="8" step="0.1">
+    </div>
+    <div class="ctrl">
+      <div class="ctrl-row"><label for="thr">alpha 閾值</label><output id="thrOut">—</output></div>
+      <input type="range" id="thr" min="0.05" max="0.95" step="0.05">
+    </div>
+    <div class="ctrl">
+      <div class="ctrl-row"><label for="post">抗鋸齒模糊</label><output id="postOut">—</output></div>
+      <input type="range" id="post" min="0" max="3" step="0.1">
+    </div>
+    <div class="ctrl">
+      <div class="ctrl-row"><label for="prog">手動進度（覆蓋捲動）</label><output id="progOut">—</output></div>
+      <input type="range" id="prog" min="0" max="1" step="0.005">
+    </div>
+    <div class="toggles">
+      <label><input type="checkbox" id="manual"> 手動</label>
+      <label><input type="checkbox" id="nofilter"> 關閉 filter</label>
+      <label><input type="checkbox" id="nobleed"> 關閉外擴</label>
+      <button class="btn-reset" id="reset" type="button">重設</button>
+    </div>
+    <div class="readout">
+      <span>scroll p <b id="rawOut">0.000</b></span>
+      <span>eased <b id="easedOut">0.000</b></span>
+    </div>
+  </div>
+</div>
+
+<script src="./ink-edge.js"></script>
+</body>
+</html>

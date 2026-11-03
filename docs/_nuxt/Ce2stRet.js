@@ -1,0 +1,1 @@
+import{Y as e,w as t}from"./bR6pn0Xh.js";import{t as n}from"./BDNMzG2s.js";import{t as r}from"./BytpGMQS.js";var i={};function a(n,i){let a=r;return e(),t(a,{variant:`paced`})}var o=n(i,[[`render`,a]]);export{o as default};
