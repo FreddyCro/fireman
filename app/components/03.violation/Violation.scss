@@ -1,0 +1,21 @@
+// 03 工安違法事實：section 根樣式。案例版面在 ui/CaseStory.scss。
+.sec-violation {
+  padding: 64px 16px;
+  color: #fff;
+  background: #000;
+  // 擋 scrapbook 旋轉素材撐出橫向捲軸。用 clip 而不是 hidden：hidden 會把 section 變成
+  // scroll container，裡面的 position: sticky 就失效。
+  overflow-x: clip;
+
+  @include rwd-min('tablet') {
+    padding: 96px 40px;
+  }
+
+  &__title {
+    margin: 0 0 48px;
+
+    @include rwd-min('tablet') {
+      margin-bottom: 64px;
+    }
+  }
+}

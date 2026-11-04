@@ -11,6 +11,7 @@ import zhHero from '~/locales/zh/section-hero.json';
 import zhManpower from '~/locales/zh/section-manpower.json';
 import zhNoTrapped from '~/locales/zh/section-no-trapped.json';
 import zhViolation from '~/locales/zh/section-violation.json';
+import zhUi from '~/locales/zh/ui.json';
 import enFooter from '~/locales/en/footer.json';
 import enHeader from '~/locales/en/header.json';
 import enMeta from '~/locales/en/meta.json';
@@ -19,11 +20,13 @@ import enHero from '~/locales/en/section-hero.json';
 import enManpower from '~/locales/en/section-manpower.json';
 import enNoTrapped from '~/locales/en/section-no-trapped.json';
 import enViolation from '~/locales/en/section-violation.json';
+import enUi from '~/locales/en/ui.json';
 
 const zh = {
   meta: zhMeta,
   header: zhHeader,
   footer: zhFooter,
+  ui: zhUi,
   hero: zhHero,
   noTrapped: zhNoTrapped,
   violation: zhViolation,
@@ -38,6 +41,7 @@ const en: Copy = {
   meta: enMeta,
   header: enHeader,
   footer: enFooter,
+  ui: enUi,
   hero: enHero,
   noTrapped: enNoTrapped,
   violation: enViolation,

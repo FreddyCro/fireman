@@ -1,5 +1,5 @@
 <!--
-  可拖曳的剪報／照片／影片（參考 mosbyfiles case-folder）。拖曳範圍＝父元素（NoTrappedCase 的 article）。
+  可拖曳的剪報／照片／影片（參考 mosbyfiles case-folder），跨 section 共用。拖曳範圍＝父元素（CaseStory 的 article）。
   外層 __item 給 Draggable 平移、內層 __paper 負責旋轉，兩者的 transform 才不會互相覆蓋。
   點擊（沒拖動）放大：滑鼠裝置直接開；觸控裝置第一下先亮放大符號，再點一次才開。
 -->
@@ -8,8 +8,8 @@ import { gsap } from 'gsap';
 import { Draggable } from 'gsap/Draggable';
 import { InertiaPlugin } from 'gsap/InertiaPlugin';
 import { TABLET_BREAKPOINTS } from '~/utils/constants';
-import type { ScrapbookItem } from '~/utils/02.no-trapped/scrapbook';
-import './NoTrappedScrapbook.scss';
+import type { ScrapbookItem } from '~/utils/scrapbook';
+import './Scrapbook.scss';
 
 const props = defineProps<{ items: ScrapbookItem[]; aspect: { mob: string; pc: string } }>();
 
@@ -105,10 +105,10 @@ onMounted(() => {
     activeCursor: 'grabbing',
     onDragStart() {
       active.value = null;
-      (this.target as HTMLElement).classList.add('no-trapped-scrapbook__item--dragging');
+      (this.target as HTMLElement).classList.add('scrapbook__item--dragging');
     },
     onRelease() {
-      (this.target as HTMLElement).classList.remove('no-trapped-scrapbook__item--dragging');
+      (this.target as HTMLElement).classList.remove('scrapbook__item--dragging');
     },
     onClick() {
       onClick(Number((this.target as HTMLElement).dataset.index));
@@ -144,23 +144,23 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div ref="root" class="no-trapped-scrapbook" :style="boardStyle">
+  <div ref="root" class="scrapbook" :style="boardStyle">
     <div
       v-for="(it, i) in items"
       :key="it.src"
       ref="itemEls"
-      class="no-trapped-scrapbook__item"
+      class="scrapbook__item"
       :class="{
-        'no-trapped-scrapbook__item--active': active === i,
-        'no-trapped-scrapbook__item--zoomed': zoomed === i,
+        'scrapbook__item--active': active === i,
+        'scrapbook__item--zoomed': zoomed === i,
       }"
       :style="itemStyle(it)"
       :data-index="i"
     >
-      <div ref="paperEls" class="no-trapped-scrapbook__paper">
+      <div ref="paperEls" class="scrapbook__paper">
         <img
           v-if="it.type === 'image'"
-          class="no-trapped-scrapbook__media"
+          class="scrapbook__media"
           :src="assetUrl(it.src)"
           :alt="it.alt"
           draggable="false"
@@ -169,7 +169,7 @@ onBeforeUnmount(() => {
         <video
           v-else
           ref="videoEls"
-          class="no-trapped-scrapbook__media"
+          class="scrapbook__media"
           :src="assetUrl(it.src)"
           :aria-label="it.alt"
           muted
@@ -177,8 +177,8 @@ onBeforeUnmount(() => {
           playsinline
           preload="metadata"
         />
-        <div class="no-trapped-scrapbook__veil" :style="veilStyle(it)" aria-hidden="true">
-          <svg class="no-trapped-scrapbook__icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.5">
+        <div class="scrapbook__veil" :style="veilStyle(it)" aria-hidden="true">
+          <svg class="scrapbook__icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.5">
             <circle cx="21" cy="21" r="12" />
             <path d="M30 30l9 9M21 15v12M15 21h12" stroke-linecap="round" />
           </svg>
@@ -186,6 +186,6 @@ onBeforeUnmount(() => {
       </div>
     </div>
 
-    <NoTrappedZoom :item="zoomed === null ? null : items[zoomed]!" :origin="zoomOrigin" :wide="wide" @closed="zoomed = null" />
+    <ScrapbookZoom :item="zoomed === null ? null : items[zoomed]!" :origin="zoomOrigin" :wide="wide" @closed="zoomed = null" />
   </div>
 </template>

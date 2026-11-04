@@ -5,7 +5,7 @@
 -->
 <script setup lang="ts">
 import { gsap } from 'gsap';
-import { zoomRect, type Rect, type ScrapbookItem } from '~/utils/02.no-trapped/scrapbook';
+import { zoomRect, type Rect, type ScrapbookItem } from '~/utils/scrapbook';
 
 interface ZoomOrigin {
   cx: number;
@@ -21,7 +21,7 @@ const props = defineProps<{ item: ScrapbookItem | null; origin: ZoomOrigin | nul
 const emit = defineEmits<{ closed: [] }>();
 
 const assetUrl = useAssetUrl();
-const str = useCopy().noTrapped;
+const str = useCopy().ui;
 const dialog = ref<HTMLDialogElement | null>(null);
 const figure = ref<HTMLElement | null>(null);
 const rect = ref<Rect | null>(null);
@@ -69,14 +69,14 @@ watch(
 const close = () => {
   if (closing || !props.origin || !rect.value) return;
   closing = true;
-  dialog.value!.classList.add('no-trapped-zoom--leaving');
+  dialog.value!.classList.add('scrapbook-zoom--leaving');
   gsap.to(figure.value, {
     ...fromOrigin(props.origin, rect.value),
     duration: 0.35,
     ease: 'power3.inOut',
     onComplete: () => {
       dialog.value!.close();
-      dialog.value!.classList.remove('no-trapped-zoom--leaving');
+      dialog.value!.classList.remove('scrapbook-zoom--leaving');
       document.documentElement.classList.remove('is-zoom-open');
       rect.value = null;
       emit('closed');
@@ -99,12 +99,12 @@ onBeforeUnmount(() => document.documentElement.classList.remove('is-zoom-open'))
 </script>
 
 <template>
-  <dialog ref="dialog" class="no-trapped-zoom" :aria-label="item?.alt" @cancel="onCancel" @click="onBackdrop">
-    <figure v-if="item && rect" ref="figure" class="no-trapped-zoom__figure" :style="figureStyle">
-      <img v-if="item.type === 'image'" class="no-trapped-zoom__media" :src="assetUrl(item.src)" :alt="item.alt" />
+  <dialog ref="dialog" class="scrapbook-zoom" :aria-label="item?.alt" @cancel="onCancel" @click="onBackdrop">
+    <figure v-if="item && rect" ref="figure" class="scrapbook-zoom__figure" :style="figureStyle">
+      <img v-if="item.type === 'image'" class="scrapbook-zoom__media" :src="assetUrl(item.src)" :alt="item.alt" />
       <video
         v-else
-        class="no-trapped-zoom__media"
+        class="scrapbook-zoom__media"
         :src="assetUrl(item.src)"
         :aria-label="item.alt"
         autoplay
@@ -113,7 +113,7 @@ onBeforeUnmount(() => document.documentElement.classList.remove('is-zoom-open'))
         playsinline
         controls
       />
-      <button type="button" class="no-trapped-zoom__close" :aria-label="str.zoomClose" @click="close">
+      <button type="button" class="scrapbook-zoom__close" :aria-label="str.zoomClose" @click="close">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
           <path d="M7 7l10 10M17 7L7 17" />
         </svg>

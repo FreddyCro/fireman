@@ -1,4 +1,4 @@
-// 02 無人受困的火場：scrapbook（可拖曳的剪報／照片／影片）的資料型別與放大框計算。
+// scrapbook（可拖曳的剪報／照片／影片）：資料型別與放大框計算。ui/Scrapbook.vue、ui/ScrapbookZoom.vue 與各 section 的 cases.ts 共用。
 
 /** 素材在 board 上的位置：x / y / w 為 board 寬高的百分比，r 為旋轉角度（deg） */
 export interface ScrapbookPlace {
@@ -21,6 +21,14 @@ export interface ScrapbookLayout {
 
 export interface ScrapbookItem extends ScrapbookLayout {
   alt: string;
+}
+
+/** 單一案例的版面（ui/CaseStory.vue）：中英文共用，文案在各 section 的 locales 以 id 對應 */
+export interface CaseLayout {
+  id: string;
+  /** board 的 CSS aspect-ratio */
+  aspect: { mob: string; pc: string };
+  media: ScrapbookLayout[];
 }
 
 export interface Rect {

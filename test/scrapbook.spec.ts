@@ -1,16 +1,22 @@
-// 02 無人受困的火場：scrapbook 素材、版面與文案對應、放大框計算
+// scrapbook：02 / 03 兩個 section 的案例素材、版面與文案對應、放大框計算
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import en from '../app/locales/en/section-no-trapped.json';
-import zh from '../app/locales/zh/section-no-trapped.json';
-import { CASES } from '../app/utils/02.no-trapped/cases';
-import { ZOOM_EXTRA, ZOOM_MARGIN, zoomRect } from '../app/utils/02.no-trapped/scrapbook';
+import enNoTrapped from '../app/locales/en/section-no-trapped.json';
+import enViolation from '../app/locales/en/section-violation.json';
+import zhNoTrapped from '../app/locales/zh/section-no-trapped.json';
+import zhViolation from '../app/locales/zh/section-violation.json';
+import { CASES as NO_TRAPPED } from '../app/utils/02.no-trapped/cases';
+import { CASES as VIOLATION } from '../app/utils/03.violation/cases';
+import { ZOOM_EXTRA, ZOOM_MARGIN, zoomRect } from '../app/utils/scrapbook';
 
-const media = CASES.flatMap((c) => c.media);
+type CaseCopy = Record<string, { alt: Record<string, string> }>;
 
-describe('scrapbook 素材', () => {
-  it.each(media)('$src 存在', (m) => {
+describe.each([
+  ['02 no-trapped', NO_TRAPPED, zhNoTrapped.cases as CaseCopy, enNoTrapped.cases as CaseCopy],
+  ['03 violation', VIOLATION, zhViolation.cases as CaseCopy, enViolation.cases as CaseCopy],
+])('scrapbook 素材：%s', (_, cases, zh, en) => {
+  it.each(cases.flatMap((c) => c.media))('$src 存在', (m) => {
     expect(existsSync(resolve(__dirname, '../public', `.${m.src}`))).toBe(true);
   });
 
@@ -18,9 +24,9 @@ describe('scrapbook 素材', () => {
     ['zh', zh],
     ['en', en],
   ] as const)('%s：每個案例都有文案，每個素材都有 alt', (_, copy) => {
-    expect(Object.keys(copy.cases).sort()).toEqual(CASES.map((c) => c.id).sort());
-    for (const c of CASES) {
-      expect(Object.keys(copy.cases[c.id].alt).sort()).toEqual(c.media.map((m) => m.id).sort());
+    expect(Object.keys(copy).sort()).toEqual(cases.map((c) => c.id).sort());
+    for (const c of cases) {
+      expect(Object.keys(copy[c.id]!.alt).sort()).toEqual(c.media.map((m) => m.id).sort());
     }
   });
 });
