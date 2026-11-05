@@ -1,5 +1,7 @@
 {
   "title": "Safety Violations",
+  "titleLabel": "Firefighters are entering high-risk, non-compliant factories more often",
+  "titleSvg": "",
   "cases": {
     "pingtung": {
       "date": "September 22, 2023",
@@ -7,7 +9,7 @@
         "Pingtung: Ming Yang International",
         "stored excess chemicals, sparking a fire"
       ],
-      "body": "At 5:31 p.m., a fire broke out at a Ming Yang International warehouse. The company had illegally stored the chemical foaming agent C40-P at 30 times the permitted safety limit, and the room temperature exceeded the safe storage temperature. Four firefighters who went in to rescue people believed to be trapped were thrown by the blast wave, burned and struck by flying debris, and died after being taken to hospital.",
+      "body": "At 5:31 p.m., a gas explosion at a Ming Yang International warehouse set off a major fire. The company had illegally stored the chemical crosslinking agent C40-P at 30 times the permitted safety limit, and the room temperature exceeded the safe storage temperature. Four firefighters who went in to rescue trapped workers were thrown by the blast wave, burned and struck by flying debris, and died after being taken to hospital.",
       "count": {
         "number": "4",
         "label": "firefighters died"
@@ -24,7 +26,7 @@
         "Taoyuan: Chin-Poon Industrial breached fire compartments,",
         "letting the fire spread with ease"
       ],
-      "body": "At 9:28 p.m., flames erupted at the Chin-Poon factory. The company had illegally run exhaust ducts through the walls, breaching the fire compartments without authorization, and firefighters only discovered unidentified solvents stored on site after they arrived. Working from information that did not match the actual conditions, the firefighters became trapped and could not get out in time. Six died.",
+      "body": "At 9:28 p.m., flames erupted at the Chin-Poon factory. The company had illegally run exhaust ducts through the walls, breaching the fire compartments without authorization, and firefighters only discovered unidentified solvents stored on site after they arrived. Because the building data they held did not match the actual conditions, the firefighters became trapped and could not get out in time. Six died.",
       "count": {
         "number": "6",
         "label": "firefighters died"
@@ -37,6 +39,7 @@
       }
     }
   },
+  "lead": "According to the National Fire Agency's 2025 yearbook, fires in factories and warehouses, the categories most prone to industrial safety incidents, nearly doubled over the past decade compared with the decade before. More fires of this kind mean firefighters enter high-risk environments more often, and this is the main reason factory-fire deaths have risen in the past ten years. Central and local government audits of high-risk factories have yet to show clear results, and regulations and inspections need to be enforced more rigorously.",
   "chart": {
     "_chart": "Pinned chart (ui/PinChart): switches to slides[1] past the halfway point; legend keys match the legend ids in utils/03.violation/chart.ts",
     "slides": {

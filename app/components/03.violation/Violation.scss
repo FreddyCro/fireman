@@ -1,4 +1,7 @@
-// 03 工安違法事實：section 根樣式。案例版面在 ui/CaseStory.scss。
+// 03 工安違法事實：section 根樣式與內文版面。案例版面在 ui/CaseStory.scss，圖表在 ui/PinChart.scss。
+$text: #f0f0f0;
+$column: 620px;
+
 .sec-violation {
   padding: 64px 16px;
   color: #fff;
@@ -16,6 +19,38 @@
 
     @include rwd-min('tablet') {
       margin-bottom: 64px;
+    }
+  }
+
+  // 桃園敬鵬 scrapbook 的落點：與內文同寬的空位，比例跟 board 一樣（CaseStory flyTo）
+  &__board-slot {
+    max-width: $column;
+    margin: 0 auto 40px;
+    aspect-ratio: var(--aspect-mob);
+
+    @include rwd-min('tablet') {
+      aspect-ratio: var(--aspect-pc);
+    }
+  }
+
+  // 內文段落：設計稿 620 欄、18/36、#f0f0f0
+  &__text {
+    max-width: $column;
+    margin: 0 auto 64px;
+    font-size: 18px;
+    line-height: 2;
+    color: $text;
+
+    @include rwd-min('tablet') {
+      margin-bottom: 80px;
+    }
+
+    p {
+      margin: 0 0 1em;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
     }
   }
 }
