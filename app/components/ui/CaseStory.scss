@@ -94,4 +94,11 @@ $orange: #f07a2c;
       flex: 1 1 auto;
     }
   }
+
+  // 會飛走的 scrapbook：疊在後面的內文之上，transform 由 CaseStory.vue 的 ScrollTrigger 給
+  &--fly &__board {
+    position: relative;
+    z-index: 2;
+    will-change: transform;
+  }
 }

@@ -11,7 +11,12 @@ import { TABLET_BREAKPOINTS } from '~/utils/constants';
 import type { ScrapbookItem } from '~/utils/scrapbook';
 import './Scrapbook.scss';
 
-const props = defineProps<{ items: ScrapbookItem[]; aspect: { mob: string; pc: string } }>();
+const props = defineProps<{
+  items: ScrapbookItem[];
+  aspect: { mob: string; pc: string };
+  /** 拖曳範圍改成 board 自己（外層 wrapper）。board 會被 transform 飛走時要開，否則 applyBounds 會把素材推回 article */
+  selfBounds?: boolean;
+}>();
 
 const assetUrl = useAssetUrl();
 const root = ref<HTMLElement | null>(null);
@@ -88,6 +93,25 @@ const onBreakpoint = () => {
   draggables.forEach((d) => d.update());
 };
 
+/** 拖曳範圍預設＝整個案例（article），素材才能拖到文字上；selfBounds 時＝直接外層（CaseStory 的飛行用 wrapper） */
+let bounds: HTMLElement;
+const getBounds = () =>
+  props.selfBounds
+    ? root.value!.parentElement!
+    : ((root.value!.closest('article') as HTMLElement | null) ?? root.value!.parentElement!);
+
+// selfBounds 可能在 mount 之後才變（CaseStory 的 flyTo 是 template ref，晚一拍才有值）：換範圍並重新觀察
+watch(
+  () => props.selfBounds,
+  () => {
+    if (!draggables.length) return;
+    bounds = getBounds();
+    draggables.forEach((d) => d.applyBounds(bounds));
+    resizeObs?.disconnect();
+    resizeObs?.observe(bounds);
+  },
+);
+
 onMounted(() => {
   gsap.registerPlugin(Draggable, InertiaPlugin);
   canHover = matchMedia('(hover: hover) and (pointer: fine)').matches;
@@ -95,7 +119,7 @@ onMounted(() => {
   wide.value = mqWide.matches;
   mqWide.addEventListener('change', onBreakpoint);
 
-  const bounds = root.value!.parentElement!;
+  bounds = getBounds();
   draggables = Draggable.create(itemEls.value, {
     type: 'x,y',
     bounds,

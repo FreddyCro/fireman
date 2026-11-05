@@ -1,13 +1,18 @@
+<!--
+  02 無人受困的火場。順序照設計稿 section2：
+  導言 → pin 圖表 → 過場 → blur 大標 → 台中案例 → 張賢龢留學故事 → 受訪者卡 → 3 項應變順序 → 段落 → 引言 → 美福倉儲段落＋照片
+-->
 <script setup lang="ts">
 import { CASES } from '~/utils/02.no-trapped/cases';
 import { CHART } from '~/utils/02.no-trapped/chart';
+import { MEIFU_PHOTOS, PROFILE_SRC } from '~/utils/02.no-trapped/media';
 import './NoTrapped.scss';
 
 const str = useCopy().noTrapped;
 
 // 版面（CASES）與文案以 id 對應，素材 alt 依素材 id 取
 const cases = CASES.map((c) => {
-  const copy = str.cases[c.id];
+  const copy = str.cases[c.id as keyof typeof str.cases];
   return {
     ...copy,
     id: c.id,
@@ -15,18 +20,55 @@ const cases = CASES.map((c) => {
     media: c.media.map((m) => ({ ...m, alt: copy.alt[m.id as keyof typeof copy.alt] ?? '' })),
   };
 });
+
+// 台中案例的 scrapbook 隨捲動飛到留學故事上方的這個空位（CaseStory 的 flyTo）
+const boardSlot = ref<HTMLElement | null>(null);
+const slotStyle = { '--aspect-mob': CASES[0]!.aspect.mob, '--aspect-pc': CASES[0]!.aspect.pc };
+
+const meifuPhotos = MEIFU_PHOTOS.map((src, i) => ({ src, alt: str.meifu.alt[i] ?? '' }));
 </script>
 
 <template>
   <section id="no-trapped" class="sec-no-trapped">
-    <h2>10年27人殉職火場 2大燒不完的制度破口</h2>
-    <p>根據消防署歷年消防年報顯示，近10年重大火災案件相較上一個10年大幅減少，而因火場救援的殉職人數卻有增無減</p>
+    <header class="sec-no-trapped__intro">
+      <h2 class="sec-no-trapped__intro-title">{{ str.intro.title }}</h2>
+      <p class="sec-no-trapped__intro-lead">{{ str.intro.lead }}</p>
+    </header>
 
     <PinChart :layout="CHART" :copy="str.chart" />
 
-    <p>導致火災殉職的因素相當複雜，本專題訪問張賢龢博士、消防員工作權益促進會(以下簡稱消促會)秘書長林昶志與副理事長鄭少書，從進入火場原則、廠房工安到人力調度與日常勤務，綜合探討如何記取教訓、降低風險、保住人命。</p>
+    <div class="sec-no-trapped__text sec-no-trapped__text--transition">
+      <p>{{ str.transition }}</p>
+    </div>
 
     <BlurTitle class="sec-no-trapped__title" :svg="str.titleSvg" :alt="str.title" :label="str.titleLabel" pin />
-    <CaseStory v-for="(c, i) in cases" :key="c.id" :data="c" :reverse="i % 2 === 1" />
+    <CaseStory v-for="(c, i) in cases" :key="c.id" :data="c" :reverse="i % 2 === 1" :fly-to="i === 0 ? boardSlot : null" />
+
+    <div ref="boardSlot" class="sec-no-trapped__board-slot" :style="slotStyle" aria-hidden="true" />
+    <div class="sec-no-trapped__text">
+      <p>
+        {{ str.story.first.before
+        }}<a :href="str.story.first.href" target="_blank" rel="noopener">{{ str.story.first.link }}</a
+        >{{ str.story.first.after }}
+      </p>
+      <p v-for="p in str.story.rest" :key="p">{{ p }}</p>
+    </div>
+
+    <NoTrappedProfile :data="str.profile" :src="PROFILE_SRC" />
+    <NoTrappedPriorities :data="str.priorities" />
+
+    <div class="sec-no-trapped__text">
+      <p v-for="p in str.afterPriorities" :key="p">{{ p }}</p>
+    </div>
+
+    <blockquote class="sec-no-trapped__quote">
+      <span class="sec-no-trapped__quote-mark" aria-hidden="true">“</span>
+      <p>{{ str.quote }}</p>
+    </blockquote>
+
+    <div class="sec-no-trapped__text">
+      <p v-for="p in str.meifu.paragraphs" :key="p">{{ p }}</p>
+    </div>
+    <NoTrappedGallery :photos="meifuPhotos" :caption="str.meifu.caption" />
   </section>
 </template>
