@@ -16,6 +16,8 @@ export interface ScrapbookLayout {
   /** CSS aspect-ratio，如 "746/762"；先佔好高度，影片載入前不會跳版 */
   ratio: string;
   mob: ScrapbookPlace;
+  /** 平板（768–1279）；沒給就沿用 pc */
+  pad?: ScrapbookPlace;
   pc: ScrapbookPlace;
 }
 
@@ -26,8 +28,10 @@ export interface ScrapbookItem extends ScrapbookLayout {
 /** 單一案例的版面（ui/CaseStory.vue）：中英文共用，文案在各 section 的 locales 以 id 對應 */
 export interface CaseLayout {
   id: string;
-  /** board 的 CSS aspect-ratio */
-  aspect: { mob: string; pc: string };
+  /** board 的 CSS aspect-ratio；pad 沒給就沿用 pc */
+  aspect: { mob: string; pad?: string; pc: string };
+  /** pad（768–1279）board 的最大寬度 px；沒給就 652（02 台中案例的稿） */
+  padWidth?: number;
   media: ScrapbookLayout[];
 }
 

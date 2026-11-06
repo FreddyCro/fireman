@@ -1,4 +1,5 @@
-// 單一案例（ui/CaseStory.vue）：文字＋scrapbook。mob：文字在上、素材在下；tablet 以上左右兩欄，reverse 對調。
+// 單一案例（ui/CaseStory.vue）：文字＋scrapbook。mob／pad：文字在上、素材在下（pad 稿文字欄 530、board 652 置中）；
+// pc 以上左右兩欄，reverse 對調。
 $serif: 'Noto Serif TC', 'Songti TC', 'PMingLiU', serif;
 $orange: #f07a2c;
 
@@ -11,14 +12,18 @@ $orange: #f07a2c;
   margin: 0 auto 80px;
 
   @include rwd-min('tablet') {
-    flex-direction: row;
-    align-items: flex-start;
-    gap: 32px;
+    gap: 20px;
     margin-bottom: 120px;
   }
 
+  @include rwd-min('pc') {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 32px;
+  }
+
   &--reverse {
-    @include rwd-min('tablet') {
+    @include rwd-min('pc') {
       flex-direction: row-reverse;
     }
   }
@@ -28,7 +33,15 @@ $orange: #f07a2c;
     z-index: 0;
 
     @include rwd-min('tablet') {
+      width: 100%;
+      max-width: 530px;
+      margin: 0 auto;
+    }
+
+    @include rwd-min('pc') {
       flex: 0 0 40%;
+      max-width: none;
+      margin: 0;
       padding-top: 24px;
     }
   }
@@ -48,6 +61,10 @@ $orange: #f07a2c;
     line-height: 1.4;
 
     @include rwd-min('tablet') {
+      font-size: 32px;
+    }
+
+    @include rwd-min('pc') {
       font-size: 28px;
     }
   }
@@ -59,8 +76,9 @@ $orange: #f07a2c;
     color: #ccc;
     text-align: justify;
 
-    @include rwd-min('pc') {
+    @include rwd-min('tablet') {
       font-size: 15px;
+      line-height: 25px;
     }
   }
 
@@ -71,8 +89,13 @@ $orange: #f07a2c;
     color: $orange;
     text-align: center;
 
+    // pad 稿：殉職人數靠右，貼在 board 右上角
     @include rwd-min('tablet') {
       font-size: 36px;
+      text-align: right;
+    }
+
+    @include rwd-min('pc') {
       text-align: left;
     }
   }
@@ -90,8 +113,16 @@ $orange: #f07a2c;
   &__board {
     width: 100%;
 
+    // pad 稿 board 頂端與殉職人數齊，往上拉；寬度各案例不同（cases.ts 的 padWidth）
     @include rwd-min('tablet') {
+      max-width: var(--board-pad);
+      margin: -100px auto 0;
+    }
+
+    @include rwd-min('pc') {
       flex: 1 1 auto;
+      max-width: none;
+      margin: 0;
     }
   }
 

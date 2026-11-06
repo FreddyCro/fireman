@@ -1,5 +1,5 @@
 // scrapbook（ui/Scrapbook.vue）：可拖曳素材＋放大框（ui/ScrapbookZoom.vue），跨 section 共用。
-// 位置來自 locales 的百分比，以 CSS 變數 --x/--y/--w/--r-{mob,pc} 傳進來。
+// 位置來自 cases.ts 的百分比，以 CSS 變數 --x/--y/--w/--r-{mob,pad,pc} 傳進來（pad 沒給時 Vue 端已補成 pc 的值）。
 $b: '.scrapbook';
 
 #{$b} {
@@ -7,6 +7,10 @@ $b: '.scrapbook';
   aspect-ratio: var(--aspect-mob);
 
   @include rwd-min('tablet') {
+    aspect-ratio: var(--aspect-pad);
+  }
+
+  @include rwd-min('pc') {
     aspect-ratio: var(--aspect-pc);
   }
 
@@ -22,6 +26,12 @@ $b: '.scrapbook';
     -webkit-touch-callout: none;
 
     @include rwd-min('tablet') {
+      left: calc(var(--x-pad) * 1%);
+      top: calc(var(--y-pad) * 1%);
+      width: calc(var(--w-pad) * 1%);
+    }
+
+    @include rwd-min('pc') {
       left: calc(var(--x-pc) * 1%);
       top: calc(var(--y-pc) * 1%);
       width: calc(var(--w-pc) * 1%);
@@ -39,6 +49,10 @@ $b: '.scrapbook';
       filter 0.25s ease;
 
     @include rwd-min('tablet') {
+      transform: rotate(calc(var(--r-pad) * 1deg)) scale(var(--s));
+    }
+
+    @include rwd-min('pc') {
       transform: rotate(calc(var(--r-pc) * 1deg)) scale(var(--s));
     }
 

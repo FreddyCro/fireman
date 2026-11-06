@@ -1,5 +1,6 @@
 // 02 無人受困的火場：section 根樣式與內文版面。案例版面在 ui/CaseStory.scss，圖表在 ui/PinChart.scss。
-// 設計稿：內文欄 mob 362 寬（414 − 26×2）、pc 620 寬置中；內文 18/36、色 #f0f0f0；圖說 15/22。
+// 設計稿：內文欄 mob 362 寬（414 − 26×2）、pad 530 寬置中（導言、受訪者卡、應變順序、__text--wide 為 620）、pc 620 寬置中；
+// 內文 18/36、色 #f0f0f0；圖說 15/22。
 $serif: 'Noto Serif TC', 'Songti TC', 'PMingLiU', serif;
 $text: #f0f0f0;
 $orange: #ed7223;
@@ -49,7 +50,7 @@ $column: 620px;
     color: $text;
   }
 
-  // ── 內文段落 ──
+  // ── 內文段落：pad 稿多數段落 530 寬，pc 620 ──
   &__text {
     max-width: $column;
     margin: 0 auto 64px;
@@ -58,7 +59,12 @@ $column: 620px;
     color: $text;
 
     @include rwd-min('tablet') {
+      max-width: 530px;
       margin-bottom: 80px;
+    }
+
+    @include rwd-min('pc') {
+      max-width: $column;
     }
 
     p {
@@ -73,6 +79,13 @@ $column: 620px;
       color: inherit;
       text-decoration: underline;
       text-underline-offset: 0.15em;
+    }
+  }
+
+  // pad 稿也是 620 寬的段落（應變順序之後那段）
+  &__text--wide {
+    @include rwd-min('tablet') {
+      max-width: $column;
     }
   }
 
@@ -91,7 +104,14 @@ $column: 620px;
     margin: 0 auto 40px;
     aspect-ratio: var(--aspect-mob);
 
+    // pad 稿落點 443 寬置中
     @include rwd-min('tablet') {
+      max-width: min(443px, var(--board-pad));
+      aspect-ratio: var(--aspect-pad);
+    }
+
+    @include rwd-min('pc') {
+      max-width: $column;
       aspect-ratio: var(--aspect-pc);
     }
   }
@@ -166,6 +186,14 @@ $column: 620px;
     margin: 0 0 40px;
     font-size: 18px;
     line-height: 2;
+
+    @include rwd-min('tablet') {
+      text-align: center;
+    }
+
+    @include rwd-min('pc') {
+      text-align: left;
+    }
   }
 
   &__priorities-list {
@@ -177,7 +205,13 @@ $column: 620px;
     padding: 0;
     list-style: none;
 
+    // pad 稿 280 寬、間距 80；pc 稿 370、60
     @include rwd-min('tablet') {
+      width: 280px;
+      gap: 80px;
+    }
+
+    @include rwd-min('pc') {
       width: 370px;
       gap: 60px;
     }
@@ -238,8 +272,14 @@ $column: 620px;
     text-align: center;
 
     @include rwd-min('tablet') {
+      max-width: 530px;
       padding: 200px 0;
       font-size: 30px;
+      line-height: 50px;
+    }
+
+    @include rwd-min('pc') {
+      max-width: 532px;
       line-height: 40px;
     }
 
@@ -254,9 +294,14 @@ $column: 620px;
   }
 
   // ── 美福倉儲照片：mob 上下疊、tablet 以上並排 ──
+  // pad 稿 654 寬（322×2＋10）、pc 820（402×2＋15）
   &__gallery {
-    max-width: 820px;
+    max-width: 654px;
     margin: 0 auto;
+
+    @include rwd-min('pc') {
+      max-width: 820px;
+    }
   }
 
   &__gallery-grid {
@@ -267,8 +312,12 @@ $column: 620px;
 
     @include rwd-min('tablet') {
       grid-template-columns: 1fr 1fr;
-      gap: 15px;
+      gap: 10px;
       max-width: none;
+    }
+
+    @include rwd-min('pc') {
+      gap: 15px;
     }
   }
 
@@ -279,6 +328,10 @@ $column: 620px;
     object-fit: cover;
 
     @include rwd-min('tablet') {
+      aspect-ratio: 322 / 242;
+    }
+
+    @include rwd-min('pc') {
       aspect-ratio: 402 / 302;
     }
   }

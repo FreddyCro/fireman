@@ -17,14 +17,17 @@ const props = defineProps<{
     title: string[];
     body: string;
     count: { number: string; label: string };
-    aspect: { mob: string; pc: string };
+    aspect: { mob: string; pad?: string; pc: string };
+    padWidth?: number;
     media: ScrapbookItem[];
   };
-  /** 平板以上左右對調（素材在左、文字在右） */
+  /** pc 以上左右對調（素材在左、文字在右） */
   reverse?: boolean;
   /** scrapbook 隨捲動飛去的落點元素 */
   flyTo?: HTMLElement | null;
 }>();
+
+const rootStyle = computed(() => ({ '--board-pad': `${props.data.padWidth ?? 652}px` }));
 
 const root = ref<HTMLElement | null>(null);
 const board = ref<HTMLElement | null>(null);
@@ -80,7 +83,12 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <article ref="root" class="case-story" :class="{ 'case-story--reverse': reverse, 'case-story--fly': !!flyTo }">
+  <article
+    ref="root"
+    class="case-story"
+    :class="{ 'case-story--reverse': reverse, 'case-story--fly': !!flyTo }"
+    :style="rootStyle"
+  >
     <div class="case-story__text">
       <p class="case-story__date">{{ data.date }}</p>
       <h3 class="case-story__heading">

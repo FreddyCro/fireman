@@ -16,6 +16,7 @@ const cases = CASES.map((c) => {
     ...copy,
     id: c.id,
     aspect: c.aspect,
+    padWidth: c.padWidth,
     media: c.media.map((m) => ({ ...m, alt: copy.alt[m.id as keyof typeof copy.alt] ?? '' })),
   };
 });
@@ -23,7 +24,12 @@ const cases = CASES.map((c) => {
 // 桃園敬鵬（最後一個案例）的 scrapbook 隨捲動飛到消防年報段落上方的這個空位（CaseStory 的 flyTo）
 const flyIndex = CASES.length - 1;
 const boardSlot = ref<HTMLElement | null>(null);
-const slotStyle = { '--aspect-mob': CASES[flyIndex]!.aspect.mob, '--aspect-pc': CASES[flyIndex]!.aspect.pc };
+const slotStyle = {
+  '--aspect-mob': CASES[flyIndex]!.aspect.mob,
+  '--aspect-pad': CASES[flyIndex]!.aspect.pad ?? CASES[flyIndex]!.aspect.pc,
+  '--aspect-pc': CASES[flyIndex]!.aspect.pc,
+  '--board-pad': `${CASES[flyIndex]!.padWidth ?? 652}px`,
+};
 </script>
 
 <template>

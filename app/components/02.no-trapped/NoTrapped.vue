@@ -17,13 +17,19 @@ const cases = CASES.map((c) => {
     ...copy,
     id: c.id,
     aspect: c.aspect,
+    padWidth: c.padWidth,
     media: c.media.map((m) => ({ ...m, alt: copy.alt[m.id as keyof typeof copy.alt] ?? '' })),
   };
 });
 
 // 台中案例的 scrapbook 隨捲動飛到留學故事上方的這個空位（CaseStory 的 flyTo）
 const boardSlot = ref<HTMLElement | null>(null);
-const slotStyle = { '--aspect-mob': CASES[0]!.aspect.mob, '--aspect-pc': CASES[0]!.aspect.pc };
+const slotStyle = {
+  '--aspect-mob': CASES[0]!.aspect.mob,
+  '--aspect-pad': CASES[0]!.aspect.pad ?? CASES[0]!.aspect.pc,
+  '--aspect-pc': CASES[0]!.aspect.pc,
+  '--board-pad': `${CASES[0]!.padWidth ?? 652}px`,
+};
 
 const meifuPhotos = MEIFU_PHOTOS.map((src, i) => ({ src, alt: str.meifu.alt[i] ?? '' }));
 </script>
@@ -57,7 +63,7 @@ const meifuPhotos = MEIFU_PHOTOS.map((src, i) => ({ src, alt: str.meifu.alt[i] ?
     <NoTrappedProfile :data="str.profile" :src="PROFILE_SRC" />
     <NoTrappedPriorities :data="str.priorities" />
 
-    <div class="sec-no-trapped__text">
+    <div class="sec-no-trapped__text sec-no-trapped__text--wide">
       <p v-for="p in str.afterPriorities" :key="p">{{ p }}</p>
     </div>
 

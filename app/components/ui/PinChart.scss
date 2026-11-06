@@ -3,8 +3,12 @@
 // 下方文字（__after）在跑道之外，跑道走完才接著捲上來。
 .pin-chart {
   width: 100%;
-  max-width: 700px;
+  max-width: 620px; // pad 稿 620、pc 稿 700
   margin: 0 auto;
+
+  @include rwd-min('pc') {
+    max-width: 700px;
+  }
 
   &__track {
     height: calc(var(--track) * 1vh);
@@ -131,7 +135,7 @@
     }
   }
 
-  // 圖表下方的文字段落
+  // 圖表下方的文字段落：pad 稿 530 欄置中、18/36
   &__after {
     padding-top: 32px;
     font-size: 14px;
@@ -140,11 +144,19 @@
     text-align: justify;
 
     @include rwd-min('tablet') {
+      max-width: 530px;
+      margin: 0 auto;
       padding-top: 40px;
+      font-size: 18px;
+      line-height: 2;
+      color: #f0f0f0;
     }
 
     @include rwd-min('pc') {
+      max-width: none;
       font-size: 15px;
+      line-height: 1.8;
+      color: #ccc;
     }
 
     p {

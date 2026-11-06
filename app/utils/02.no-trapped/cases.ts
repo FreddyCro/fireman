@@ -4,7 +4,8 @@ import type { CaseLayout } from '~/utils/scrapbook';
 export const CASES: CaseLayout[] = [
   {
     id: 'taichung',
-    aspect: { mob: '4/5', pc: '6/5' },
+    // pad 稿：board 652×575，文字在上、素材在下
+    aspect: { mob: '4/5', pad: '652/575', pc: '6/5' },
     media: [
       {
         id: 'clipping',
@@ -12,6 +13,7 @@ export const CASES: CaseLayout[] = [
         src: '/img/scrapbook/case1/firefighter_p02_pic02_1030.png',
         ratio: '746/762',
         mob: { x: 4, y: 30, w: 70, r: -4 },
+        pad: { x: 2, y: 11, w: 51, r: -4 },
         pc: { x: 4, y: 6, w: 52, r: -4 },
       },
       {
@@ -20,6 +22,7 @@ export const CASES: CaseLayout[] = [
         src: '/img/scrapbook/case1/firefighter_p02_pic01_1030.jpg',
         ratio: '674/380',
         mob: { x: 30, y: 2, w: 66, r: 3 },
+        pad: { x: 35, y: 24, w: 64, r: 3 },
         pc: { x: 46, y: 2, w: 50, r: 3 },
       },
       {
@@ -28,6 +31,7 @@ export const CASES: CaseLayout[] = [
         src: '/img/scrapbook/case1/firefighter_p02_video0103_1030.mp4',
         ratio: '16/9',
         mob: { x: 10, y: 64, w: 80, r: -2 },
+        pad: { x: 25, y: 64, w: 53, r: -2 },
         pc: { x: 30, y: 54, w: 62, r: -2 },
       },
     ],

@@ -22,18 +22,24 @@ $column: 620px;
     }
   }
 
-  // 桃園敬鵬 scrapbook 的落點：與內文同寬的空位，比例跟 board 一樣（CaseStory flyTo）
+  // 桃園敬鵬 scrapbook 的落點：與內文同寬的空位，比例跟 board 一樣（CaseStory flyTo）。pad 稿 520 寬置中
   &__board-slot {
     max-width: $column;
     margin: 0 auto 40px;
     aspect-ratio: var(--aspect-mob);
 
     @include rwd-min('tablet') {
+      max-width: min(520px, var(--board-pad));
+      aspect-ratio: var(--aspect-pad);
+    }
+
+    @include rwd-min('pc') {
+      max-width: $column;
       aspect-ratio: var(--aspect-pc);
     }
   }
 
-  // 內文段落：設計稿 620 欄、18/36、#f0f0f0
+  // 內文段落：pad 稿 530 欄、pc 稿 620 欄，18/36、#f0f0f0
   &__text {
     max-width: $column;
     margin: 0 auto 64px;
@@ -42,7 +48,12 @@ $column: 620px;
     color: $text;
 
     @include rwd-min('tablet') {
+      max-width: 530px;
       margin-bottom: 80px;
+    }
+
+    @include rwd-min('pc') {
+      max-width: $column;
     }
 
     p {

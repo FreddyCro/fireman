@@ -7,13 +7,13 @@
 import { gsap } from 'gsap';
 import { Draggable } from 'gsap/Draggable';
 import { InertiaPlugin } from 'gsap/InertiaPlugin';
-import { TABLET_BREAKPOINTS } from '~/utils/constants';
+import { PC_BREAKPOINTS, TABLET_BREAKPOINTS } from '~/utils/constants';
 import type { ScrapbookItem } from '~/utils/scrapbook';
 import './Scrapbook.scss';
 
 const props = defineProps<{
   items: ScrapbookItem[];
-  aspect: { mob: string; pc: string };
+  aspect: { mob: string; pad?: string; pc: string };
   /** 拖曳範圍改成 board 自己（外層 wrapper）。board 會被 transform 飛走時要開，否則 applyBounds 會把素材推回 article */
   selfBounds?: boolean;
 }>();
@@ -28,14 +28,24 @@ const videoEls = ref<HTMLVideoElement[]>([]);
 const active = ref<number | null>(null);
 const zoomed = ref<number | null>(null);
 const wide = ref(false);
+/** pc 斷點以上（素材角度用 pc，否則用 pad） */
+const isPc = ref(false);
 
-const boardStyle = computed(() => ({ '--aspect-mob': props.aspect.mob, '--aspect-pc': props.aspect.pc }));
+const boardStyle = computed(() => ({
+  '--aspect-mob': props.aspect.mob,
+  '--aspect-pad': props.aspect.pad ?? props.aspect.pc,
+  '--aspect-pc': props.aspect.pc,
+}));
 
 const itemStyle = (it: ScrapbookItem) => ({
   '--x-mob': it.mob.x,
   '--y-mob': it.mob.y,
   '--w-mob': it.mob.w,
   '--r-mob': it.mob.r,
+  '--x-pad': (it.pad ?? it.pc).x,
+  '--y-pad': (it.pad ?? it.pc).y,
+  '--w-pad': (it.pad ?? it.pc).w,
+  '--r-pad': (it.pad ?? it.pc).r,
   '--x-pc': it.pc.x,
   '--y-pc': it.pc.y,
   '--w-pc': it.pc.w,
@@ -59,13 +69,14 @@ const zoomOrigin = computed(() => {
     cy: box.top + box.height / 2,
     w: paper.offsetWidth,
     h: paper.offsetHeight,
-    r: wide.value ? it.pc.r : it.mob.r,
+    r: isPc.value ? it.pc.r : wide.value ? (it.pad ?? it.pc).r : it.mob.r,
     time: videoEls.value.find((v) => paper.contains(v))?.currentTime ?? 0,
   };
 });
 
 let draggables: Draggable[] = [];
 let mqWide: MediaQueryList | null = null;
+let mqPc: MediaQueryList | null = null;
 let canHover = false;
 let resizeObs: ResizeObserver | null = null;
 let videoObs: IntersectionObserver | null = null;
@@ -89,6 +100,7 @@ const onDocPointer = (e: PointerEvent) => {
 /** 換斷點時素材位置整組換掉，拖曳留下的位移歸零 */
 const onBreakpoint = () => {
   wide.value = !!mqWide?.matches;
+  isPc.value = !!mqPc?.matches;
   gsap.set(itemEls.value, { x: 0, y: 0 });
   draggables.forEach((d) => d.update());
 };
@@ -118,6 +130,9 @@ onMounted(() => {
   mqWide = matchMedia(`(min-width: ${TABLET_BREAKPOINTS}px)`);
   wide.value = mqWide.matches;
   mqWide.addEventListener('change', onBreakpoint);
+  mqPc = matchMedia(`(min-width: ${PC_BREAKPOINTS}px)`);
+  isPc.value = mqPc.matches;
+  mqPc.addEventListener('change', onBreakpoint);
 
   bounds = getBounds();
   draggables = Draggable.create(itemEls.value, {
@@ -161,6 +176,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   draggables.forEach((d) => d.kill());
   mqWide?.removeEventListener('change', onBreakpoint);
+  mqPc?.removeEventListener('change', onBreakpoint);
   resizeObs?.disconnect();
   videoObs?.disconnect();
   document.removeEventListener('pointerdown', onDocPointer);
