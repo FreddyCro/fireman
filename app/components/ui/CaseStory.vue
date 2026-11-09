@@ -1,5 +1,6 @@
 <!--
   單一案例：文字＋scrapbook，跨 section 共用（02 no-trapped、03 violation）。整個 article 就是素材的拖曳範圍，素材可以拖到文字上。
+  body 文案裡用 **…** 包起來的字會渲染成粗體白字（設計稿的重點句）。
 
   flyTo：給一個「落點」元素（同比例的空位，見 02 的 __board-slot），scrapbook 整塊會隨捲動從案例的位置
   平移＋縮放飛到那個空位（ScrollTrigger scrub）：案例置中時出發、落點置中時到達，往回捲會飛回來。
@@ -28,6 +29,9 @@ const props = defineProps<{
 }>();
 
 const rootStyle = computed(() => ({ '--board-pad': `${props.data.padWidth ?? 652}px` }));
+
+/** body 依 **…** 切段：偶數段一般文字、奇數段粗體 */
+const bodyParts = computed(() => props.data.body.split(/\*\*(.+?)\*\*/));
 
 const root = ref<HTMLElement | null>(null);
 const board = ref<HTMLElement | null>(null);
@@ -94,7 +98,12 @@ onBeforeUnmount(() => {
       <h3 class="case-story__heading">
         <span v-for="l in data.title" :key="l">{{ l }}</span>
       </h3>
-      <p class="case-story__body">{{ data.body }}</p>
+      <p class="case-story__body">
+        <template v-for="(part, i) in bodyParts" :key="i">
+          <strong v-if="i % 2" class="case-story__em">{{ part }}</strong>
+          <template v-else>{{ part }}</template>
+        </template>
+      </p>
       <p class="case-story__count">
         <span class="case-story__count-num">{{ data.count.number }}</span>{{ data.count.label }}
       </p>

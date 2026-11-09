@@ -8,7 +8,7 @@ import zhNoTrapped from '../app/locales/zh/section-no-trapped.json';
 import zhViolation from '../app/locales/zh/section-violation.json';
 import { CASES as NO_TRAPPED } from '../app/utils/02.no-trapped/cases';
 import { CASES as VIOLATION } from '../app/utils/03.violation/cases';
-import { ZOOM_EXTRA, ZOOM_MARGIN, zoomRect } from '../app/utils/scrapbook';
+import { ZOOM_CLOSE_SPACE, ZOOM_EXTRA, ZOOM_MARGIN, zoomRect } from '../app/utils/scrapbook';
 
 type CaseCopy = Record<string, { alt: Record<string, string> }>;
 
@@ -54,11 +54,19 @@ describe('zoomRect', () => {
     expect(r.width / r.height).toBeCloseTo(300 / 1000);
   });
 
-  it('手機：滿版寬（扣邊距）並置中視窗', () => {
+  it('手機：撐滿裝置寬並置中視窗', () => {
     const mob = { w: 390, h: 844 };
     const r = zoomRect({ cx: 100, cy: 100, w: 200, h: 150 }, mob, false);
-    expect(r.width).toBe(mob.w - ZOOM_MARGIN * 2);
-    expect(r.left).toBe(ZOOM_MARGIN);
+    expect(r.width).toBe(mob.w);
+    expect(r.left).toBe(0);
     expect(r.top + r.height / 2).toBeCloseTo(mob.h / 2);
+  });
+
+  it('手機：太高時縮回，上下留出關閉鈕的位置', () => {
+    const mob = { w: 390, h: 844 };
+    const r = zoomRect({ cx: 100, cy: 100, w: 200, h: 600 }, mob, false);
+    expect(r.top).toBeCloseTo(ZOOM_MARGIN + ZOOM_CLOSE_SPACE);
+    expect(r.left + r.width / 2).toBeCloseTo(mob.w / 2);
+    expect(r.width / r.height).toBeCloseTo(200 / 600);
   });
 });

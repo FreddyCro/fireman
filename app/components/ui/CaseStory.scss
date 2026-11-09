@@ -46,10 +46,16 @@ $orange: #f07a2c;
     }
   }
 
+  // mob 稿：日期 18 襯線、大標 32 襯線、內文 17/29、殉職人數靠右（數字 96）
   &__date {
     margin: 0 0 8px;
-    font-size: 15px;
+    font-family: $serif;
+    font-size: 18px;
     letter-spacing: 0.05em;
+
+    @include rwd-min('tablet') {
+      font-size: 15px;
+    }
   }
 
   &__heading {
@@ -57,7 +63,8 @@ $orange: #f07a2c;
     flex-direction: column;
     margin: 0 0 16px;
     font-family: $serif;
-    font-size: 24px;
+    font-size: 32px;
+    font-weight: 700;
     line-height: 1.4;
 
     @include rwd-min('tablet') {
@@ -71,15 +78,22 @@ $orange: #f07a2c;
 
   &__body {
     margin: 0 0 24px;
-    font-size: 14px;
-    line-height: 1.8;
+    font-size: 17px;
+    line-height: 29px;
+    letter-spacing: 0.05em;
     color: #ccc;
     text-align: justify;
 
     @include rwd-min('tablet') {
       font-size: 15px;
       line-height: 25px;
+      letter-spacing: 0;
     }
+  }
+
+  &__em {
+    font-weight: 700;
+    color: #fff;
   }
 
   &__count {
@@ -87,11 +101,23 @@ $orange: #f07a2c;
     font-family: $serif;
     font-size: 32px;
     color: $orange;
-    text-align: center;
+    // mob／pad 稿：殉職人數靠右，貼在 board 右上角
+    text-align: right;
 
-    // pad 稿：殉職人數靠右，貼在 board 右上角
     @include rwd-min('tablet') {
       font-size: 36px;
+    }
+
+    @include rwd-min('pc') {
+      text-align: left;
+    }
+  }
+
+  // mob 稿：第二個（reverse）案例的殉職人數置中
+  &--reverse &__count {
+    text-align: center;
+
+    @include rwd-min('tablet') {
       text-align: right;
     }
 
@@ -102,7 +128,7 @@ $orange: #f07a2c;
 
   &__count-num {
     margin-right: 4px;
-    font-size: 72px;
+    font-size: 96px;
     line-height: 1;
 
     @include rwd-min('tablet') {

@@ -3,7 +3,8 @@ $text: #f0f0f0;
 $column: 620px;
 
 .sec-violation {
-  padding: 64px 16px;
+  // mob 稿內文欄 362＝414 − 26×2
+  padding: 64px 26px;
   color: #fff;
   background: #000;
   // 擋 scrapbook 旋轉素材撐出橫向捲軸。用 clip 而不是 hidden：hidden 會把 section 變成

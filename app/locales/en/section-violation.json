@@ -2,6 +2,7 @@
   "title": "Safety Violations",
   "titleLabel": "Firefighters are entering high-risk, non-compliant factories more often",
   "titleSvg": "",
+  "titleSvgNarrow": "",
   "cases": {
     "pingtung": {
       "date": "September 22, 2023",
@@ -9,7 +10,7 @@
         "Pingtung: Ming Yang International",
         "stored excess chemicals, sparking a fire"
       ],
-      "body": "At 5:31 p.m., a gas explosion at a Ming Yang International warehouse set off a major fire. The company had illegally stored the chemical crosslinking agent C40-P at 30 times the permitted safety limit, and the room temperature exceeded the safe storage temperature. Four firefighters who went in to rescue trapped workers were thrown by the blast wave, burned and struck by flying debris, and died after being taken to hospital.",
+      "body": "At 5:31 p.m., a gas explosion at a Ming Yang International warehouse set off a major fire. The company had **illegally stored the chemical crosslinking agent C40-P at 30 times the permitted safety limit**, and the room temperature exceeded the safe storage temperature. Four firefighters who went in to rescue trapped workers were thrown by the blast wave, burned and struck by flying debris, and died after being taken to hospital.",
       "count": {
         "number": "4",
         "label": "firefighters died"

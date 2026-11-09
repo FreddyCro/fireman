@@ -6,8 +6,9 @@ $text: #f0f0f0;
 $orange: #ed7223;
 $column: 620px;
 
+// mob 稿內文欄 362＝414 − 26×2，左右留 26
 .sec-no-trapped {
-  padding: 64px 16px;
+  padding: 64px 26px;
   color: #fff;
   background: #000;
   // 擋 scrapbook 旋轉素材撐出橫向捲軸。用 clip 而不是 hidden：hidden 會把 section 變成
@@ -31,9 +32,9 @@ $column: 620px;
   &__intro-title {
     margin: 0 0 20px;
     font-family: $serif;
-    font-size: 26px;
+    font-size: 30px;
     font-weight: 700;
-    line-height: 1.6;
+    line-height: 1.55;
     letter-spacing: 0.1em;
     color: #f5f5f5;
 
@@ -221,6 +222,16 @@ $column: 620px;
     display: flex;
     gap: 24px;
     align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
+  }
+
+  &__priorities-item--shown {
+    opacity: 1;
   }
 
   // 中文版：整行是 SVG（設計稿 350×100 / 370×95 / 339×107），依寬縮放
@@ -264,12 +275,13 @@ $column: 620px;
     margin: 0 auto;
     padding: 120px 0;
     font-family: $serif;
-    font-size: 24px;
+    font-size: 30px;
     font-weight: 700;
     line-height: 1.5;
     letter-spacing: 0.1em;
     color: #f5f5f5;
     text-align: center;
+    will-change: filter; // 隨捲動 blur（NoTrapped.vue useScrollBlur）
 
     @include rwd-min('tablet') {
       max-width: 530px;
@@ -291,6 +303,19 @@ $column: 620px;
   &__quote-mark {
     display: block;
     line-height: 1;
+  }
+
+  // ── 引言後的插畫：只有 mob 稿有（362×448），素材未到先放 placeholder ──
+  &__illust {
+    max-width: $column;
+    margin: 0 auto 64px;
+    aspect-ratio: 362 / 448;
+    background: #1a1a1a;
+    outline: 1px dashed #444;
+
+    @include rwd-min('tablet') {
+      display: none;
+    }
   }
 
   // ── 美福倉儲照片：mob 上下疊、tablet 以上並排 ──

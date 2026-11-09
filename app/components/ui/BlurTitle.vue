@@ -1,6 +1,7 @@
 <!--
   滾動 blur 大標：大標是 SVG（文字已轉圖），從 blur(maxBlur) 隨捲動清晰到 blur(0)。
   svg 沒給（如該語系還沒有正式稿）就直接渲染 alt 文字，一樣 blur。
+  svgNarrow 有給時，pc 斷點以下改用它（如 03 大標 mob／pad 是直書、pc 是橫書）。
   label 有給就在上方顯示小標（白底黑字），小標不 blur。
 
   兩種模式：
@@ -10,14 +11,15 @@
   prefers-reduced-motion 時不做動畫、直接清晰。
 -->
 <script setup lang="ts">
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { PC_BREAKPOINTS } from '~/utils/constants';
 import './BlurTitle.scss';
 
 const props = withDefaults(
   defineProps<{
     /** 大標 SVG 路徑（站台根目錄寫法，如 /img/no-trapped/title-zh.svg）；空字串＝改渲染 alt 文字 */
     svg?: string;
+    /** pc 斷點以下用的 SVG（直書版）；空字串＝各斷點都用 svg */
+    svgNarrow?: string;
     /** 大標文字，給 <img alt> 與 SEO 用 */
     alt: string;
     /** 上方小標；不給就不顯示 */
@@ -38,6 +40,7 @@ const props = withDefaults(
   }>(),
   {
     svg: '',
+    svgNarrow: '',
     label: undefined,
     tag: 'h2',
     maxBlur: 10,
@@ -52,32 +55,15 @@ const props = withDefaults(
 const assetUrl = useAssetUrl();
 const root = ref<HTMLElement | null>(null);
 const img = ref<HTMLElement | null>(null);
-let trigger: ScrollTrigger | null = null;
 
-onMounted(() => {
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const setBlur = gsap.quickSetter(img.value, 'filter') as (v: string) => void;
-  // pin：跑道從貼頂到貼底；預設：元件本身從 start 到 end
-  const range = props.pin ? { start: 'top top', end: 'bottom bottom' } : { start: props.start, end: props.end };
-  const clearAt = props.pin ? props.clearAt : 1;
-  trigger = ScrollTrigger.create({
-    trigger: root.value,
-    ...range,
-    onUpdate: (self) => {
-      const t = Math.min(self.progress / clearAt, 1);
-      setBlur(`blur(${(props.maxBlur * (1 - t)).toFixed(2)}px)`);
-    },
-    onRefresh: (self) => {
-      const t = Math.min(self.progress / clearAt, 1);
-      setBlur(`blur(${(props.maxBlur * (1 - t)).toFixed(2)}px)`);
-    },
-  });
-});
-
-onBeforeUnmount(() => {
-  trigger?.kill();
-  trigger = null;
-});
+// pin：跑道從貼頂到貼底、進度到 clearAt 全清；預設：元件本身從 start 到 end
+useScrollBlur(
+  img,
+  root,
+  props.pin
+    ? { maxBlur: props.maxBlur, start: 'top top', end: 'bottom bottom', clearAt: props.clearAt }
+    : { maxBlur: props.maxBlur, start: props.start, end: props.end },
+);
 </script>
 
 <template>
@@ -85,7 +71,10 @@ onBeforeUnmount(() => {
     <div class="blur-title__stage">
       <p v-if="label" class="blur-title__label">{{ label }}</p>
       <component :is="tag" class="blur-title__title">
-        <img v-if="svg" ref="img" class="blur-title__img" :src="assetUrl(svg)" :alt="alt" />
+        <picture v-if="svg">
+          <source v-if="svgNarrow" :media="`(max-width: ${PC_BREAKPOINTS - 0.02}px)`" :srcset="assetUrl(svgNarrow)" />
+          <img ref="img" class="blur-title__img" :src="assetUrl(svg)" :alt="alt" />
+        </picture>
         <span v-else ref="img" class="blur-title__text">{{ alt }}</span>
       </component>
     </div>

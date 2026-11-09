@@ -21,6 +21,9 @@ $b: '.scrapbook';
     width: calc(var(--w-mob) * 1%);
     // 文字在下層；Draggable 按下時會再往上加 z-index
     z-index: 1;
+    // 進入視窗前先藏，scrapbook--shown 後依 --reveal 一張接一張淡入
+    opacity: 0;
+    transition: opacity 0.3s ease calc(var(--reveal, 0) * 0.3s);
     touch-action: none;
     user-select: none;
     -webkit-touch-callout: none;
@@ -35,6 +38,16 @@ $b: '.scrapbook';
       left: calc(var(--x-pc) * 1%);
       top: calc(var(--y-pc) * 1%);
       width: calc(var(--w-pc) * 1%);
+    }
+  }
+
+  &--shown &__item {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &__item {
+      transition: none;
     }
   }
 
@@ -154,10 +167,11 @@ html.is-zoom-open {
     object-fit: contain;
   }
 
+  // 手機：在圖上方 10px、距螢幕右緣 26px（圖置中，用 (100vw − 圖寬) / 2 換算）；平板以上：貼圖右上角。尺寸三種載具相同
   &__close {
     position: absolute;
-    top: 0;
-    right: 0;
+    right: calc(26px - (100vw - 100%) / 2);
+    bottom: calc(100% + 10px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -170,8 +184,14 @@ html.is-zoom-open {
     border-radius: 50%;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
     cursor: pointer;
-    transform: translate(40%, -40%);
     animation: scrapbook-zoom-fade 0.3s ease 0.3s both;
+
+    @include rwd-min('tablet') {
+      top: 0;
+      right: 0;
+      bottom: auto;
+      transform: translate(40%, -40%);
+    }
 
     #{$z}--leaving & {
       opacity: 0;

@@ -7,6 +7,7 @@
   "title": "無人受困的火場為何仍要派消防員進入",
   "titleLabel": "指揮火場救災應以消防員安全為優先",
   "titleSvg": "/img/no-trapped/title-zh.svg",
+  "titleSvgNarrow": "/img/no-trapped/title-zh-v.svg",
   "chart": {
     "_chart": "pin 住的圖表（ui/PinChart）：捲動過半切換 slides[1]；legend 的 key 對應 utils/02.no-trapped/chart.ts 的 legend id",
     "slides": {
@@ -36,7 +37,7 @@
         "台中大雅工廠火災",
         "無人受困仍派員入內"
       ],
-      "body": "凌晨1點45分，台中大雅一處違建工廠起火燃燒，工廠無人受困，然而2位消防員被小隊長指派持熱顯像儀進場尋找火源，不料10分鐘後火勢全面燃燒，2人最終不幸殉職。",
+      "body": "凌晨1點45分，台中大雅一處違建工廠起火燃燒，**工廠無人受困**，然而2位消防員被小隊長指派持熱顯像儀進場尋找火源，不料10分鐘後火勢全面燃燒，2人最終不幸殉職。",
       "count": {
         "number": "2",
         "label": "人殉職"

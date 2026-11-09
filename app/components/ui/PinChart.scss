@@ -37,26 +37,28 @@
     }
   }
 
+  // mob 稿標題 28、圖例 20；pad 稿 30、22
   &__title {
     margin: 0 0 8px;
-    font-size: 20px;
+    font-size: 28px;
     font-weight: 700;
-    line-height: 1.4;
+    line-height: 1.45;
 
     @include rwd-min('tablet') {
-      font-size: 24px;
+      font-size: 30px;
     }
   }
 
   &__legend {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px 16px;
+    gap: 4px 20px;
     margin: 0;
-    font-size: 14px;
+    font-size: 20px;
+    line-height: 1.6;
 
     @include rwd-min('tablet') {
-      font-size: 15px;
+      font-size: 22px;
     }
   }
 
@@ -74,13 +76,13 @@
   }
 
   &__legend-item--line::before {
-    width: 12px;
+    width: 14px;
     height: 2px;
   }
 
   &__legend-item--bar::before {
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
   }
 
   // 圖表：一張圖，上面兩塊黑色半透明遮罩，只顯示目前那組的，opacity 交替
@@ -125,14 +127,10 @@
 
   &__note {
     margin: 16px 0 0;
-    font-size: 11px;
-    line-height: 1.6;
+    font-size: 15px;
+    line-height: 22px;
     color: #999;
     text-align: justify;
-
-    @include rwd-min('tablet') {
-      font-size: 12px;
-    }
   }
 
   // 圖表下方的文字段落：pad 稿 530 欄置中、18/36

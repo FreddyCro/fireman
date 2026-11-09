@@ -34,7 +34,14 @@ const slotStyle = {
 
 <template>
   <section id="violation" class="sec-violation">
-    <BlurTitle class="sec-violation__title" :svg="str.titleSvg" :alt="str.title" :label="str.titleLabel" pin />
+    <BlurTitle
+      class="sec-violation__title"
+      :svg="str.titleSvg"
+      :svg-narrow="str.titleSvgNarrow"
+      :alt="str.title"
+      :label="str.titleLabel"
+      pin
+    />
     <CaseStory
       v-for="(c, i) in cases"
       :key="c.id"

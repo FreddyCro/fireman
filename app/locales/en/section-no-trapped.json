@@ -7,6 +7,7 @@
   "title": "Fires With No One Trapped",
   "titleLabel": "Fireground command should put firefighter safety first",
   "titleSvg": "",
+  "titleSvgNarrow": "",
   "chart": {
     "_chart": "Pinned chart (ui/PinChart): switches to slides[1] past the halfway point; legend keys match the legend ids in utils/02.no-trapped/chart.ts",
     "slides": {
@@ -36,7 +37,7 @@
         "Taichung Daya factory fire:",
         "no one trapped, yet firefighters were sent in"
       ],
-      "body": "At 1:45 a.m., a fire broke out at an illegally built factory in Daya, Taichung. No one was trapped inside, yet a squad leader sent two firefighters in with a thermal imaging camera to look for the source of the fire. Ten minutes later the building was fully engulfed, and both firefighters were killed.",
+      "body": "At 1:45 a.m., a fire broke out at an illegally built factory in Daya, Taichung. **No one was trapped inside**, yet a squad leader sent two firefighters in with a thermal imaging camera to look for the source of the fire. Ten minutes later the building was fully engulfed, and both firefighters were killed.",
       "count": {
         "number": "2",
         "label": "firefighters died"

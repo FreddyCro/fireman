@@ -2,6 +2,7 @@
   可拖曳的剪報／照片／影片（參考 mosbyfiles case-folder），跨 section 共用。拖曳範圍＝父元素（CaseStory 的 article）。
   外層 __item 給 Draggable 平移、內層 __paper 負責旋轉，兩者的 transform 才不會互相覆蓋。
   點擊（沒拖動）放大：滑鼠裝置直接開；觸控裝置第一下先亮放大符號，再點一次才開。
+  進入視窗時素材依序原地淡入（opacity 0 → 1，0.3s，順序見 ScrapbookLayout.reveal）。
 -->
 <script setup lang="ts">
 import { gsap } from 'gsap';
@@ -37,7 +38,7 @@ const boardStyle = computed(() => ({
   '--aspect-pc': props.aspect.pc,
 }));
 
-const itemStyle = (it: ScrapbookItem) => ({
+const itemStyle = (it: ScrapbookItem, i: number) => ({
   '--x-mob': it.mob.x,
   '--y-mob': it.mob.y,
   '--w-mob': it.mob.w,
@@ -51,7 +52,11 @@ const itemStyle = (it: ScrapbookItem) => ({
   '--w-pc': it.pc.w,
   '--r-pc': it.pc.r,
   '--ratio': it.ratio,
+  '--reveal': it.reveal ?? i,
 });
+
+// 進入視窗後素材依 reveal 順序淡入（每張間隔 0.3s，scss 的 transition-delay）
+const shown = useReveal(root, { threshold: 0.25 });
 
 /** 遮罩用圖片本身的 alpha，撕邊剪報的變暗色塊才不會露出方角 */
 const veilStyle = (it: ScrapbookItem) =>
@@ -184,7 +189,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div ref="root" class="scrapbook" :style="boardStyle">
+  <div ref="root" class="scrapbook" :class="{ 'scrapbook--shown': shown[0] }" :style="boardStyle">
     <div
       v-for="(it, i) in items"
       :key="it.src"
@@ -194,7 +199,7 @@ onBeforeUnmount(() => {
         'scrapbook__item--active': active === i,
         'scrapbook__item--zoomed': zoomed === i,
       }"
-      :style="itemStyle(it)"
+      :style="itemStyle(it, i)"
       :data-index="i"
     >
       <div ref="paperEls" class="scrapbook__paper">
