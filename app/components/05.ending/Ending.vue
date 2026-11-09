@@ -1,34 +1,55 @@
 <!--
   05 ending（黑底）。順序照設計稿：
   滿版大圖（捲動 zoom out）→ 照片拼貼（各張進入視窗時原地淡入；敬鵬擦汗那張在框內捲動 zoom in）→ 火焰圖＋支持聯合報區塊
-  版面座標在 app/utils/05.ending/collage.ts（1280 稿 px，這裡換算成百分比等比縮放）。
+  版面座標在 app/utils/05.ending/collage.ts：mob／pad／pc 各一份（各稿 px），這裡換算成百分比，
+  以 CSS 變數 --{d,l,t,w,ar,z}-{mob,pad,pc} 交給 Ending.scss 依斷點套用；某斷點沒列到的照片 display: none。
 -->
 <script setup lang="ts">
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { COLLAGE, FIRE_SRC, HERO, PHOTOS } from '~/utils/05.ending/collage';
+import { FIRE_SRC, HERO, LAYOUTS, PHOTOS, type Breakpoint } from '~/utils/05.ending/collage';
 import './Ending.scss';
 
 const str = useCopy().ending;
 const assetUrl = useAssetUrl();
 
+const BPS: Breakpoint[] = ['mob', 'pad', 'pc'];
 const pct = (v: number, base: number) => `${((v / base) * 100).toFixed(3)}%`;
 
-const photos = PHOTOS.map((p) => ({
-  ...p,
-  alt: str.photos[p.id as keyof typeof str.photos] ?? '',
-  style: {
-    left: pct(p.x - COLLAGE.x, COLLAGE.w),
-    top: pct(p.y - COLLAGE.y, COLLAGE.h),
-    width: pct(p.w, COLLAGE.w),
-    aspectRatio: `${p.w} / ${p.h}`,
-  },
-}));
-
-const collageStyle = {
-  '--collage-ratio': `${COLLAGE.w} / ${COLLAGE.h}`,
-  '--collage-overlap': COLLAGE.overlap / COLLAGE.w,
+/** 單張照片在各斷點的位置（框的百分比）、比例、疊放順序；沒列到＝不顯示 */
+const photoVars = (id: string) => {
+  const vars: Record<string, string | number> = {};
+  for (const bp of BPS) {
+    const { frame, stack } = LAYOUTS[bp];
+    const i = stack.findIndex((r) => r.id === id);
+    const r = stack[i];
+    if (!r) {
+      vars[`--d-${bp}`] = 'none';
+      continue;
+    }
+    vars[`--d-${bp}`] = 'block';
+    vars[`--l-${bp}`] = pct(r.x - frame.x, frame.w);
+    vars[`--t-${bp}`] = pct(r.y - frame.y, frame.h);
+    vars[`--w-${bp}`] = pct(r.w, frame.w);
+    vars[`--ar-${bp}`] = `${r.w} / ${r.h}`;
+    vars[`--z-${bp}`] = i + 1;
+  }
+  return vars;
 };
+
+const photos = PHOTOS.map((p) => ({ ...p, alt: str.photos[p.id as keyof typeof str.photos] ?? '', style: photoVars(p.id) }));
+
+/** 拼貼框：各斷點的比例、最大寬、疊進大圖的比例（相對框寬） */
+const collageStyle = Object.fromEntries(
+  BPS.flatMap((bp) => {
+    const { frame } = LAYOUTS[bp];
+    return [
+      [`--ratio-${bp}`, `${frame.w} / ${frame.h}`],
+      [`--max-${bp}`, frame.maxW ? `${frame.maxW}px` : '100%'],
+      [`--overlap-${bp}`, frame.overlap / frame.w],
+    ];
+  }),
+);
 
 const root = ref<HTMLElement | null>(null);
 const heroImg = ref<HTMLElement | null>(null);

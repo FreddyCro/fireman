@@ -1,5 +1,6 @@
-// 05 ending：黑底。大圖滿版；拼貼框照 1280 稿的 1054×1056 等比縮放、上緣疊進大圖；支持區塊置中 260 寬。
-// 設計稿：標題 24、紅線 260×2 #ca2528、內文 14/25 #efefef、按鈕 120×37 紅框膠囊。
+// 05 ending：黑底。大圖滿版；拼貼框依斷點換版面（mob 414 稿滿版縮放、pad 768 置中、pc 1054 置中疊進大圖）；
+// 支持區塊置中 260 寬。設計稿：標題 24、內文 14/25 #efefef、按鈕 120×37 膠囊；
+// pad／pc 標題下紅線 260×2 #ca2528、按鈕紅框，mob 沒有紅線、按鈕白框。
 $red: #ca2528;
 $text: #efefef;
 
@@ -28,21 +29,57 @@ $text: #efefef;
     will-change: transform;
   }
 
-  // ── 照片拼貼：位置是框的百分比（Ending.vue 由 collage.ts 換算），上緣疊進大圖 ──
+  // ── 照片拼貼：位置是框的百分比（Ending.vue 由 collage.ts 換算成 CSS 變數），上緣依 overlap 疊進大圖 ──
   &__collage {
     position: relative;
     width: 100%;
-    max-width: 1054px;
-    margin: calc(min(100%, 1054px) * var(--collage-overlap) * -1) auto 0;
-    aspect-ratio: var(--collage-ratio);
+    max-width: var(--max-mob);
+    margin: calc(min(100%, var(--max-mob)) * var(--overlap-mob) * -1) auto 0;
+    aspect-ratio: var(--ratio-mob);
+
+    @include rwd-min('tablet') {
+      max-width: var(--max-pad);
+      margin-top: calc(min(100%, var(--max-pad)) * var(--overlap-pad) * -1);
+      aspect-ratio: var(--ratio-pad);
+    }
+
+    @include rwd-min('pc') {
+      max-width: var(--max-pc);
+      margin-top: calc(min(100%, var(--max-pc)) * var(--overlap-pc) * -1);
+      aspect-ratio: var(--ratio-pc);
+    }
   }
 
   &__photo {
     position: absolute;
+    top: var(--t-mob);
+    left: var(--l-mob);
+    z-index: var(--z-mob);
+    display: var(--d-mob);
+    width: var(--w-mob);
     margin: 0;
     overflow: hidden;
+    aspect-ratio: var(--ar-mob);
     opacity: 0;
     transition: opacity 0.3s ease;
+
+    @include rwd-min('tablet') {
+      top: var(--t-pad);
+      left: var(--l-pad);
+      z-index: var(--z-pad);
+      display: var(--d-pad);
+      width: var(--w-pad);
+      aspect-ratio: var(--ar-pad);
+    }
+
+    @include rwd-min('pc') {
+      top: var(--t-pc);
+      left: var(--l-pc);
+      z-index: var(--z-pc);
+      display: var(--d-pc);
+      width: var(--w-pc);
+      aspect-ratio: var(--ar-pc);
+    }
 
     @media (prefers-reduced-motion: reduce) {
       transition: none;
@@ -66,19 +103,19 @@ $text: #efefef;
     flex-direction: column;
     align-items: center;
     max-width: 260px;
-    margin: 80px auto 0;
+    margin: 150px auto 0;
     text-align: center;
+
+    @include rwd-min('tablet') {
+      margin-top: 80px;
+    }
   }
 
   &__fire {
     display: block;
-    width: 160px;
+    width: 207px;
     height: auto;
     margin-bottom: 12px;
-
-    @include rwd-min('tablet') {
-      width: 207px;
-    }
   }
 
   &__title {
@@ -89,7 +126,10 @@ $text: #efefef;
     font-weight: 500;
     line-height: 1.4;
     letter-spacing: 0.03em;
-    border-bottom: 2px solid $red;
+
+    @include rwd-min('tablet') {
+      border-bottom: 2px solid $red;
+    }
   }
 
   &__body {
@@ -113,16 +153,21 @@ $text: #efefef;
     font-weight: 700;
     color: $text;
     text-decoration: none;
-    border: 2px solid $red;
+    border: 2px solid $text;
     border-radius: 999px;
     transition:
       background 0.2s ease,
       color 0.2s ease;
 
+    @include rwd-min('tablet') {
+      border-color: $red;
+    }
+
     &:hover,
     &:focus-visible {
       color: #fff;
       background: $red;
+      border-color: $red;
     }
 
     &:focus-visible {
