@@ -1,0 +1,138 @@
+// 05 ending：黑底。大圖滿版；拼貼框照 1280 稿的 1054×1056 等比縮放、上緣疊進大圖；支持區塊置中 260 寬。
+// 設計稿：標題 24、紅線 260×2 #ca2528、內文 14/25 #efefef、按鈕 120×37 紅框膠囊。
+$red: #ca2528;
+$text: #efefef;
+
+.sec-ending {
+  padding-bottom: 80px;
+  color: #fff;
+  background: #000;
+  overflow-x: clip;
+
+  // ── 滿版大圖：mob 裁成較高的比例，tablet 以上照稿 1280×519 ──
+  &__hero {
+    overflow: hidden;
+    aspect-ratio: 414 / 260;
+
+    @include rwd-min('tablet') {
+      aspect-ratio: 1280 / 519;
+    }
+  }
+
+  &__hero-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform-origin: 50% 60%;
+    will-change: transform;
+  }
+
+  // ── 照片拼貼：位置是框的百分比（Ending.vue 由 collage.ts 換算），上緣疊進大圖 ──
+  &__collage {
+    position: relative;
+    width: 100%;
+    max-width: 1054px;
+    margin: calc(min(100%, 1054px) * var(--collage-overlap) * -1) auto 0;
+    aspect-ratio: var(--collage-ratio);
+  }
+
+  &__photo {
+    position: absolute;
+    margin: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
+  }
+
+  &__photo--shown {
+    opacity: 1;
+  }
+
+  &__photo-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  // ── 支持聯合報 ──
+  &__support {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 260px;
+    margin: 80px auto 0;
+    text-align: center;
+  }
+
+  &__fire {
+    display: block;
+    width: 160px;
+    height: auto;
+    margin-bottom: 12px;
+
+    @include rwd-min('tablet') {
+      width: 207px;
+    }
+  }
+
+  &__title {
+    width: 100%;
+    margin: 0;
+    padding-bottom: 16px;
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0.03em;
+    border-bottom: 2px solid $red;
+  }
+
+  &__body {
+    margin: 12px 0 16px;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 25px;
+    color: $text;
+    text-align: justify;
+  }
+
+  &__cta {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    min-width: 120px;
+    height: 37px;
+    padding: 0 18px;
+    font-size: 15px;
+    font-weight: 700;
+    color: $text;
+    text-decoration: none;
+    border: 2px solid $red;
+    border-radius: 999px;
+    transition:
+      background 0.2s ease,
+      color 0.2s ease;
+
+    &:hover,
+    &:focus-visible {
+      color: #fff;
+      background: $red;
+    }
+
+    &:focus-visible {
+      outline: 2px solid #fff;
+      outline-offset: 2px;
+    }
+  }
+
+  &__cta-icon {
+    width: 8px;
+    height: 12px;
+  }
+}

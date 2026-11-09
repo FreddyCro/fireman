@@ -1,3 +1,25 @@
 {
-  "title": "ending"
+  "_alt": "Photo alt text keyed by id in app/utils/05.ending/collage.ts",
+  "hero": {
+    "alt": "Fire and smoke engulf the Ming Yang International plant"
+  },
+  "photos": {
+    "xufu": "After the explosion at the Xufu pharmaceutical plant in Taoyuan, firefighters keep spraying water into the night as the fire spreads to a neighboring paper warehouse",
+    "ladder": "Firefighters search from an aerial ladder at the Chengzhongcheng building fire in Kaohsiung",
+    "rest": "Exhausted firefighters wipe off sweat by the roadside after the Jingpeng fire",
+    "meifu": "A firefighter at the Meifu warehouse fire",
+    "funeral": "Colleagues break down watching a memorial video at the funeral of Taichung firefighters Hsieh Chih-hsiung and Chang Che-chia",
+    "rescue": "Firefighters lead a resident out of the Chengzhongcheng building fire in Kaohsiung",
+    "masks": "Firefighters in breathing apparatus help residents evacuate the Chengzhongcheng building in Kaohsiung",
+    "mingyang": "The scene of the explosion at the Ming Yang International plant in Pingtung",
+    "feili": "A firefighter rehydrates after taking off her gear following the first wave of firefighting at a bridal shop fire in Kaohsiung",
+    "gear": "A firefighter takes off his sweat-soaked turnout gear after battling the Jingpeng fire all night"
+  },
+  "fireAlt": "",
+  "support": {
+    "title": "Support United Daily News your way",
+    "body": "Join United Daily News in holding government to account and watching over society, and help turn reporting into a force for change. In-depth coverage and sharp analysis of global trends, policy, business, education and everyday life.",
+    "cta": "Subscribe",
+    "href": "https://vip.udn.com/vip/order?from=Newmedia"
+  }
 }
