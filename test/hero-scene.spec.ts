@@ -107,7 +107,17 @@ describe('hero 3-6v 捲動影片（設計師測試）', () => {
     expect(el.playback?.mode).toBe('scroll');
     const range = el.playback!.mode === 'scroll' ? el.playback!.range : [0, 0];
     expect(range[1]).toBe(t1);
-    expect(vh(range[1]) - vh(range[0])).toBe(400);
+    expect(vh(range[1]) - vh(range[0])).toBe(150);
+  });
+
+  it('3-6 靜態圖同樣 cover 舞台，在 3-6v 出現的同一點硬切消失', () => {
+    const still = heroScene.elements.find((e) => e.id === '3-6')!;
+    expect(still.cover).toBe('stage');
+    const range = el.playback!.mode === 'scroll' ? el.playback!.range : [0, 0];
+    const gone = still.keyframes.find((k) => k.p >= range[0] && k.opacity === 0);
+    const shown = el.keyframes.find((k) => k.p === range[0]);
+    expect(gone?.p).toBe(range[0]);
+    expect(shown?.opacity).toBe(1);
   });
 
   it('scrub 區間內沒有文字', () => {

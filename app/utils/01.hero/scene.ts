@@ -1,6 +1,7 @@
 // Hero「消防員之死」分鏡，來自 POC C 版（/poc/fire-story-paced，設計見 architecture/2026-10-22-fire-story-paced-design.md）。
 // C1～C3 是整張不透明的直式插畫，以幻燈片交叉淡化串接（只有 2-1 有 zoom）；
-// 3-6 之後插一支橫式影片（3-6v，設計師測試中）：綁捲動 scrub、所有載具都 cover 滿版，前後硬切；
+// 3-6 換成橫式靜態圖、後接橫式影片 3-6v（設計師測試中，2026-11-10 版）：兩者都 cover: 'stage'（三載具同高、Pad/Mob 左右裁），
+// 3-5 → 3-6 淡入、3-6 → 3-6v 硬切（注意：3-6 與影片首格構圖不同，硬切會跳）、3-6v 綁捲動 scrub、3-6v → 4-1 硬切；
 // C4 是動畫師交的影片：捲到觸發點自動原速播放、播完接下一段，由 sequence 控制，影片之間硬切。
 // 文字在 Hero.vue 的 DOM overlay，與幻燈片同一條進度軸。
 //
@@ -15,7 +16,7 @@ const H = 1920;
 const CENTER: [number, number] = [0.5, 0.5];
 
 /** 跑道長度（vh）；捲動距離 = 跑道 − 一個畫面（舞台 100lvh） */
-export const HERO_TRACK_VH = 2600;
+export const HERO_TRACK_VH = 2350;
 const DIST = HERO_TRACK_VH - 100;
 
 /** 捲動位置（vh）→ 進度 p */
@@ -25,7 +26,13 @@ const range = (a: number, b: number): [number, number] => [at(a), at(b)];
 /** 硬切、隱藏用的極小進度差 */
 const EPS = 0.0001;
 
-const image = (name: string): SpriteConfig => ({ src: `${DIR}/${name}.webp`, frames: 1, cellW: W, cellH: H, anchor: CENTER });
+const image = (name: string, cellW = W, cellH = H): SpriteConfig => ({
+  src: `${DIR}/${name}.webp`,
+  frames: 1,
+  cellW,
+  cellH,
+  anchor: CENTER,
+});
 const video = (name: string, cellW = W, cellH = H): SpriteConfig => ({
   src: `${DIR}/${name}.mp4`,
   kind: 'video',
@@ -81,8 +88,8 @@ function slide(id: string, sprite: SpriteConfig, o: SlideOpts): ElementConfig {
 
 /** 3-6v 硬切出現、開始 scrub 的位置 */
 const V0 = 1275;
-/** 3-6v 的 scrub 長度：8.5 秒 205 格，約每 2vh 一格 */
-const V_LEN = 400;
+/** 3-6v 的 scrub 長度：3.6 秒 36 格（10fps），約每 4vh 一格 */
+const V_LEN = 150;
 /** 3-6v 到最後一格、硬切 4-1 並觸發播放（3 秒）；C4 的段落都以這裡為起點排 */
 const T1 = V0 + V_LEN;
 /** 觸發 4-3（3 秒），硬切蓋掉 4-2 loop。區 0 拉到 400vh，參考紐時 6 秒影片配約 360vh */
@@ -128,10 +135,10 @@ export const heroScene: SceneConfig = {
     slide('3-3', image('3-3'), { layer: 8, fadeIn: [816, 884], hideAt: 969 }),
     slide('3-4', image('3-4'), { layer: 9, fadeIn: [901, 969], hideAt: 1054 }),
     slide('3-5', image('3-5'), { layer: 10, fadeIn: [986, 1054], hideAt: 1207 }),
-    // 3-6 與 2-2 是同一張圖
-    slide('3-6', image('2-2'), { layer: 11, fadeIn: [1139, 1207], hideAt: V0 }),
+    // 3-6 橫式靜態圖（測試）：從 3-5 淡入，在 V0 硬切成影片；和 3-6v 一樣不跟場景的 smart
+    slide('3-6', image('3-6', 1920, 1080), { layer: 11, fadeIn: [1139, 1207], hideAt: V0, cover: 'stage' }),
     // 3-6v 橫式影片（測試）：前後硬切、捲動 scrub；不跟場景的 smart，桌機滿版、平板手機高度頂滿左右裁
-    slide('3-6v', video('3-6-test', 1920, 1080), {
+    slide('3-6v', video('3-6', 1920, 1080), {
       layer: 12,
       cutIn: V0,
       hideAt: T1,
