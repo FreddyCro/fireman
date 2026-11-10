@@ -1,0 +1,68 @@
+// 03 工安違法事實：section 根樣式與內文版面。案例版面在 ui/CaseStory.scss，圖表在 ui/PinChart.scss。
+$text: #f0f0f0;
+$column: 620px;
+
+.sec-violation {
+  // mob 稿內文欄 362＝414 − 26×2
+  padding: 64px 26px;
+  color: #fff;
+  background: #000;
+  // 擋 scrapbook 旋轉素材撐出橫向捲軸。用 clip 而不是 hidden：hidden 會把 section 變成
+  // scroll container，裡面的 position: sticky 就失效。
+  overflow-x: clip;
+
+  @include rwd-min('tablet') {
+    padding: 96px 40px;
+  }
+
+  &__title {
+    margin: 0 0 48px;
+
+    @include rwd-min('tablet') {
+      margin-bottom: 64px;
+    }
+  }
+
+  // 桃園敬鵬 scrapbook 的落點：與內文同寬的空位，比例跟 board 一樣（CaseStory flyTo）。pad 稿 520 寬置中
+  &__board-slot {
+    max-width: $column;
+    margin: 0 auto 40px;
+    aspect-ratio: var(--aspect-mob);
+
+    @include rwd-min('tablet') {
+      max-width: min(520px, var(--board-pad));
+      aspect-ratio: var(--aspect-pad);
+    }
+
+    @include rwd-min('pc') {
+      max-width: $column;
+      aspect-ratio: var(--aspect-pc);
+    }
+  }
+
+  // 內文段落：pad 稿 530 欄、pc 稿 620 欄，18/36、#f0f0f0
+  &__text {
+    max-width: $column;
+    margin: 0 auto 64px;
+    font-size: 18px;
+    line-height: 2;
+    color: $text;
+
+    @include rwd-min('tablet') {
+      max-width: 530px;
+      margin-bottom: 80px;
+    }
+
+    @include rwd-min('pc') {
+      max-width: $column;
+    }
+
+    p {
+      margin: 0 0 1em;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}

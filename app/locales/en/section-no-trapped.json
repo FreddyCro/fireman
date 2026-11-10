@@ -1,0 +1,106 @@
+{
+  "intro": {
+    "title": "27 Firefighters Killed in a Decade: Two Systemic Gaps That Keep Burning",
+    "lead": "National Fire Agency yearbooks show that major fires fell sharply over the past decade compared with the decade before, yet the number of firefighters killed on the fireground has only grown."
+  },
+  "transition": "The causes of firefighter deaths are complex. For this report we interviewed Dr. Chang Hsien-ho, along with Lin Chang-chih, secretary-general, and Cheng Shao-shu, deputy chair, of the Taiwan Firefighters' Rights Association, to look at fireground entry rules, factory safety, staffing and daily duties, and ask how to learn from past tragedies, reduce risk and save lives.",
+  "title": "Fires With No One Trapped",
+  "titleLabel": "Fireground command should put firefighter safety first",
+  "titleSvg": "",
+  "titleSvgNarrow": "",
+  "chart": {
+    "_chart": "Pinned chart (ui/PinChart): switches to slides[1] past the halfway point; legend keys match the legend ids in utils/02.no-trapped/chart.ts",
+    "slides": {
+      "before": {
+        "title": "Major fires fell year after year in the previous decade",
+        "legend": {
+          "fires": "Major fires: 35,085",
+          "deaths": "Firefighter deaths: 17"
+        }
+      },
+      "after": {
+        "title": "Fewer major fires in the past decade, yet more firefighters died?",
+        "legend": {
+          "fires": "Major fires: 14,234",
+          "deaths": "Firefighter deaths: 27"
+        }
+      }
+    },
+    "alt": "Chart of major fires and firefighter deaths by year",
+    "note": "Note: On January 1, 2017, the National Fire Agency revised its fire classification standard and broadened the scope of statistics. A1: fires causing deaths. A2: fires causing injuries, involving disputes or arson, or with causes under investigation.",
+    "source": "Source: National Fire Agency statistical yearbooks"
+  },
+  "cases": {
+    "taichung": {
+      "date": "October 3, 2019",
+      "title": [
+        "Taichung Daya factory fire:",
+        "no one trapped, yet firefighters were sent in"
+      ],
+      "body": "At 1:45 a.m., a fire broke out at an illegally built factory in Daya, Taichung. **No one was trapped inside**, yet a squad leader sent two firefighters in with a thermal imaging camera to look for the source of the fire. Ten minutes later the building was fully engulfed, and both firefighters were killed.",
+      "count": {
+        "number": "2",
+        "label": "firefighters died"
+      },
+      "alt": {
+        "clipping": "United Daily News clipping, Oct. 4, 2019: “No one trapped, but the fire must still be controlled”",
+        "photo": "Scene of the sheet-metal factory fire in Daya, Taichung",
+        "video": "Video of the sheet-metal factory fire in Daya, Taichung"
+      }
+    }
+  },
+  "story": {
+    "_story": "first paragraph contains a link: before + link + after form one sentence",
+    "first": {
+      "before": "Dr. Chang Hsien-ho, now a tenured associate professor at Embry-Riddle Aeronautical University's Worldwide Campus, once wrote in ",
+      "link": "United Daily News' Opinion column",
+      "href": "https://opinion.udn.com/opinion/story/6663/2804816",
+      "after": " about a question a classmate asked him while he was studying in the United States in 2005. It has stayed with him ever since."
+    },
+    "rest": [
+      "At the time, a fierce apartment fire was about to burn the building to the ground. No firefighters went inside; they only sprayed water from the perimeter to stop it spreading. In class the next day he asked a classmate why they had not gone in to attack the seat of the fire. The classmate shot back: \"Nobody was trapped. Why send firefighters in to risk their lives just to put it out a little sooner?\" He was struck by how different this was from Taiwan. Just months before he left for the US, a fire had broken out at an illegal electrical factory in Sanxia, then Taipei County. A firefighter went in alone to look for the fire's source in a building with no one trapped, and did not come out alive."
+    ]
+  },
+  "profile": {
+    "name": "Dr. Chang Hsien-ho",
+    "bio": "Tenured associate professor at Embry-Riddle Aeronautical University's Worldwide Campus. A former section chief at the New Taipei City Fire Department, he went on to earn his doctorate in the US and has taken part in major disaster research and response-policy planning in both the US and Taiwan.",
+    "alt": "Dr. Chang Hsien-ho during the interview"
+  },
+  "priorities": {
+    "_priorities": "svg is the Chinese artwork (number, Chinese title and English subtitle are all in the image); when svg is empty the title / sub text is rendered instead",
+    "lead": "Dr. Chang points to the three incident priorities used in the United States:",
+    "items": [
+      {
+        "svg": "",
+        "title": "Life Safety",
+        "sub": "Life Safety"
+      },
+      {
+        "svg": "",
+        "title": "Incident Stability",
+        "sub": "Incident Stability"
+      },
+      {
+        "svg": "",
+        "title": "Property Conservation",
+        "sub": "Property Conservation"
+      }
+    ]
+  },
+  "afterPriorities": [
+    "Dr. Chang stresses that when the risk to firefighters is likely to rise, commanders must assess carefully rather than rushing to shrink the fire or protect property. This order of priorities should hold from training through to the fireground, and firefighters should not have to pay for management failures that could have been controlled. Since Taiwan passed the three firefighter-rights amendments in 2019, neglecting risk assessment can lead to serious casualties.",
+    "On the experience of front-line crews in recent years, Cheng Shao-shu shared the account of an anonymous firefighter, nicknamed Chao, who narrowly escaped a factory fire."
+  ],
+  "quote": "I once went into a factory with no one trapped. I heard an explosion and a rush of gas. I yelled run! We scrambled out on our hands and knees......",
+  "meifu": {
+    "paragraphs": [
+      "Years on, fireground risk assessment for firefighter safety has not fully changed even after the right-to-retreat amendment. But Cheng Shao-shu points to the 2022 Meifu warehouse fire, fought defensively, as a case where the risk assessment was more cautious.",
+      "Crews advanced slowly from outside. The fire burned for 21 days before it was out, and the stench hung over the whole neighbourhood. The commander withstood pressure from residents and local politicians, refusing to chase a quick knockdown and putting firefighters' lives first."
+    ],
+    "alt": [
+      "The Meifu warehouse fire. Photo courtesy of Taoyuan City Fire Department",
+      "Firefighters on an aerial ladder putting out the smouldering fourth-floor cold store on the south side of the Meifu warehouse"
+    ],
+    "caption": "The fourth-floor cold store on the south side of the Meifu warehouse smouldered until the operator removed the sealed steel panels, letting firefighters finally reach the fire. Photo: Yang Chan-hua"
+  }
+}

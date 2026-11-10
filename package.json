@@ -12,6 +12,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@nuxtjs/i18n": "^10.6.0",
     "@udn-digital-center/common-components": "^0.3.4",
     "gsap": "^3.15.0",
     "nuxt": "^4.4.5",

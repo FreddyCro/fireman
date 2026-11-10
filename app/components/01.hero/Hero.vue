@@ -1,6 +1,5 @@
 <!-- 「消防員之死」捲動動畫，來自 POC C 版（/poc/fire-story-paced）。分鏡與時間軸在 utils/01.hero/scene.ts。 -->
 <script setup lang="ts">
-import str from '~/locales/section-hero.json';
 import { clamp01 } from '~/utils/paper-scroll/keyframes';
 import type { SequenceState } from '~/utils/paper-scroll/sequence';
 import {
@@ -15,6 +14,8 @@ import {
   type HeroCue,
 } from '~/utils/01.hero/scene';
 import './Hero.scss';
+
+const str = useCopy().hero;
 
 // 除錯面板在手機上會蓋住半個畫面，網址加 ?debug 才開；prerender 時不知道 query，掛載後才判斷以免 hydration 不一致
 const debug = ref(false);

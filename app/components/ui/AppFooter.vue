@@ -4,10 +4,10 @@ import {
   NmdFooter,
   NmdShare,
 } from '@udn-digital-center/common-components';
-import { shareURL_fb, shareURL_twitter, useLineShareUrl } from '@/utils/share';
-import strFooter from '@/locales/footer.json';
+import { useShareUrls } from '@/utils/share';
 
-const lineHref = useLineShareUrl();
+const share = useShareUrls();
+const strFooter = useCopy().footer;
 
 const CURRENT_YEAR = new Date().getFullYear();
 </script>
@@ -27,9 +27,9 @@ const CURRENT_YEAR = new Date().getFullYear();
       </NmdAuthor>
       <ClientOnly>
         <NmdShare
-          :facebook="{ href: shareURL_fb }"
-          :line="{ href: lineHref, target: '_blank' }"
-          :twitter="{ href: shareURL_twitter }"
+          :facebook="{ href: share.fb }"
+          :line="{ href: share.line.value, target: '_blank' }"
+          :twitter="{ href: share.twitter }"
           twitter-icon="x"
         />
       </ClientOnly>

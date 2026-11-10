@@ -2,7 +2,7 @@
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import str from '../app/locales/section-hero.json';
+import str from '../app/locales/zh/section-hero.json';
 import { HERO_ROLL, HERO_TEXT, HERO_TRACK_VH, exitPresence, heroScene } from '../app/utils/01.hero/scene';
 
 /** p → vh，取到 0.001vh 免得浮點誤差讓 ≥ 比較失敗 */

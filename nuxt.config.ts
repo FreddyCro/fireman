@@ -13,6 +13,28 @@ export default defineNuxtConfig({
 
   ssr: true,
 
+  modules: ['@nuxtjs/i18n'],
+
+  // 中文 /、英文 /en，沒有動態切換、不偵測瀏覽器語言。
+  // 只用模組的路由與 SEO（<html lang>、hreflang）；文案不走 vue-i18n messages，見 composables/useCopy.ts。
+  i18n: {
+    strategy: 'prefix_except_default',
+    defaultLocale: 'zh',
+    locales: [
+      { code: 'zh', language: 'zh-TW' },
+      { code: 'en', language: 'en' },
+    ],
+    detectBrowserLanguage: false,
+    // hreflang 要絕對網址。只給 origin：模組會自己接上 app.baseURL（/fireman/），給完整 NUXT_URL 會重複
+    baseUrl: (() => {
+      try {
+        return new URL(process.env.NUXT_URL ?? '').origin;
+      } catch {
+        return '';
+      }
+    })(),
+  },
+
   experimental: {
     // 純靜態站用不到 /_nuxt/builds/meta/<id>.json（沒有 route rules、不需要偵測新版）。
     appManifest: false,
@@ -74,7 +96,8 @@ export default defineNuxtConfig({
       // vue-scrollto 為 CJS-only（common-components 內部會 import 它），
       // 預先 bundle 成 ESM 才有 default export；common-components 若是延遲載入，
       // Vite 初掃描不到，故明確列入，避免 dev 期間觸發整頁 reload。
-      include: ['vue-scrollto', '@udn-digital-center/common-components'],
+      // gsap 插件同理：02 scrapbook 的 Draggable / InertiaPlugin 晚於初掃描才被發現。
+      include: ['vue-scrollto', '@udn-digital-center/common-components', 'gsap/Draggable', 'gsap/InertiaPlugin'],
     },
     css: {
       preprocessorOptions: {

@@ -1,0 +1,70 @@
+{
+  "title": "Safety Violations",
+  "titleLabel": "Firefighters are entering high-risk, non-compliant factories more often",
+  "titleSvg": "",
+  "titleSvgNarrow": "",
+  "cases": {
+    "pingtung": {
+      "date": "September 22, 2023",
+      "title": [
+        "Pingtung: Ming Yang International",
+        "stored excess chemicals, sparking a fire"
+      ],
+      "body": "At 5:31 p.m., a gas explosion at a Ming Yang International warehouse set off a major fire. The company had **illegally stored the chemical crosslinking agent C40-P at 30 times the permitted safety limit**, and the room temperature exceeded the safe storage temperature. Four firefighters who went in to rescue trapped workers were thrown by the blast wave, burned and struck by flying debris, and died after being taken to hospital.",
+      "count": {
+        "number": "4",
+        "label": "firefighters died"
+      },
+      "alt": {
+        "video": "Aerial video of the Ming Yang International warehouse fire",
+        "report": "Ming Yang International fire investigation report: firefighters killed by the fire triggered by the explosion",
+        "photo": "Scene of the Ming Yang International warehouse fire"
+      }
+    },
+    "taoyuan": {
+      "date": "April 28, 2018",
+      "title": [
+        "Taoyuan: Chin-Poon Industrial breached fire compartments,",
+        "letting the fire spread with ease"
+      ],
+      "body": "At 9:28 p.m., flames erupted at the Chin-Poon factory. The company had illegally run exhaust ducts through the walls, breaching the fire compartments without authorization, and firefighters only discovered unidentified solvents stored on site after they arrived. Because the building data they held did not match the actual conditions, the firefighters became trapped and could not get out in time. Six died.",
+      "count": {
+        "number": "6",
+        "label": "firefighters died"
+      },
+      "alt": {
+        "video": "Video of the Chin-Poon factory fire",
+        "report": "Comprehensive review report: illegal construction and breached fire compartments let the fire spread",
+        "ducts": "Exhaust ducts piercing the fire compartment wall to the outside",
+        "photo": "Scene of the Chin-Poon factory fire"
+      }
+    }
+  },
+  "lead": "According to the National Fire Agency's 2025 yearbook, fires in factories and warehouses, the categories most prone to industrial safety incidents, nearly doubled over the past decade compared with the decade before. More fires of this kind mean firefighters enter high-risk environments more often, and this is the main reason factory-fire deaths have risen in the past ten years. Central and local government audits of high-risk factories have yet to show clear results, and regulations and inspections need to be enforced more rigorously.",
+  "chart": {
+    "_chart": "Pinned chart (ui/PinChart): switches to slides[1] past the halfway point; legend keys match the legend ids in utils/03.violation/chart.ts",
+    "slides": {
+      "before": {
+        "title": "Factory and warehouse fires were already falling in the previous decade",
+        "legend": {
+          "factory": "Factories: 2,947",
+          "warehouse": "Warehouses: 1,193"
+        }
+      },
+      "after": {
+        "title": "In the past decade the numbers surged and have stayed high",
+        "legend": {
+          "factory": "Factories: 4,337",
+          "warehouse": "Warehouses: 3,056"
+        }
+      }
+    },
+    "alt": "Chart of factory and warehouse fires by year, 2004 to 2025",
+    "note": "Note: On January 1, 2017, the National Fire Agency revised its fire classification standard and broadened the scope of statistics.",
+    "source": "Source: National Fire Agency statistical yearbooks"
+  },
+  "quotes": [
+    "Dr. Chang Hsien-ho stresses that factories should build their own safety management systems. The simplest way to tell whether a factory is an accident waiting to happen is to look at its office environment and overall management. Factories that end up in disasters are mostly cluttered and chaotic, cutting corners on safety details and neglecting occupational safety rules until catastrophe strikes.",
+    "Cheng Shao-shu, deputy chair of the firefighters' rights association, says that after the deadly Xinwu fire in 2015 and the Chin-Poon fire in 2018, Taoyuan now has more complete digital building data for its factories than other cities and counties. Even so, the data firefighters hold is only partial, and conditions on the scene remain full of uncertainty."
+  ]
+}

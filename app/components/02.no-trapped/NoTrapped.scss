@@ -1,119 +1,371 @@
-// 02 無人受困的火場。mob：文字在上、素材在下；tablet 以上左右兩欄，偶數案例對調。
+// 02 無人受困的火場：section 根樣式與內文版面。案例版面在 ui/CaseStory.scss，圖表在 ui/PinChart.scss。
+// 設計稿：內文欄 mob 362 寬（414 − 26×2）、pad 530 寬置中（導言、受訪者卡、應變順序、__text--wide 為 620）、pc 620 寬置中；
+// 內文 18/36、色 #f0f0f0；圖說 15/22。
 $serif: 'Noto Serif TC', 'Songti TC', 'PMingLiU', serif;
-$orange: #f07a2c;
+$text: #f0f0f0;
+$orange: #ed7223;
+$column: 620px;
 
+// mob 稿內文欄 362＝414 − 26×2，左右留 26
 .sec-no-trapped {
-  padding: 64px 16px;
+  padding: 64px 26px;
   color: #fff;
   background: #000;
-  overflow: hidden;
+  // 擋 scrapbook 旋轉素材撐出橫向捲軸。用 clip 而不是 hidden：hidden 會把 section 變成
+  // scroll container，裡面的 position: sticky（圖表 pin）就失效。
+  overflow-x: clip;
 
   @include rwd-min('tablet') {
     padding: 96px 40px;
   }
 
-  &__title {
-    margin: 0 0 48px;
-    font-family: $serif;
-    font-size: 28px;
-    text-align: center;
+  // ── 導言 ──
+  &__intro {
+    max-width: $column;
+    margin: 0 auto 64px;
 
     @include rwd-min('tablet') {
-      font-size: 36px;
+      margin-bottom: 96px;
     }
   }
 
-  &__case {
-    position: relative;
+  &__intro-title {
+    margin: 0 0 20px;
+    font-family: $serif;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.55;
+    letter-spacing: 0.1em;
+    color: #f5f5f5;
+
+    @include rwd-min('tablet') {
+      font-size: 30px;
+      line-height: 50px;
+    }
+  }
+
+  &__intro-lead {
+    margin: 0;
+    font-size: 18px;
+    line-height: 2;
+    color: $text;
+  }
+
+  // ── 內文段落：pad 稿多數段落 530 寬，pc 620 ──
+  &__text {
+    max-width: $column;
+    margin: 0 auto 64px;
+    font-size: 18px;
+    line-height: 2;
+    color: $text;
+
+    @include rwd-min('tablet') {
+      max-width: 530px;
+      margin-bottom: 80px;
+    }
+
+    @include rwd-min('pc') {
+      max-width: $column;
+    }
+
+    p {
+      margin: 0 0 1em;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    a {
+      color: inherit;
+      text-decoration: underline;
+      text-underline-offset: 0.15em;
+    }
+  }
+
+  // pad 稿也是 620 寬的段落（應變順序之後那段）
+  &__text--wide {
+    @include rwd-min('tablet') {
+      max-width: $column;
+    }
+  }
+
+  // 圖表與大標之間的過場段落：上下各留一個視窗高的呼吸空間
+  &__text--transition {
+    margin: 96px auto;
+
+    @include rwd-min('tablet') {
+      margin: 160px auto;
+    }
+  }
+
+  // 台中案例 scrapbook 的落點：與內文同寬的空位，比例跟 board 一樣（CaseStory flyTo）
+  &__board-slot {
+    max-width: $column;
+    margin: 0 auto 40px;
+    aspect-ratio: var(--aspect-mob);
+
+    // pad 稿落點 443 寬置中
+    @include rwd-min('tablet') {
+      max-width: min(443px, var(--board-pad));
+      aspect-ratio: var(--aspect-pad);
+    }
+
+    @include rwd-min('pc') {
+      max-width: $column;
+      aspect-ratio: var(--aspect-pc);
+    }
+  }
+
+  // 大標改用 ui/BlurTitle（SVG + 滾動 blur），這裡只管與案例的間距
+  &__title {
+    margin: 0 0 48px;
+
+    @include rwd-min('tablet') {
+      margin-bottom: 64px;
+    }
+  }
+
+  // ── 受訪者卡：mob 照片滿版在上；tablet 以上照片 204×140 在左、文字在右 ──
+  &__profile {
     display: flex;
     flex-direction: column;
-    gap: 24px;
-    max-width: 1100px;
-    margin: 0 auto 80px;
+    gap: 20px;
+    max-width: $column;
+    margin: 0 auto 40px;
 
     @include rwd-min('tablet') {
       flex-direction: row;
+      gap: 22px;
       align-items: flex-start;
-      gap: 32px;
-      margin-bottom: 120px;
     }
   }
 
-  &__case--reverse {
-    @include rwd-min('tablet') {
-      flex-direction: row-reverse;
-    }
-  }
-
-  &__text {
-    position: relative;
-    z-index: 0;
+  &__profile-img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 362 / 248;
+    object-fit: cover;
 
     @include rwd-min('tablet') {
-      flex: 0 0 40%;
-      padding-top: 24px;
+      flex: none;
+      width: 204px;
+      aspect-ratio: 204 / 140;
     }
   }
 
-  &__date {
-    margin: 0 0 8px;
+  &__profile-text {
+    color: $text;
+
+    @include rwd-min('tablet') {
+      padding-top: 16px;
+    }
+  }
+
+  &__profile-name {
+    margin: 0 0 5px;
+    font-size: 22px;
+    line-height: 30px;
+    letter-spacing: 0.1em;
+  }
+
+  &__profile-bio {
+    margin: 0;
     font-size: 15px;
-    letter-spacing: 0.05em;
+    line-height: 25px;
+    text-align: justify;
   }
 
-  &__heading {
-    display: flex;
-    flex-direction: column;
-    margin: 0 0 16px;
-    font-family: $serif;
-    font-size: 24px;
-    line-height: 1.4;
+  // ── 3 項災害應變順序 ──
+  &__priorities {
+    max-width: $column;
+    margin: 0 auto 40px;
+    color: $text;
+  }
+
+  &__priorities-lead {
+    margin: 0 0 40px;
+    font-size: 18px;
+    line-height: 2;
 
     @include rwd-min('tablet') {
-      font-size: 28px;
+      text-align: center;
     }
-  }
-
-  &__body {
-    margin: 0 0 24px;
-    font-size: 14px;
-    line-height: 1.8;
-    color: #ccc;
-    text-align: justify;
 
     @include rwd-min('pc') {
-      font-size: 15px;
-    }
-  }
-
-  &__count {
-    margin: 0;
-    font-family: $serif;
-    font-size: 32px;
-    color: $orange;
-    text-align: center;
-
-    @include rwd-min('tablet') {
-      font-size: 36px;
       text-align: left;
     }
   }
 
-  &__count-num {
-    margin-right: 4px;
-    font-size: 72px;
-    line-height: 1;
+  &__priorities-list {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    width: 300px;
+    margin: 0 auto;
+    padding: 0;
+    list-style: none;
 
+    // pad 稿 280 寬、間距 80；pc 稿 370、60
     @include rwd-min('tablet') {
-      font-size: 96px;
+      width: 280px;
+      gap: 80px;
+    }
+
+    @include rwd-min('pc') {
+      width: 370px;
+      gap: 60px;
     }
   }
 
-  &__board {
+  &__priorities-item {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
+  }
+
+  &__priorities-item--shown {
+    opacity: 1;
+  }
+
+  // 中文版：整行是 SVG（設計稿 350×100 / 370×95 / 339×107），依寬縮放
+  &__priorities-img {
+    display: block;
     width: 100%;
+    height: auto;
+  }
+
+  // 英文 fallback：序號＋標題＋副標，顏色照設計稿橘字
+  &__priorities-num {
+    flex: none;
+    width: 64px;
+    font-family: $serif;
+    font-size: 96px;
+    line-height: 1;
+    color: $orange;
+  }
+
+  &__priorities-text {
+    display: flex;
+    flex-direction: column;
+    color: $orange;
+  }
+
+  &__priorities-title {
+    font-family: $serif;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  &__priorities-sub {
+    font-family: $serif;
+    font-size: 16px;
+  }
+
+  // ── 引言：置中襯線粗體，上下留白讓它獨占一屏 ──
+  &__quote {
+    max-width: 532px;
+    margin: 0 auto;
+    padding: 120px 0;
+    font-family: $serif;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.5;
+    letter-spacing: 0.1em;
+    color: #f5f5f5;
+    text-align: center;
+    will-change: filter; // 隨捲動 blur（NoTrapped.vue useScrollBlur）
 
     @include rwd-min('tablet') {
-      flex: 1 1 auto;
+      max-width: 530px;
+      padding: 200px 0;
+      font-size: 30px;
+      line-height: 50px;
     }
+
+    @include rwd-min('pc') {
+      max-width: 532px;
+      line-height: 40px;
+    }
+
+    p {
+      margin: 0;
+    }
+  }
+
+  &__quote-mark {
+    display: block;
+    line-height: 1;
+  }
+
+  // ── 引言後的插畫：只有 mob 稿有（362×448），素材未到先放 placeholder ──
+  &__illust {
+    max-width: $column;
+    margin: 0 auto 64px;
+    aspect-ratio: 362 / 448;
+    background: #1a1a1a;
+    outline: 1px dashed #444;
+
+    @include rwd-min('tablet') {
+      display: none;
+    }
+  }
+
+  // ── 美福倉儲照片：mob 上下疊、tablet 以上並排 ──
+  // pad 稿 654 寬（322×2＋10）、pc 820（402×2＋15）
+  &__gallery {
+    max-width: 654px;
+    margin: 0 auto;
+
+    @include rwd-min('pc') {
+      max-width: 820px;
+    }
+  }
+
+  &__gallery-grid {
+    display: grid;
+    gap: 10px;
+    max-width: $column;
+    margin: 0 auto 15px;
+
+    @include rwd-min('tablet') {
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      max-width: none;
+    }
+
+    @include rwd-min('pc') {
+      gap: 15px;
+    }
+  }
+
+  &__gallery-img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 362 / 271;
+    object-fit: cover;
+
+    @include rwd-min('tablet') {
+      aspect-ratio: 322 / 242;
+    }
+
+    @include rwd-min('pc') {
+      aspect-ratio: 402 / 302;
+    }
+  }
+
+  &__gallery-caption {
+    max-width: $column;
+    margin: 0 auto;
+    font-size: 15px;
+    line-height: 22px;
+    color: $text;
   }
 }
