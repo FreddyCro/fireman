@@ -2,6 +2,7 @@
   滾動 blur 大標：大標是 SVG（文字已轉圖），從 blur(maxBlur) 隨捲動清晰到 blur(0)。
   svg 沒給（如該語系還沒有正式稿）就直接渲染 alt 文字，一樣 blur。
   svgNarrow 有給時，pc 斷點以下改用它（如 03 大標 mob／pad 是直書、pc 是橫書）。
+  svgMob 有給時，tablet 斷點以下再改用它（如 04 英文版 mob 另有一張）；不給就沿用 svgNarrow。
   label 有給就在上方顯示小標（白底黑字），小標不 blur。
 
   兩種模式：
@@ -11,7 +12,7 @@
   prefers-reduced-motion 時不做動畫、直接清晰。
 -->
 <script setup lang="ts">
-import { PC_BREAKPOINTS } from '~/utils/constants';
+import { PC_BREAKPOINTS, TABLET_BREAKPOINTS } from '~/utils/constants';
 import './BlurTitle.scss';
 
 const props = withDefaults(
@@ -20,6 +21,8 @@ const props = withDefaults(
     svg?: string;
     /** pc 斷點以下用的 SVG（直書版）；空字串＝各斷點都用 svg */
     svgNarrow?: string;
+    /** tablet 斷點以下用的 SVG；空字串＝沿用 svgNarrow */
+    svgMob?: string;
     /** 大標文字，給 <img alt> 與 SEO 用 */
     alt: string;
     /** 上方小標；不給就不顯示 */
@@ -41,6 +44,7 @@ const props = withDefaults(
   {
     svg: '',
     svgNarrow: '',
+    svgMob: '',
     label: undefined,
     tag: 'h2',
     maxBlur: 10,
@@ -72,6 +76,7 @@ useScrollBlur(
       <p v-if="label" class="blur-title__label">{{ label }}</p>
       <component :is="tag" class="blur-title__title">
         <picture v-if="svg">
+          <source v-if="svgMob" :media="`(max-width: ${TABLET_BREAKPOINTS - 0.02}px)`" :srcset="assetUrl(svgMob)" />
           <source v-if="svgNarrow" :media="`(max-width: ${PC_BREAKPOINTS - 0.02}px)`" :srcset="assetUrl(svgNarrow)" />
           <img ref="img" class="blur-title__img" :src="assetUrl(svg)" :alt="alt" />
         </picture>

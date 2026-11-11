@@ -1,0 +1,351 @@
+// 04 各國消防員服務比（ManpowerChart.vue、ManpowerChartDots.vue）
+// 設計稿：圖表 pc 720×720、pad 620×704（PC、PAD 規格相同）、mob 362 寬；圖表→註解 40
+// 字級（註記 2430:3085～2431:3094）：intro 小標 20/60、問句 30/60（pad 32、mob 25/40）、一位民眾 20/60（pad、mob 18）；
+// P02/P03 標題 20/60、國家＋人 30/60、大數字 72/60；P04 國家 20/60、數字 32/50、單位 16/60 50%
+@use './ManpowerTokens' as *;
+
+.mp-chart {
+  &__track {
+    height: calc(100svh + var(--steps) * 80vh);
+  }
+
+  &__stage {
+    position: sticky;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    height: 100vh;
+    height: 100svh;
+    padding: 0 $mp-gutter;
+  }
+
+  &__box {
+    // 圓點：方塊點距、長條點距。視窗矮時跟著縮，讓最高的台灣（方塊 44 列、長條 128 列）塞得進舞台；
+    // 扣掉的是標題、國名、數字等文字的高度
+    --pitch: clamp(3px, calc((90svh - 300px) / 44), 5px);
+    --bar-pitch: clamp(1.5px, calc((90svh - 230px) / 128), 2.4px);
+
+    position: relative;
+    width: 100%;
+    max-width: 362px;
+    height: min(560px, 90svh);
+    font-family: $mp-sans;
+    color: $mp-text;
+    text-align: center;
+    background: $mp-bg;
+
+    @include rwd-min('tablet') {
+      --pitch: clamp(3px, calc((92svh - 400px) / 44), 7px);
+      --bar-pitch: clamp(1.5px, calc((92svh - 320px) / 128), 3px);
+
+      max-width: $mp-wide-pad;
+      height: min(704px, 92svh);
+    }
+
+    @include rwd-min('pc') {
+      max-width: $mp-chart-pc;
+      height: min(720px, 92svh);
+    }
+  }
+
+  // 四個狀態疊在一起，只顯示目前這個
+  &__state {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 30px 0 40px;
+    opacity: 0;
+    transition: opacity $mp-fade-slow;
+    pointer-events: none;
+
+    &--active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    &--intro {
+      justify-content: center;
+      color: $mp-white;
+    }
+  }
+
+  // ── 0：intro ──
+  &__intro-label {
+    margin: 0;
+    font-size: 18px;
+    line-height: 60px;
+
+    @include rwd-min('tablet') {
+      font-size: 20px;
+    }
+  }
+
+  &__intro-question {
+    margin: 0 0 60px;
+    font-size: 25px;
+    line-height: 40px;
+
+    @include rwd-min('tablet') {
+      font-size: 32px;
+      line-height: 60px;
+    }
+
+    @include rwd-min('pc') {
+      font-size: 30px;
+    }
+  }
+
+  &__person {
+    display: flex;
+    flex-direction: column;
+    gap: $mp-gap-s;
+    align-items: center;
+    margin: 0;
+    font-size: 18px;
+    line-height: 30px;
+
+    @include rwd-min('pc') {
+      font-size: 20px;
+    }
+  }
+
+  &__person-dot {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: $mp-white;
+  }
+
+  // ── 共用標題 ──
+  &__title {
+    margin: 0;
+    font-size: 18px;
+    line-height: 30px;
+    letter-spacing: 0.1em;
+
+    @include rwd-min('tablet') {
+      font-size: 20px;
+      line-height: 60px;
+    }
+  }
+
+  // ── 1、2：方塊 ──
+  &__pairs {
+    display: flex;
+    flex: 1;
+    gap: 24px;
+    align-items: flex-end;
+    justify-content: center;
+    width: 100%;
+
+    @include rwd-min('tablet') {
+      gap: 60px;
+    }
+  }
+
+  &__pair {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+
+    &--accent {
+      color: $mp-accent;
+    }
+  }
+
+  &__name {
+    margin: 0;
+    font-size: 22px;
+    line-height: 40px;
+
+    @include rwd-min('tablet') {
+      font-size: 30px;
+      line-height: 60px;
+    }
+  }
+
+  &__big {
+    margin: 0;
+    font-size: 48px;
+    line-height: 56px;
+    font-variant-numeric: tabular-nums;
+
+    @include rwd-min('tablet') {
+      font-size: 72px;
+      line-height: 80px;
+    }
+  }
+
+  &__unit {
+    margin-left: 4px;
+    font-size: 22px;
+
+    @include rwd-min('tablet') {
+      font-size: 30px;
+    }
+  }
+
+  &__diff {
+    margin: auto 0 12px;
+    font-size: 22px;
+    line-height: 30px;
+
+    @include rwd-min('tablet') {
+      font-size: 30px;
+      line-height: 60px;
+    }
+  }
+
+  // 名稱、數字在上，方塊貼底；台灣的橘色差額疊在白色方塊上方
+  &__pair &__dots:first-of-type {
+    margin-top: auto;
+  }
+
+  &__pair--accent &__diff + &__dots {
+    margin-top: 0;
+  }
+
+  // ── 3：長條 ──
+  &__bars {
+    display: flex;
+    flex: 1;
+    gap: 8px;
+    align-items: stretch;
+    justify-content: center;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    @include rwd-min('tablet') {
+      gap: 30px;
+    }
+  }
+
+  &__bar {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    max-width: 90px;
+
+    &--accent {
+      color: $mp-accent;
+    }
+  }
+
+  &__bar-name {
+    font-size: 15px;
+    line-height: 30px;
+    white-space: nowrap;
+
+    @include rwd-min('tablet') {
+      font-size: 20px;
+      line-height: 60px;
+    }
+  }
+
+  &__bar-value {
+    margin-bottom: 12px;
+    font-size: 22px;
+    line-height: 30px;
+    font-variant-numeric: tabular-nums;
+
+    @include rwd-min('tablet') {
+      font-size: 32px;
+      line-height: 50px;
+    }
+  }
+
+  &__bar-dots {
+    --pitch: var(--bar-pitch);
+
+    margin-top: auto;
+  }
+
+  // 長條下方靠左
+  &__unit-note {
+    align-self: flex-start;
+    margin: 8px 0 0;
+    font-size: 14px;
+    line-height: 20px;
+    color: $mp-muted;
+
+    @include rwd-min('tablet') {
+      margin-left: 30px;
+      font-size: 16px;
+      line-height: 24px;
+    }
+  }
+
+  // ── 註解與資料來源（不 pin，緊接在跑道後）──
+  &__note {
+    box-sizing: border-box;
+    width: 100%;
+    margin: $mp-gap-m auto 0;
+    padding-inline: $mp-gutter;
+    @include mp-note;
+
+    @include rwd-min('tablet') {
+      max-width: $mp-col-pad;
+      padding-inline: 0;
+    }
+
+    @include rwd-min('pc') {
+      max-width: $mp-col-pc;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: underline;
+      text-underline-offset: 0.15em;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &__state {
+      transition: none;
+    }
+  }
+}
+
+// 圓點方塊（ManpowerChartDots.vue）：--pitch 點距、--dot 顏色，由外層給
+.mp-dots {
+  --dot: #{$mp-white};
+  --r: calc(var(--pitch) * 0.34);
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+
+  &--accent {
+    --dot: #{$mp-accent};
+  }
+
+  &__row,
+  &__block {
+    display: block;
+    height: var(--pitch);
+    background: radial-gradient(circle, var(--dot) var(--r), transparent calc(var(--r) + 0.5px)) 0 0 / var(--pitch)
+      var(--pitch);
+  }
+
+  &__row {
+    width: calc(var(--rem) * var(--pitch));
+  }
+
+  &__block {
+    width: calc(var(--cols) * var(--pitch));
+    height: calc(var(--rows) * var(--pitch));
+  }
+}

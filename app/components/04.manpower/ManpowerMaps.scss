@@ -1,0 +1,174 @@
+// 04 四縣市地圖（ManpowerMaps.vue）
+// 設計稿：說明 25/48＋圖例 15/20（間距 20），文字欄寬；地圖帶滿版 pc 1280×500、pad 768×500、mob 414×325，
+// 單張地圖寬 620（pc），旁邊兩張 opacity 30%；箭頭 16×16 在中間那張左右
+@use './ManpowerTokens' as *;
+
+.mp-maps {
+  margin: $mp-gap-m 0 0;
+
+  &__head {
+    display: flex;
+    flex-direction: column;
+    gap: $mp-gap-s;
+    margin-bottom: $mp-gap-s;
+    @include mp-column;
+  }
+
+  &__captions {
+    display: grid;
+  }
+
+  &__caption {
+    grid-area: 1 / 1;
+    margin: 0;
+    font-family: $mp-sans;
+    font-size: 25px;
+    line-height: 48px;
+    color: $mp-text;
+    visibility: hidden;
+
+    &--active {
+      visibility: visible;
+    }
+  }
+
+  &__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $mp-gap-s;
+    align-items: center;
+    margin: 0;
+    font-family: $mp-sans;
+    font-size: 15px;
+    line-height: 20px;
+    color: $mp-text;
+  }
+
+  &__legend-scale,
+  &__legend-station {
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+  }
+
+  &__legend-bar {
+    width: 69px;
+    height: 9px;
+    border-radius: 10px;
+    background: $mp-legend-gradient;
+  }
+
+  &__legend-dot {
+    width: 9px;
+    height: 9px;
+    border: 1px solid $mp-bg;
+    border-radius: 50%;
+    background: $mp-text;
+  }
+
+  // ── 地圖帶 ──
+  &__strip {
+    --item: 300px;
+    --gap: 16px;
+
+    position: relative;
+    height: 325px;
+    overflow: hidden;
+
+    @include rwd-min('tablet') {
+      --item: 520px;
+      --gap: 24px;
+
+      height: 500px;
+    }
+
+    @include rwd-min('pc') {
+      --item: 620px;
+      --gap: 32px;
+    }
+  }
+
+  // 從中線往左推，讓第 --i 張置中
+  &__list {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    display: flex;
+    gap: var(--gap);
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    transform: translateX(calc(-1 * (var(--i) + 0.5) * var(--item) - var(--i) * var(--gap)));
+    transition: transform $mp-fade-slow ease;
+  }
+
+  &__item {
+    flex: none;
+    width: var(--item);
+    height: 100%;
+    opacity: 0.3;
+    cursor: pointer;
+    transition: opacity $mp-fade-slow;
+
+    &--active {
+      opacity: 1;
+      cursor: default;
+    }
+  }
+
+  &__img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  &__arrow {
+    position: absolute;
+    top: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    transform: translateY(-50%);
+
+    &:disabled {
+      opacity: 0.3;
+      cursor: default;
+    }
+
+    // mob 貼齊文字欄邊緣；tablet 以上貼在中間那張地圖兩側
+    &--prev {
+      left: calc($mp-gutter - 14px);
+
+      @include rwd-min('tablet') {
+        left: calc(50% - var(--item) / 2 - 22px);
+      }
+    }
+
+    &--next {
+      right: calc($mp-gutter - 14px);
+
+      @include rwd-min('tablet') {
+        right: calc(50% - var(--item) / 2 - 22px);
+      }
+
+      img {
+        transform: rotate(180deg);
+      }
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &__list,
+    &__item {
+      transition: none;
+    }
+  }
+}

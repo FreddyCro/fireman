@@ -1,0 +1,165 @@
+// 04 屏東地圖 scrollytelling（ManpowerPingtung.vue）
+// 設計稿：pc 整組 607×353（文字 387＋地圖 212，第二段起文字 263＋地圖 317）、pad 620×353、mob 文字 362 在上、地圖 212×353 置中在下
+@use './ManpowerTokens' as *;
+
+.mp-pingtung {
+  // 跑道：一屏舞台＋每段 100vh
+  height: calc(100svh + var(--steps) * 100vh);
+
+  &__stage {
+    position: sticky;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    height: 100vh;
+    height: 100svh;
+    padding: 0 $mp-gutter;
+  }
+
+  &__inner {
+    display: flex;
+    flex-direction: column;
+    gap: $mp-gap-s;
+    align-items: center;
+    width: 100%;
+    max-width: 362px;
+
+    @include rwd-min('tablet') {
+      flex-direction: row;
+      gap: $mp-gap-s;
+      max-width: $mp-wide-pad;
+    }
+
+    @include rwd-min('pc') {
+      max-width: 607px;
+    }
+  }
+
+  // 每段文字疊在同一格，只顯示目前這段
+  &__texts {
+    display: grid;
+    flex: 1 1 auto;
+    width: 100%;
+  }
+
+  &__text {
+    grid-area: 1 / 1;
+    align-self: center;
+    margin: 0;
+    opacity: 0;
+    transition: opacity $mp-fade-slow;
+    @include mp-body;
+
+    &--active {
+      opacity: 1;
+    }
+  }
+
+  // 地圖：縣市圖 212 寬、屏東市分隊圖 317 寬（mob 依寬度縮放）
+  &__map {
+    position: relative;
+    flex: none;
+    width: 212px;
+    aspect-ratio: 213 / 355;
+    transition: width $mp-fade-slow;
+
+    &--city {
+      width: min(317px, 100%);
+      aspect-ratio: 318 / 355;
+    }
+  }
+
+  &__layer {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity $mp-fade-slow;
+
+    &--county {
+      opacity: 1;
+    }
+  }
+
+  &__map--city &__layer--county {
+    opacity: 0;
+  }
+
+  &__map--city &__layer--city {
+    opacity: 1;
+  }
+
+  &__img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  // 縣市標籤：設計稿在地圖左上（45×44），英文版縮小到 10px
+  &__place {
+    position: absolute;
+    top: 11.3%;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    font-family: $mp-sans;
+    font-size: 15px;
+    line-height: 22px;
+    color: $mp-text;
+
+    &:lang(en) {
+      font-size: 10px;
+      line-height: 14px;
+    }
+  }
+
+  // 分隊標籤：名稱 18/40、人數 35/40 橘色
+  &__station {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    font-family: $mp-sans;
+    white-space: nowrap;
+  }
+
+  &__station-name {
+    font-size: 15px;
+    line-height: 30px;
+    color: $mp-text;
+
+    @include rwd-min('tablet') {
+      font-size: 18px;
+      line-height: 40px;
+    }
+  }
+
+  // 建國分隊 0 人時字級 23，有人後放大到 35
+  &__station-count {
+    font-size: 23px;
+    line-height: 40px;
+    color: $mp-accent;
+    font-variant-numeric: tabular-nums;
+    transition: font-size $mp-fade-slow;
+
+    &--grown {
+      font-size: 28px;
+
+      @include rwd-min('tablet') {
+        font-size: 35px;
+      }
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &__text,
+    &__layer,
+    &__map,
+    &__station-count {
+      transition: none;
+    }
+  }
+}

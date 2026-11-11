@@ -1,4 +1,4 @@
-// 中英文文案（app/locales/{zh,en}/）：兩邊檔案與結構要一致，英文不能殘留中文
+// 中英文文案（app/locales/{zh,en}/）：中文為主，英文只能有中文有的 key（缺的執行時用中文補），英文不能殘留中文
 import { readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -30,8 +30,17 @@ describe('文案中英對照', () => {
     expect(readdirSync(dir('en')).filter((f) => f.endsWith('.json')).sort()).toEqual([...files].sort());
   });
 
-  it.each(files)('%s 中英文結構一致', (file) => {
-    expect(shape(load('en', file))).toEqual(shape(load('zh', file)));
+  it.each(files)('%s 英文沒有中文以外的 key、型別一致', (file) => {
+    expect(shape(load('zh', file))).toMatchObject(shape(load('en', file)) as object);
+  });
+
+  it.each(files)('%s 英文不用空字串佔位（缺翻譯就不要填，讓中文補上）', (file) => {
+    const zhStrings = new Map(strings(load('zh', file)));
+    // 陣列是整段替換、不逐項補中文，陣列裡的空字串是刻意的（例如英文不用中文 SVG），不檢查
+    const blanks = strings(load('en', file)).filter(
+      ([path, s]) => s === '' && zhStrings.get(path) && !/\.\d+(\.|$)/.test(path),
+    );
+    expect(blanks).toEqual([]);
   });
 
   it.each(files)('%s 英文沒有殘留中文', (file) => {

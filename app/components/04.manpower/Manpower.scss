@@ -1,0 +1,90 @@
+// 04 人力吃緊：section 根樣式、引言與文字區塊。互動區塊各自的 scss：
+// ManpowerPingtung / ManpowerIllustration / ManpowerMaps / ManpowerChart。token 在 ManpowerTokens.scss（只給本 section 用）。
+// 設計稿：文字欄 mob 362（左右 26）、pad 520、pc 620；小標 30/50（mob 30/40）Bold；內文 18/36；段落間空一行（36）
+@use './ManpowerTokens' as *;
+
+.sec-manpower {
+  color: $mp-text;
+  background: $mp-bg;
+  // 地圖帶滿版、輪播往兩側推出去，用 clip 擋橫向捲軸（hidden 會讓 sticky 失效）
+  overflow-x: clip;
+
+  // 大標：SVG 照原尺寸顯示，只用高度封頂（中文 pad／mob 直書共用一張，mob 縮成約 120 寬）
+  &__title {
+    .blur-title__title {
+      max-width: none;
+    }
+
+    .blur-title__img {
+      width: auto;
+      max-width: 100%;
+      max-height: min(550px, 75svh);
+      margin: 0 auto;
+
+      @include rwd-min('tablet') {
+        max-height: min(645px, 80svh);
+      }
+    }
+  }
+
+  // 專家引言：pc 620、pad 530、mob 362；引言 Serif SemiBold（pc 30/45、pad／mob 25/40），出處靠右 18/36
+  &__quote {
+    display: flex;
+    flex-direction: column;
+    gap: $mp-gap-s;
+    margin-block: $mp-gap-l;
+    will-change: filter;
+    @include mp-column($mp-quote-pad, $mp-col-pc);
+
+    @include rwd-min('tablet') {
+      margin-block: 120px;
+    }
+  }
+
+  &__quote-body {
+    margin: 0;
+    font-family: $mp-serif;
+    font-size: 25px;
+    font-weight: 600;
+    line-height: 40px;
+
+    @include rwd-min('pc') {
+      font-size: 30px;
+      line-height: 45px;
+    }
+  }
+
+  &__quote-by {
+    font-family: $mp-serif;
+    font-size: 18px;
+    line-height: 36px;
+    text-align: right;
+  }
+
+  // 文字區塊：小標 → 內文 40；區塊之間 80
+  &__block {
+    margin-top: $mp-gap-l;
+    @include mp-column;
+
+    &--last {
+      padding-bottom: $mp-gap-l;
+    }
+  }
+
+  &__subtitle {
+    margin: 0 0 $mp-gap-m;
+    @include mp-subtitle;
+  }
+
+  &__text {
+    @include mp-body;
+
+    p {
+      margin: 0 0 36px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}

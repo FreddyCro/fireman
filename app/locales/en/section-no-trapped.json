@@ -6,8 +6,6 @@
   "transition": "The causes of firefighter deaths are complex. For this report we interviewed Dr. Chang Hsien-ho, along with Lin Chang-chih, secretary-general, and Cheng Shao-shu, deputy chair, of the Taiwan Firefighters' Rights Association, to look at fireground entry rules, factory safety, staffing and daily duties, and ask how to learn from past tragedies, reduce risk and save lives.",
   "title": "Fires With No One Trapped",
   "titleLabel": "Fireground command should put firefighter safety first",
-  "titleSvg": "",
-  "titleSvgNarrow": "",
   "chart": {
     "_chart": "Pinned chart (ui/PinChart): switches to slides[1] past the halfway point; legend keys match the legend ids in utils/02.no-trapped/chart.ts",
     "slides": {

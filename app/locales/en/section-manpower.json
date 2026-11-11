@@ -1,3 +1,138 @@
 {
-  "title": "Stretched Thin"
+  "_figma": "設計稿：EN pc 2484:42217 → 2464:2143；屏東地圖狀態 2464:3589、2464:3611；各國比較 2477:7211～2464:7372",
+  "title": "Short-Staffed but Still Expected to Go Door to Door Promoting Smoke Alarms",
+  "titleSvg": "/img/manpower/title0101_en_pc.svg",
+  "titleSvgNarrow": "/img/manpower/title0101_en_pad.svg",
+  "titleSvgMob": "/img/manpower/title0101_en_mob.svg",
+  "pingtung": {
+    "_pingtung": "屏東地圖 scrollytelling：steps 依序對應三個狀態，分隊人數放 utils/04.manpower/stations.ts，以 id 對應 stations",
+    "steps": [
+      "After the 2023 Launch Technologies fire claimed the lives of four firefighters, the Pingtung County Council began considering a third fire station in Pingtung City in early 2024 to address staffing shortages and the heavy demand for emergency medical services among the city’s 190,000 residents.",
+      "Councilors questioned whether the new Pingsan Fire Station would simply draw personnel from nearby stations—Pingtung, with 37 firefighters, and Gongguan, with 20. Without an increase in total staffing, opening another station could weaken each crew’s response capacity and stretch personnel even thinner.",
+      "In an interview in late 2025, Pingtung County Fire Department Director Li Pin-cheng said the new station would receive an additional 15 to 18 personnel. Whether those positions would be filled as promised, rather than through transfers from other stations, remained to be seen."
+    ],
+    "place": [
+      "Pingtung County",
+      "Pingtung City"
+    ],
+    "stations": {
+      "pingtung": "Pingtung",
+      "gongguan": "Gongguan",
+      "jianguo": "Jianguo"
+    }
+  },
+  "quote": {
+    "body": "“Fire stations are not convenience stores. Opening more stations without providing enough personnel only weakens teamwork. When small crews scattered across different locations come together to respond to a fire, a lack of coordination can cost them their lives.”",
+    "by": "— Ray Hsienho Chang, Ph.D., U.S.-based disaster response expert"
+  },
+  "illustration": {
+    "_illustration": "8 人小分隊插畫，隨捲動切換；設計稿在第三、四句之間註記互動：[Interactive sequence: An incoming call reports a medical emergency or fire.]",
+    "lines": [
+      "A Day at a Small Suburban Fire Station with Eight Firefighters",
+      "Three firefighters are on a scheduled rest break in the station’s sleeping quarters, leaving five on duty.",
+      "Two leave for a nighttime patrol.",
+      "One remains at the watch desk.",
+      "The remaining two take an ambulance out on a call.",
+      "Another fire is reported. No crew is immediately available to respond.",
+      "Firefighters must interrupt their rest to provide backup, compromising their recovery and physical and mental health."
+    ]
+  },
+  "deploy": {
+    "title": "Use Data-Driven Analysis to Determine Fire Station Locations",
+    "body": [
+      "Ray Hsienho Chang, Ph.D., who has closely observed operations at the Phoenix Fire Department in the United States, said that spreading personnel across small stations does not solve staffing shortages.",
+      "Fire and police services once belonged to the same system in Taiwan, so many early fire stations were located near police stations. A nearby police station may give residents a sense of neighborhood security, but having a fire station next door does not prevent fires. Even if a crew arrives quickly, insufficient staffing means it must still wait for reinforcements.",
+      "An additional station can help share the demand for emergency medical services, Chang said. But effective fire response ultimately depends on training and coordination with neighboring crews.",
+      "He favors concentrating more personnel at larger stations. Beyond staff assigned to ambulance services, safety inspections, and other regular duties, this arrangement allows more firefighters to be deployed at any given time. Building a cohesive response team should come first. Temporary mobile posts can then be established for major events, such as New Year’s celebrations, large concerts, or parades, according to the expected crowds.",
+      "Chang explained that locating fire stations requires a different approach from defining police jurisdictions. Geographic information systems (GIS) should be used to identify densely populated areas and calculate the coverage reachable within an eight-minute drive of each station, compared with five minutes for urban fire departments in the United States.",
+      "Putting too many stations in the same administrative district can leave each with too few personnel to conduct full-team emergency response training."
+    ],
+    "maps": {
+      "_maps": "四張地圖（屏東、新北、桃園、台中）用地圖 JSON 灌資料；caption 空字串＝該縣市沒有說明（設計稿只有新北有）",
+      "regions": {
+        "pingtung": {
+          "name": "Pingtung County",
+          "caption": ""
+        },
+        "newTaipei": {
+          "name": "New Taipei City",
+          "caption": "Yonghe District has the highest concentration of fire stations in New Taipei City. The Yonghe and Yongli fire stations are just 550 meters apart in a straight line."
+        },
+        "taoyuan": {
+          "name": "Taoyuan City",
+          "caption": ""
+        },
+        "taichung": {
+          "name": "Taichung City",
+          "caption": ""
+        }
+      },
+      "legend": {
+        "min": "0",
+        "max": "160 Reported Fires",
+        "stations": "Fire Station Locations"
+      }
+    }
+  },
+  "staffing": {
+    "title": "International Comparison of Firefighter Staffing and Shift Schedules",
+    "body": [
+      "According to National Fire Agency figures released this July, Taiwan has 18,254 fire service personnel, against an authorized staffing level of 23,716. The reported shortfall is 6,326, or 26% of the total.",
+      "Taiwan has one firefighter for every 1,280 residents, still falling behind the average of fewer than 1,000 residents per firefighter in neighboring Asian countries.",
+      "NAFR vice chair Cheng Shao-shu urged the government to close this gap by working toward a ratio of one firefighter per 1,000 residents."
+    ],
+    "chart": {
+      "_chart": "捲動切換四個狀態：intro（一位民眾）→ 日本 → 日本 vs 台灣 → 五國長條；人數放 utils/04.manpower/staffing.ts，以 id 對應 countries。英文稿各狀態的標題都用 label 那句；英文稿數字後沒有單位、也沒有「單位」註記，unit / unitNote 先不填（顯示中文），待確認",
+      "intro": {
+        "label": "Comparing Firefighter Numbers with National Populations",
+        "question": "How Many People Does Each Firefighter Serve on Average?",
+        "person": "One Person"
+      },
+      "title": "Comparing Firefighter Numbers with National Populations",
+      "countries": {
+        "jp": "Japan",
+        "kr": "Korea",
+        "us": "U.S.",
+        "sg": "Singapore",
+        "tw": "Taiwan"
+      },
+      "note": "Notes: 1.Firefighter-to-population ratios are calculated using publicly available data on firefighter numbers and national populations as of July this year. 2.Singapore's figures include Singapore Civil Defence Force (SCDF) firefighters and full-time National Servicemen (NSFs), based on SCDF staffing data and figures disclosed by the Ministry of Home Affairs (MHA). The ratio is calculated against Singapore's citizen population.",
+      "sources": {
+        "_sources": "連結放 utils/04.manpower/staffing.ts 的 SOURCES，以 id 對應（英文稿沒有加連結，先沿用中文的）",
+        "label": "Sources: ",
+        "sep": ", ",
+        "end": ".",
+        "items": {
+          "nfa": "Taiwan's National Fire Agency",
+          "nafr": "Firefighters' Rights Promotion Association",
+          "hk": "Hong Kong Fire Services Department",
+          "jp": "Japan's Fire and Disaster Management Agency",
+          "kr": "Statistics Korea",
+          "us": "U.S. National Fire Department Registry",
+          "sg": "Singapore's Ministry of Home Affairs (MHA) and Singapore Civil Defence Force (SCDF)"
+        }
+      }
+    }
+  },
+  "duties": {
+    "title": "Too Many Duties, Not Enough Time: Can Smart Systems Help Firefighters Keep Up?",
+    "body": [
+      "Cheng observed that many stations have just five firefighters on duty to maintain basic operations. Training is interrupted as soon as a call comes in. Over time, this makes it impossible to carry out intensive training for complex scenarios requiring coordinated action.",
+      "Since fire services became independent of the police system in 1995, some routine assignments have become increasingly difficult to justify. These include nighttime patrols around election campaign headquarters, vehicle patrols to prevent drowning, and door-to-door visits to promote smoke alarms.",
+      "Cheng said that non-emergency medical calls take up 70% to 80% of firefighters’ time. With too little time left for training, they must also perform duties resembling police work. When a fire breaks out, these assignments can make it harder to reach the scene promptly.",
+      "Given the staffing shortage, Chang said, Taiwan should reconsider whether a dedicated watch desk is necessary. Phasing out the requirement to staff it could free up at least one additional firefighter per shift.",
+      "This September brought a breakthrough in station staffing. Previously, stations assigned personnel to keep the watch desk staffed around the clock. The Taipei City Fire Department introduced an Internet of Things (IoT) system through its first “smart-duty fire station” initiative.",
+      "When an emergency call comes in, the system automatically broadcasts dispatch alerts to the floors where responding personnel are located, turns on lights, and opens vehicle bay doors. Automating these tasks frees up watch desk personnel and improves response efficiency.",
+      "The pilot has performed well so far, raising the prospect of expansion to other stations."
+    ]
+  },
+  "rights": {
+    "title": "Advancing Firefighters’ Rights and Working Conditions",
+    "body": [
+      "Training a firefighter takes considerable effort. Their lives are more precious still. From administrative management to frontline rescue operations, Taiwan must consistently put firefighters’ life safety first.",
+      "NAFR secretary-general Lin Chang-chih said that efforts to establish a union have continued to face obstacles in recent years. However, some cities and counties have made substantial progress on working hours, rest schedules, compensatory leave, and overtime pay. These changes provide compensation for long hours—and, more importantly, give firefighters more time to rest.",
+      "Chang recommended that, alongside investments in facilities and equipment and changes to work–rest schedules and public-facing duties, the government devote resources to studying the nature of firefighters’ work and improving training and operational readiness.",
+      "Fire service administration should also be updated to reflect Taiwan’s specific conditions. Used effectively, AI could support more accurate decision-making, so that emergency responders do not have to shoulder risks based solely on experience and judgments made at the scene."
+    ]
+  }
 }
