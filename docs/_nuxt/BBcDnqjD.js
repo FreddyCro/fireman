@@ -1,0 +1,1 @@
+import{o as e}from"./DC-DkOTf.js";function t(){let t=e().public.APP_ASSETS_PATH;return e=>!e||/^(https?:)?\/\//.test(e)||e.startsWith(`data:`)?e??``:`${t}${e}`}export{t};

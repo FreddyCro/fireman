@@ -1,1 +1,0 @@
-import{$ as e,E as t,I as n}from"./LLldYW5k.js";import{t as r}from"./CEJb6j68.js";import{t as i}from"./DjbXS-z-.js";var a=n({__name:`fire-story`,setup(n){return i({i18n:!1}),(n,i)=>{let a=r;return e(),t(a,{variant:`scrub`})}}});export{a as default};
