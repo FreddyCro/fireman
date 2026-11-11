@@ -65,6 +65,8 @@
         "max": "160件火災通報案",
         "stations": "消防分隊駐點"
       },
+      "_popupCount": "hover／點擊鄉鎮的彈出視窗，{count} 換成通報數；英文稿沒有這句",
+      "popupCount": "{count}件火災通報案",
       "prev": "上一個縣市",
       "next": "下一個縣市"
     }

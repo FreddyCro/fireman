@@ -59,11 +59,12 @@
   }
 
   &__legend-dot {
+    box-sizing: border-box;
     width: 9px;
     height: 9px;
-    border: 1px solid $mp-bg;
+    border: 1px solid $mp-pin-ring;
     border-radius: 50%;
-    background: $mp-text;
+    background: $mp-pin;
   }
 
   // ── 地圖帶 ──
@@ -117,11 +118,71 @@
     }
   }
 
-  &__img {
+  &__svg {
     display: block;
     width: 100%;
     height: 100%;
-    object-fit: contain;
+  }
+
+  // 鄉鎮：依通報數上色（inline fill），黑色細邊；只有中間那張可 hover
+  &__town {
+    stroke: $mp-bg;
+    stroke-width: 0.6;
+    vector-effect: non-scaling-stroke;
+    transition: opacity $mp-fade;
+  }
+
+  &__item--active &__town {
+    cursor: pointer;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
+  &__town--hover {
+    stroke: $mp-accent;
+    stroke-width: 2;
+  }
+
+  // 消防分隊據點（同圖例的點）
+  // 消防分隊據點：灰點白邊（同圖例 Ellipse 268：#6F6F6F、邊 #FAFAFA）。
+  // 零長度線段＋圓頭，線寬不隨 viewBox 縮放 → 各斷點都是固定像素的圓（外圈 7px、內圈 5px）
+  &__pin {
+    fill: none;
+    stroke: $mp-pin;
+    stroke-width: 5px;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+    pointer-events: none;
+
+    &--ring {
+      stroke: $mp-pin-ring;
+      stroke-width: 7px;
+    }
+  }
+
+  // 彈出視窗：白底、20/40 Medium、padding 5 15、radius 10，寬度隨文字（設計註記 2477:7203）
+  &__popup {
+    position: absolute;
+    z-index: 2;
+    margin: 0;
+    padding: 5px 15px;
+    border-radius: 10px;
+    font-family: $mp-sans;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 30px;
+    color: $mp-bg;
+    white-space: nowrap;
+    background: $mp-white;
+    transform: translate(-50%, calc(-100% - 12px));
+    pointer-events: none;
+
+    @include rwd-min('tablet') {
+      font-size: 20px;
+      line-height: 40px;
+    }
   }
 
   &__arrow {

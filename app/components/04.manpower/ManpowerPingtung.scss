@@ -1,5 +1,6 @@
 // 04 屏東地圖 scrollytelling（ManpowerPingtung.vue）
-// 設計稿：pc 整組 607×353（文字 387＋地圖 212，第二段起文字 263＋地圖 317）、pad 620×353、mob 文字 362 在上、地圖 212×353 置中在下
+// 設計稿：pc 整組 607×353（文字＋地圖）、pad 620×353、mob 文字 362 在上、地圖置中在下；地圖容器 317×353
+// 鄉鎮：填 #454545，第一段邊線 #D3D3D4 50%、屏東市標橘；zoom 後屏東市邊線白色（pic0201／pic0202）
 @use './ManpowerTokens' as *;
 
 .mp-pingtung {
@@ -28,7 +29,6 @@
 
     @include rwd-min('tablet') {
       flex-direction: row;
-      gap: $mp-gap-s;
       max-width: $mp-wide-pad;
     }
 
@@ -57,51 +57,65 @@
     }
   }
 
-  // 地圖：縣市圖 212 寬、屏東市分隊圖 317 寬（mob 依寬度縮放）
+  // 地圖容器 317×353；矮螢幕的 mob 再縮
   &__map {
     position: relative;
     flex: none;
-    width: 212px;
-    aspect-ratio: 213 / 355;
-    transition: width $mp-fade-slow;
+    width: min(317px, 100%, calc((100svh - 300px) * 317 / 353));
+    aspect-ratio: 317 / 353;
 
-    &--city {
-      width: min(317px, 100%);
-      aspect-ratio: 318 / 355;
+    @include rwd-min('tablet') {
+      width: 317px;
     }
   }
 
-  &__layer {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    transition: opacity $mp-fade-slow;
-
-    &--county {
-      opacity: 1;
-    }
-  }
-
-  &__map--city &__layer--county {
-    opacity: 0;
-  }
-
-  &__map--city &__layer--city {
-    opacity: 1;
-  }
-
-  &__img {
+  &__svg {
     display: block;
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    overflow: visible;
   }
 
-  // 縣市標籤：設計稿在地圖左上（45×44），英文版縮小到 10px
+  &__town {
+    fill: #454545;
+    stroke: rgba(211, 211, 212, 0.5);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+    transition:
+      opacity $mp-fade-slow,
+      fill $mp-fade-slow,
+      stroke $mp-fade-slow;
+
+    &--city {
+      fill: $mp-accent;
+    }
+  }
+
+  // zoom in 後：其他鄉鎮淡出、屏東市變灰底白邊、分隊點出現
+  &__map--zoomed &__town {
+    opacity: 0;
+  }
+
+  &__map--zoomed &__town--city {
+    opacity: 1;
+    fill: #454545;
+    stroke: $mp-white;
+  }
+
+  &__dot {
+    fill: #ececec;
+    opacity: 0;
+    transition: opacity $mp-fade-slow;
+  }
+
+  &__map--zoomed &__dot {
+    opacity: 1;
+    transition-delay: 0.8s;
+  }
+
+  // 縣市標籤：屏東市西側、往左推出去；英文版縮小到 10/15
   &__place {
     position: absolute;
-    top: 11.3%;
-    left: 0;
     display: flex;
     flex-direction: column;
     margin: 0;
@@ -109,26 +123,44 @@
     font-size: 15px;
     line-height: 22px;
     color: $mp-text;
+    text-align: right;
+    white-space: nowrap;
+    transform: translate(calc(-100% - 8px), -50%);
+    transition: opacity $mp-fade;
 
     &:lang(en) {
       font-size: 10px;
-      line-height: 14px;
+      line-height: 15px;
     }
   }
 
-  // 分隊標籤：名稱 18/40、人數 35/40 橘色
+  &__map--zoomed &__place {
+    opacity: 0;
+  }
+
+  // 分隊標籤：點的正上方；名稱 18/40、人數 35/40 橘色
   &__station {
     position: absolute;
     display: flex;
     flex-direction: column;
+    align-items: center;
     margin: 0;
     font-family: $mp-sans;
     white-space: nowrap;
+    opacity: 0;
+    transform: translate(-50%, calc(-100% - 10px));
+    transition: opacity $mp-fade-slow;
+    pointer-events: none;
+  }
+
+  &__map--zoomed &__station {
+    opacity: 1;
+    transition-delay: 0.8s;
   }
 
   &__station-name {
     font-size: 15px;
-    line-height: 30px;
+    line-height: 26px;
     color: $mp-text;
 
     @include rwd-min('tablet') {
@@ -140,10 +172,14 @@
   // 建國分隊 0 人時字級 23，有人後放大到 35
   &__station-count {
     font-size: 23px;
-    line-height: 40px;
+    line-height: 36px;
     color: $mp-accent;
     font-variant-numeric: tabular-nums;
     transition: font-size $mp-fade-slow;
+
+    @include rwd-min('tablet') {
+      line-height: 40px;
+    }
 
     &--grown {
       font-size: 28px;
@@ -156,8 +192,10 @@
 
   @media (prefers-reduced-motion: reduce) {
     &__text,
-    &__layer,
-    &__map,
+    &__town,
+    &__dot,
+    &__place,
+    &__station,
     &__station-count {
       transition: none;
     }

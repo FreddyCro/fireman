@@ -13,7 +13,9 @@ $mp-white: #fff;
 $mp-accent: #ed7223;
 $mp-bg: #000;
 $mp-muted: rgba(240, 240, 240, 0.5);
-$mp-legend-gradient: linear-gradient(to right, #ed7223, #f5f5f5);
+$mp-legend-gradient: linear-gradient(to right, #f5f5f5, #ed7223); // 0 淺 → 160 橘（同 utils/04.manpower/maps.ts 的 FIRE_COLORS）
+$mp-pin: #6f6f6f; // 消防分隊據點（地圖 pin、圖例）
+$mp-pin-ring: #fafafa;
 
 // ── container ──
 $mp-gutter: 26px; // mob 稿 414 − 362 ＝ 26×2
