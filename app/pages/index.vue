@@ -7,12 +7,12 @@
     <NoTrapped />
 
     <!-- 03：工安違法事實 -->
-    <Violation />
+    <!-- <Violation /> -->
 
     <!-- 04：人力吃緊 -->
-    <Manpower />
+    <!-- <Manpower /> -->
 
     <!-- 05 -->
-    <Ending />
+    <!-- <Ending /> -->
   </div>
 </template>
