@@ -6,6 +6,9 @@
   "transition": "The causes of firefighter deaths are complex. For this report we interviewed Dr. Chang Hsien-ho, along with Lin Chang-chih, secretary-general, and Cheng Shao-shu, deputy chair, of the Taiwan Firefighters' Rights Association, to look at fireground entry rules, factory safety, staffing and daily duties, and ask how to learn from past tragedies, reduce risk and save lives.",
   "title": "Fires With No One Trapped",
   "titleLabel": "Fireground command should put firefighter safety first",
+  "titleSvg": "/img/no-trapped/title0101_en_pc.svg",
+  "titleSvgNarrow": "/img/no-trapped/title0101_en_pad.svg",
+  "titleSvgMob": "/img/no-trapped/title0101_en_mob.svg",
   "chart": {
     "_chart": "Pinned chart (ui/PinChart): switches to slides[1] past the halfway point; legend keys match the legend ids in utils/02.no-trapped/chart.ts",
     "slides": {
@@ -32,18 +35,15 @@
     "taichung": {
       "date": "October 3, 2019",
       "title": [
-        "Taichung Daya factory fire:",
-        "no one trapped, yet firefighters were sent in"
+        "Taichung Daya Factory Fire",
+        "Firefighters Sent Inside Despite No One Trapped"
       ],
-      "body": "At 1:45 a.m., a fire broke out at an illegally built factory in Daya, Taichung. **No one was trapped inside**, yet a squad leader sent two firefighters in with a thermal imaging camera to look for the source of the fire. Ten minutes later the building was fully engulfed, and both firefighters were killed.",
-      "count": {
-        "number": "2",
-        "label": "firefighters died"
-      },
-      "alt": {
-        "clipping": "United Daily News clipping, Oct. 4, 2019: “No one trapped, but the fire must still be controlled”",
-        "photo": "Scene of the sheet-metal factory fire in Daya, Taichung",
-        "video": "Video of the sheet-metal factory fire in Daya, Taichung"
+      "body": "At 1:45 a.m., a fire broke out at an illegally built factory in Taichung’s Daya District. No one was trapped inside. Nevertheless, a fire lieutenant ordered two firefighters to enter with a thermal imaging camera to locate the source of the fire. Ten minutes later, the building became fully engulfed. Neither firefighter survived.",
+      "countSvg": "/img/no-trapped/number0105_en",
+      "items": {
+        "heading": {
+          "text": "United Daily News published a report in its print edition the day after the fire."
+        }
       }
     }
   },

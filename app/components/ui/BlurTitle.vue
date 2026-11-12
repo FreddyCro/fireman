@@ -4,6 +4,7 @@
   svgNarrow 有給時，pc 斷點以下改用它（如 03 大標 mob／pad 是直書、pc 是橫書）。
   svgMob 有給時，tablet 斷點以下再改用它（如 04 英文版 mob 另有一張）；不給就沿用 svgNarrow。
   label 有給就在上方顯示小標（白底黑字），小標不 blur。
+  natural：大標 SVG 照檔案本身的尺寸顯示（02、03 章節標題：pc 高 120、pad 直書寬 150、mob 直書寬 120），不撐滿欄寬。
 
   兩種模式：
   ・預設：元件進入視窗（start）到 end 之間完成清晰。
@@ -36,6 +37,8 @@ const props = withDefaults(
     end?: string;
     /** pin 模式：100svh pin 住、依跑道進度 blur */
     pin?: boolean;
+    /** SVG 照檔案原尺寸顯示（不撐滿欄寬） */
+    natural?: boolean;
     /** pin 模式的跑道高度（vh） */
     trackVh?: number;
     /** pin 模式：跑道進度到此比例時全清 */
@@ -51,6 +54,7 @@ const props = withDefaults(
     start: 'top 85%',
     end: 'center 50%',
     pin: false,
+    natural: false,
     trackVh: 200,
     clearAt: 0.6,
   },
@@ -71,7 +75,7 @@ useScrollBlur(
 </script>
 
 <template>
-  <div ref="root" class="blur-title" :class="{ 'blur-title--pin': pin }" :style="pin ? { '--track': trackVh } : undefined">
+  <div ref="root" class="blur-title" :class="{ 'blur-title--pin': pin, 'blur-title--natural': natural }" :style="pin ? { '--track': trackVh } : undefined">
     <div class="blur-title__stage">
       <p v-if="label" class="blur-title__label">{{ label }}</p>
       <component :is="tag" class="blur-title__title">

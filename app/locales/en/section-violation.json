@@ -1,40 +1,58 @@
 {
   "title": "Safety Violations",
   "titleLabel": "Firefighters are entering high-risk, non-compliant factories more often",
+  "titleSvg": "/img/violation/title0101_en_pc.svg",
+  "titleSvgNarrow": "/img/violation/title0101_en_pad.svg",
+  "titleSvgMob": "/img/violation/title0101_en_mob.svg",
   "cases": {
     "pingtung": {
       "date": "September 22, 2023",
       "title": [
-        "Pingtung: Ming Yang International",
-        "stored excess chemicals, sparking a fire"
+        "Excessive Chemical Storage Sparks Fire",
+        "at Ming Yang Factory in Pingtung"
       ],
-      "body": "At 5:31 p.m., a gas explosion at a Ming Yang International warehouse set off a major fire. The company had **illegally stored the chemical crosslinking agent C40-P at 30 times the permitted safety limit**, and the room temperature exceeded the safe storage temperature. Four firefighters who went in to rescue trapped workers were thrown by the blast wave, burned and struck by flying debris, and died after being taken to hospital.",
-      "count": {
-        "number": "4",
-        "label": "firefighters died"
-      },
-      "alt": {
-        "video": "Aerial video of the Ming Yang International warehouse fire",
-        "report": "Ming Yang International fire investigation report: firefighters killed by the fire triggered by the explosion",
-        "photo": "Scene of the Ming Yang International warehouse fire"
+      "body": "At 5:31 p.m., an explosion sparked a major fire at Ming Yang International's warehouse. The company had illegally stored 30 times the permitted amount of C40-P, a chemical crosslinking agent, in temperatures above the safe storage limit. Four firefighters entered to rescue trapped people but were fatally injured by the blast, flames and flying debris.",
+      "countSvg": "/img/violation/number0102_en",
+      "items": {
+        "heading": {
+          "text": "Ming Yang International Fire Investigation Report — Sept. 27, 2023"
+        },
+        "storage": {
+          "steps": {
+            "a": {
+              "title": "Excessive C40-P Storage",
+              "label": "Safe Storage Temperature 30°C"
+            },
+            "b": {
+              "title": "Excessive C40-P Storage",
+              "label": "Safe Storage Temperature 30°C"
+            },
+            "c": {
+              "label": "Safe Storage Temperature 30°C"
+            }
+          }
+        }
       }
     },
     "taoyuan": {
       "date": "April 28, 2018",
       "title": [
-        "Taoyuan: Chin-Poon Industrial breached fire compartments,",
-        "letting the fire spread with ease"
+        "Damaged Fire Barriers Allowed Flames to Spread",
+        "at Chin Poon Industrial in Taoyuan"
       ],
-      "body": "At 9:28 p.m., flames erupted at the Chin-Poon factory. The company had illegally run exhaust ducts through the walls, breaching the fire compartments without authorization, and firefighters only discovered unidentified solvents stored on site after they arrived. Because the building data they held did not match the actual conditions, the firefighters became trapped and could not get out in time. Six died.",
-      "count": {
-        "number": "6",
-        "label": "firefighters died"
-      },
-      "alt": {
-        "video": "Video of the Chin-Poon factory fire",
-        "report": "Comprehensive review report: illegal construction and breached fire compartments let the fire spread",
-        "ducts": "Exhaust ducts piercing the fire compartment wall to the outside",
-        "photo": "Scene of the Chin-Poon factory fire"
+      "body": "At 9:28 p.m., a major fire broke out at the Chin Poon factory. The company had illegally installed ventilation ducts through fire-resistant walls, allowing flames to spread. Firefighters also discovered unknown solvents on-site. Misleading building plans left firefighters trapped inside, and six people died after failing to escape in time.",
+      "countSvg": "/img/violation/number0201_en",
+      "items": {
+        "heading": {
+          "text": "Comprehensive Review and Improvement Report — Jan. 15, 2019"
+        },
+        "spread": {
+          "steps": {
+            "a": {
+              "title": "Intact Fire Barriers Keep Flames Contained"
+            }
+          }
+        }
       }
     }
   },

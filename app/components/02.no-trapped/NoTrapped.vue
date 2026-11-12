@@ -10,26 +10,8 @@ import './NoTrapped.scss';
 
 const str = useCopy().noTrapped;
 
-// 版面（CASES）與文案以 id 對應，素材 alt 依素材 id 取
-const cases = CASES.map((c) => {
-  const copy = str.cases[c.id as keyof typeof str.cases];
-  return {
-    ...copy,
-    id: c.id,
-    aspect: c.aspect,
-    padWidth: c.padWidth,
-    media: c.media.map((m) => ({ ...m, alt: copy.alt[m.id as keyof typeof copy.alt] ?? '' })),
-  };
-});
-
-// 台中案例的 scrapbook 隨捲動飛到留學故事上方的這個空位（CaseStory 的 flyTo）
-const boardSlot = ref<HTMLElement | null>(null);
-const slotStyle = {
-  '--aspect-mob': CASES[0]!.aspect.mob,
-  '--aspect-pad': CASES[0]!.aspect.pad ?? CASES[0]!.aspect.pc,
-  '--aspect-pc': CASES[0]!.aspect.pc,
-  '--board-pad': `${CASES[0]!.padWidth ?? 652}px`,
-};
+// 版面（CASES）與文案以 id 對應
+const caseCopy = (id: string) => str.cases[id as keyof typeof str.cases];
 
 const meifuPhotos = MEIFU_PHOTOS.map((src, i) => ({ src, alt: str.meifu.alt[i] ?? '' }));
 
@@ -55,13 +37,14 @@ useScrollBlur(quote, quote);
       class="sec-no-trapped__title"
       :svg="str.titleSvg"
       :svg-narrow="str.titleSvgNarrow"
+      :svg-mob="str.titleSvgMob"
       :alt="str.title"
       :label="str.titleLabel"
+      natural
       pin
     />
-    <CaseStory v-for="(c, i) in cases" :key="c.id" :data="c" :reverse="i % 2 === 1" :fly-to="i === 0 ? boardSlot : null" />
+    <CaseStory v-for="c in CASES" :key="c.id" :layout="c" :copy="caseCopy(c.id)" />
 
-    <div ref="boardSlot" class="sec-no-trapped__board-slot" :style="slotStyle" aria-hidden="true" />
     <div class="sec-no-trapped__text">
       <p>
         {{ str.story.first.before

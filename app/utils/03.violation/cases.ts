@@ -1,85 +1,87 @@
-// 03 工安違法事實：屏東明揚、桃園敬鵬案例 scrapbook 的版面（素材、位置、角度）。中英文共用，文案在 locales/{zh,en}/section-violation.json，以 id 對應。
-import type { CaseLayout } from '~/utils/scrapbook';
+// 03 工安違法事實：屏東明揚、桃園敬鵬案例右欄的素材（中英文共用）。文字在 locales/{zh,en}/section-violation.json 的 cases.<id>，以 id 對應。
+// 設計稿 1110 定版。檔名對應注意：pic0106a 的焦點圖是 pic0105b；pic0105a 的焦點圖是 pic0105a-focus_pcpad。
+import type { CaseLayout } from '~/utils/case-story';
 
 export const CASES: CaseLayout[] = [
   {
+    // 報告標題 → 報告（主要成因）→ 倉庫堆放情境圖（a→b→c＋溫度計）→ 報告（安全資料表）→ 報告（隱匿超量存放）
     id: 'pingtung',
-    // pad 稿：board 與文字欄同寬 530、高 610，影片→剪報→照片由上往下疊
-    // mob 稿：board 362×605，影片左上、報告書中、照片下
-    aspect: { mob: '362/605', pad: '530/610', pc: '6/5' },
-    padWidth: 530,
-    media: [
+    items: [
+      { kind: 'heading', id: 'heading' },
       {
-        id: 'video',
-        type: 'video',
-        src: '/img/scrapbook/case2/firefighter_p03_video0103_1030.mp4',
-        ratio: '3/2',
-        mob: { x: 1, y: 3, w: 76, r: -5 },
-        pad: { x: 0, y: 2, w: 54, r: 2 },
-        pc: { x: 52, y: 0, w: 46, r: 2 },
+        kind: 'doc',
+        id: 'cause',
+        src: '/img/violation/pic0103.jpg',
+        focus: '/img/violation/pic0103b_pcpad.jpg',
+        focusPcPadOnly: true,
+        ratio: '800/634',
       },
       {
-        id: 'report',
-        type: 'image',
-        src: '/img/scrapbook/case2/firefighter_p03_pic0102_1030.png',
-        ratio: '1377/504',
-        mob: { x: 0, y: 31, w: 98, r: 2 },
-        pad: { x: 14, y: 25, w: 84, r: -3 },
-        pc: { x: 4, y: 30, w: 72, r: -3 },
+        kind: 'steps',
+        id: 'storage',
+        srcs: ['/img/violation/pic0104a.jpg', '/img/violation/pic0104b.jpg', '/img/violation/pic0104c.jpg'],
+        ratio: '626/506',
+        thermometer: [
+          [64, 100],
+          [0, 64],
+          [0, 19],
+        ],
       },
       {
-        id: 'photo',
-        type: 'image',
-        src: '/img/scrapbook/case2/firefighter_p03_pic0101_1030.jpg',
-        ratio: '909/618',
-        mob: { x: 2, y: 57, w: 94, r: -1 },
-        pad: { x: 15, y: 49, w: 85, r: 2 },
-        pc: { x: 30, y: 52, w: 58, r: 2 },
+        kind: 'doc',
+        id: 'sds',
+        src: '/img/violation/pic0105a.jpg',
+        focus: '/img/violation/pic0105a-focus_pcpad.jpg',
+        focusPcPadOnly: true,
+        ratio: '800/774',
+      },
+      {
+        kind: 'doc',
+        id: 'conceal',
+        src: '/img/violation/pic0106a.jpg',
+        focus: '/img/violation/pic0105b.jpg',
+        ratio: '800/624',
       },
     ],
   },
   {
+    // 報告標題 → 報告（防火區劃破壞）→ 延燒路徑圖（正常 a → 破壞後 b）→ 風管照（疊字＋箭頭）→ 廠房照（疊字＋箭頭）
     id: 'taoyuan',
-    // pad 稿：board 530×560，影片左上、剪報中、pic0202（廠房）右下、pic0203（風管）左下
-    // mob 稿：board 362×762，影片上、報告書、廠房照右、風管照左下
-    aspect: { mob: '362/762', pad: '530/560', pc: '6/5' },
-    padWidth: 530,
-    media: [
+    items: [
+      { kind: 'heading', id: 'heading' },
       {
-        id: 'video',
-        type: 'video',
-        src: '/img/scrapbook/case3/firefighter_p03_video0204_1030.mp4',
-        ratio: '16/9',
-        mob: { x: 25, y: 0, w: 50, r: -1 },
-        pad: { x: 0, y: 2, w: 34, r: -2 },
-        pc: { x: 56, y: 52, w: 42, r: 3 },
-      },
-      {
+        kind: 'doc',
         id: 'report',
-        type: 'image',
-        src: '/img/scrapbook/case3/firefighter_p03_pic0201_1030.png',
-        ratio: '904/550',
-        mob: { x: 1, y: 13, w: 97, r: 4 },
-        pad: { x: 23, y: 20, w: 76, r: -3 },
-        pc: { x: 2, y: 0, w: 62, r: -2 },
+        src: '/img/violation/pic0202a.jpg',
+        focus: '/img/violation/pic0202b.jpg',
+        ratio: '800/904',
       },
       {
+        kind: 'steps',
+        id: 'spread',
+        srcs: ['/img/violation/pic0203a.jpg', '/img/violation/pic0203b.jpg'],
+        ratio: '724/828',
+      },
+      {
+        kind: 'photo',
         id: 'ducts',
-        type: 'image',
-        src: '/img/scrapbook/case3/firefighter_p03_pic0202_1030.jpg',
-        ratio: '550/767',
-        mob: { x: 36, y: 44, w: 64, r: -1 },
-        pad: { x: 55, y: 36, w: 45, r: -3 },
-        pc: { x: 0, y: 44, w: 32, r: 2 },
+        src: '/img/violation/pic0204.jpg',
+        ratio: '800/1192',
+        // 設計稿（400×596）：字在 (108, 228)，向上箭頭 (164, 166) 68 寬、向下箭頭 (204, 263) 71 寬
+        overlayText: { x: 27, y: 38.3 },
+        arrows: [
+          { src: '/img/violation/arrow0204wup.svg', x: 41, y: 27.9, w: 17 },
+          { src: '/img/violation/arrow0204wdown.svg', x: 51, y: 44.1, w: 17.75 },
+        ],
       },
       {
-        id: 'photo',
-        type: 'image',
-        src: '/img/scrapbook/case3/firefighter_p03_pic0203_1030.jpg',
-        ratio: '410/610',
-        mob: { x: 10, y: 63, w: 52, r: 3 },
-        pad: { x: 4, y: 50, w: 36, r: 2 },
-        pc: { x: 34, y: 42, w: 28, r: -4 },
+        kind: 'photo',
+        id: 'outside',
+        src: '/img/violation/pic0205.jpg',
+        ratio: '800/1092',
+        // 設計稿（400×546）：深色字置中於 x 170、上緣 17、寬 280；箭頭 (66, 42) 107 寬
+        overlayText: { x: 42.5, y: 3.1, w: 70, center: true, dark: true },
+        arrows: [{ src: '/img/violation/arrow0205b.svg', x: 16.5, y: 7.7, w: 26.75 }],
       },
     ],
   },

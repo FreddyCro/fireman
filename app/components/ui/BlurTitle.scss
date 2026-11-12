@@ -71,6 +71,23 @@
     }
   }
 
+  // natural：SVG 照檔案的 width／height 顯示，窄螢幕不超出欄寬。
+  // mob 直書（150×707）要縮成寬 120（設計稿「MOB 寬度統一 120px」）：限高 566 ≈ 707 × 120 / 150，橫書不受影響
+  &--natural &__title {
+    max-width: 100%;
+  }
+
+  &--natural &__img {
+    width: auto;
+    max-width: 100%;
+    max-height: min(566px, 75svh);
+    margin: 0 auto;
+
+    @include rwd-min('tablet') {
+      max-height: none;
+    }
+  }
+
   // 沒有 SVG 時的文字版
   &__text {
     display: block;

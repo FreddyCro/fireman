@@ -99,24 +99,6 @@ $column: 620px;
     }
   }
 
-  // 台中案例 scrapbook 的落點：與內文同寬的空位，比例跟 board 一樣（CaseStory flyTo）
-  &__board-slot {
-    max-width: $column;
-    margin: 0 auto 40px;
-    aspect-ratio: var(--aspect-mob);
-
-    // pad 稿落點 443 寬置中
-    @include rwd-min('tablet') {
-      max-width: min(443px, var(--board-pad));
-      aspect-ratio: var(--aspect-pad);
-    }
-
-    @include rwd-min('pc') {
-      max-width: $column;
-      aspect-ratio: var(--aspect-pc);
-    }
-  }
-
   // 大標改用 ui/BlurTitle（SVG + 滾動 blur），這裡只管與案例的間距
   &__title {
     margin: 0 0 48px;

@@ -6,8 +6,9 @@
   "transition": "導致火災殉職的因素相當複雜，本專題訪問張賢龢博士、消防員工作權益促進會(以下簡稱消促會)秘書長林昶志與副理事長鄭少書，從進入火場原則、廠房工安到人力調度與日常勤務，綜合探討如何記取教訓、降低風險、保住人命。",
   "title": "無人受困的火場為何仍要派消防員進入",
   "titleLabel": "指揮火場救災應以消防員安全為優先",
-  "titleSvg": "/img/no-trapped/title-zh.svg",
-  "titleSvgNarrow": "/img/no-trapped/title-zh-v.svg",
+  "titleSvg": "/img/no-trapped/title0101_pc.svg",
+  "titleSvgNarrow": "/img/no-trapped/title0101_pad.svg",
+  "titleSvgMob": "/img/no-trapped/title0101_mob.svg",
   "chart": {
     "_chart": "pin 住的圖表（ui/PinChart）：捲動過半切換 slides[1]；legend 的 key 對應 utils/02.no-trapped/chart.ts 的 legend id",
     "slides": {
@@ -32,20 +33,31 @@
   },
   "cases": {
     "taichung": {
-      "date": "2019年10月3日",
+      "date": "2019.10.3",
       "title": [
         "台中大雅工廠火災",
         "無人受困仍派員入內"
       ],
       "body": "凌晨1點45分，台中大雅一處違建工廠起火燃燒，**工廠無人受困**，然而2位消防員被小隊長指派持熱顯像儀進場尋找火源，不料10分鐘後火勢全面燃燒，2人最終不幸殉職。",
-      "count": {
-        "number": "2",
-        "label": "人殉職"
-      },
-      "alt": {
-        "clipping": "2019年10月4日聯合報剪報〈沒人受困 也要控制火勢〉",
-        "photo": "台中大雅鐵皮工廠火災現場",
-        "video": "台中大雅鐵皮工廠火災現場影片"
+      "_countSvg": "殉職人數 SVG 的檔名主幹，元件補 _pc／_pad／_mob.svg",
+      "countSvg": "/img/no-trapped/number0105",
+      "countAlt": "2人殉職",
+      "items": {
+        "heading": {
+          "text": "聯合報於火災事發隔日報版刊登報導"
+        },
+        "clipping": {
+          "alt": "2019年10月4日聯合報剪報〈沒人受困 也要控制火勢〉"
+        },
+        "aerial": {
+          "alt": "台中大雅木材工廠大火現場，圖／台中市消防局提供"
+        },
+        "quote": {
+          "text": "消防員恐被控告瀆職"
+        },
+        "rescue": {
+          "alt": "台中大雅鐵皮違建工廠惡火，消防員射水灌救"
+        }
       }
     }
   },

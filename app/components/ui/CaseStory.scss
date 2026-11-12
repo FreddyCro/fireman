@@ -1,161 +1,369 @@
-// 單一案例（ui/CaseStory.vue）：文字＋scrapbook。mob／pad：文字在上、素材在下（pad 稿文字欄 530、board 652 置中）；
-// pc 以上左右兩欄，reverse 對調。
+// 案例區（ui/CaseStory.vue），設計稿 1110 定版。
+// mob（≤767）：文字欄 362、殉職人數置中；素材欄滿版（最寬 414），素材 262 → active 414。
+// pad（768–1279）：文字欄 530、殉職人數置中；素材欄 500，素材 400 → active 500。
+// pc（≥1280）：左 500（sticky 置中）＋ 間距 40 ＋ 右 500；右欄素材 400 → active 500，排列間距 20。
+// 字：日期 Serif Bold 18/40、標題 Serif Bold 35/45、內文 Sans Light 16/25（重點 Medium 白字）、文件標題 Sans Light 16/35。
 $serif: 'Noto Serif TC', 'Songti TC', 'PMingLiU', serif;
-$orange: #f07a2c;
+$text: #f0f0f0;
+$orange: #ed7223;
+$ease: 0.3s ease;
+
+// 溫度計漸層的兩個停點，註冊成數字才能 transition
+@property --thermo-white {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 64;
+}
+
+@property --thermo-orange {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 100;
+}
 
 .case-story {
-  position: relative;
+  --list-w: min(100vw, 414px);
+  --w-idle: 63.29%; // 262 / 414
+  --w-wide: 87.44%; // 362 / 414：文件標題、情境圖
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  max-width: 1100px;
   margin: 0 auto 80px;
+  color: $text;
 
   @include rwd-min('tablet') {
-    gap: 20px;
+    --list-w: 500px;
+    --w-idle: 80%; // 400 / 500
+    --w-wide: 80%;
     margin-bottom: 120px;
   }
 
   @include rwd-min('pc') {
-    flex-direction: row;
-    align-items: flex-start;
-    gap: 32px;
+    display: grid;
+    grid-template-columns: 500px 500px;
+    column-gap: 40px;
+    justify-content: center;
+    margin-bottom: 160px;
   }
 
-  &--reverse {
+  // ── 左欄：PC sticky 一整個視窗高、內容垂直置中；pad／mob 一般排列 ──
+  &__intro {
     @include rwd-min('pc') {
-      flex-direction: row-reverse;
+      position: sticky;
+      top: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100vh;
     }
   }
 
-  &__text {
-    position: relative;
-    z-index: 0;
+  &__intro-box {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    align-items: center;
 
     @include rwd-min('tablet') {
-      width: 100%;
       max-width: 530px;
       margin: 0 auto;
     }
 
     @include rwd-min('pc') {
-      flex: 0 0 40%;
+      gap: 20px;
+      align-items: flex-start;
       max-width: none;
       margin: 0;
-      padding-top: 24px;
     }
   }
 
-  // mob 稿：日期 18 襯線、大標 32 襯線、內文 17/29、殉職人數靠右（數字 96）
+  // 進場 fade up：文字先、殉職人數晚 0.3s
+  &__text,
+  &__count {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity $ease,
+      transform $ease;
+
+    @media (prefers-reduced-motion: reduce) {
+      transform: none;
+      transition: none;
+    }
+  }
+
+  &__count {
+    transition-delay: 0.3s;
+  }
+
+  &__text--shown,
+  &__count--shown {
+    opacity: 1;
+    transform: none;
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
   &__date {
-    margin: 0 0 8px;
+    margin: 0;
     font-family: $serif;
     font-size: 18px;
-    letter-spacing: 0.05em;
-
-    @include rwd-min('tablet') {
-      font-size: 15px;
-    }
+    font-weight: 700;
+    line-height: 40px;
+    letter-spacing: 0.14em;
+    color: #f5f5f5;
   }
 
   &__heading {
     display: flex;
     flex-direction: column;
-    margin: 0 0 16px;
+    margin: 0 0 20px;
     font-family: $serif;
-    font-size: 32px;
+    font-size: 30px;
     font-weight: 700;
-    line-height: 1.4;
+    line-height: 38px;
+    letter-spacing: 0.07em;
+    color: #f5f5f5;
 
     @include rwd-min('tablet') {
-      font-size: 32px;
-    }
-
-    @include rwd-min('pc') {
-      font-size: 28px;
+      font-size: 35px;
+      line-height: 45px;
     }
   }
 
   &__body {
-    margin: 0 0 24px;
-    font-size: 17px;
-    line-height: 29px;
-    letter-spacing: 0.05em;
-    color: #ccc;
+    margin: 0;
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 25px;
+    letter-spacing: 0.1em;
+    color: #f5f5f5;
     text-align: justify;
-
-    @include rwd-min('tablet') {
-      font-size: 15px;
-      line-height: 25px;
-      letter-spacing: 0;
-    }
   }
 
   &__em {
-    font-weight: 700;
+    font-weight: 500;
     color: #fff;
   }
 
   &__count {
-    margin: 0;
-    font-family: $serif;
-    font-size: 32px;
-    color: $orange;
-    // mob／pad 稿：殉職人數靠右，貼在 board 右上角
-    text-align: right;
-
-    @include rwd-min('tablet') {
-      font-size: 36px;
-    }
-
-    @include rwd-min('pc') {
-      text-align: left;
-    }
+    display: block;
   }
 
-  // mob 稿：第二個（reverse）案例的殉職人數置中
-  &--reverse &__count {
-    text-align: center;
-
-    @include rwd-min('tablet') {
-      text-align: right;
-    }
-
-    @include rwd-min('pc') {
-      text-align: left;
-    }
+  // 殉職人數 SVG 照原尺寸（pc 約 268 寬、pad 174、mob 165），窄螢幕不超出欄寬
+  &__count-img {
+    display: block;
+    max-width: 100%;
+    height: auto;
   }
 
-  &__count-num {
-    margin-right: 4px;
-    font-size: 96px;
-    line-height: 1;
-
-    @include rwd-min('tablet') {
-      font-size: 96px;
-    }
-  }
-
-  &__board {
-    width: 100%;
-
-    // pad 稿 board 頂端與殉職人數齊，往上拉；寬度各案例不同（cases.ts 的 padWidth）
-    @include rwd-min('tablet') {
-      max-width: var(--board-pad);
-      margin: -100px auto 0;
-    }
+  // ── 右欄：素材垂直排列，置中 ──
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+    width: var(--list-w);
+    // mob 素材欄比文字欄寬（滿版），用負邊距撐出 section 的左右留白
+    margin: 40px calc((100% - var(--list-w)) / 2) 0;
+    // active 素材放大會推動下方素材，關掉捲動錨定，避免瀏覽器自己補 scrollTop
+    overflow-anchor: none;
 
     @include rwd-min('pc') {
-      flex: 1 1 auto;
-      max-width: none;
+      // 第一張從視窗下方滑上來，案例貼頂時停在 107px；
+      // 捲完時最後一張下緣與左欄（垂直置中）下緣齊平，左欄隨即鬆開，整組一起往上收
       margin: 0;
+      padding: 107px 0 calc(50vh - var(--intro-h, 0px) / 2);
     }
   }
 
-  // 會飛走的 scrapbook：疊在後面的內文之上，transform 由 CaseStory.vue 的 ScrollTrigger 給
-  &--fly &__board {
+  &__item {
+    width: var(--w-idle);
+    transition: width $ease;
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
+  }
+
+  &__item--active {
+    width: 100%;
+  }
+
+  &__item--heading,
+  &__item--steps {
+    width: var(--w-wide);
+  }
+
+  // 情境圖固定寬：pc／pad 362
+  &__item--steps {
+    @include rwd-min('tablet') {
+      width: 362px;
+    }
+  }
+
+  // 引述只有 PC 稿有
+  &__item--quote {
+    display: none;
+
+    @include rwd-min('pc') {
+      display: block;
+    }
+  }
+
+  // 文件標題＋分隔線
+  &__doc-title {
+    margin: 0;
+    padding-bottom: 5px;
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 35px;
+    letter-spacing: 0.1em;
+    text-align: center;
+    border-bottom: 1px solid $text;
+  }
+
+  &__quote {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 35px;
+    letter-spacing: 0.1em;
+  }
+
+  // ── 文件／照片：固定比例的框，圖疊在一起 ──
+  &__frame {
     position: relative;
-    z-index: 2;
-    will-change: transform;
+    width: 100%;
+    // 疊字的字級跟著照片寬度縮放（設計稿 400 寬時 18px）
+    container-type: inline-size;
+  }
+
+  &__img {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  // 文件 active 換焦點圖：疊在原圖上淡入
+  &__img--focus {
+    opacity: 0;
+    transition: opacity $ease;
+
+    .case-story__item--active & {
+      opacity: 1;
+    }
+  }
+
+  // 焦點圖只有 pc／pad 版：mob 不換圖、只放大
+  &__img--pcpad {
+    display: none;
+
+    @include rwd-min('tablet') {
+      display: block;
+    }
+  }
+
+  &__arrow {
+    position: absolute;
+    display: block;
+    height: auto;
+    pointer-events: none;
+  }
+
+  &__overlay {
+    position: absolute;
+    margin: 0;
+    font-size: 4.5cqw; // 18 / 400
+    line-height: 2;
+    color: #fff;
+    white-space: nowrap;
+  }
+
+  &__overlay--center {
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0.1em;
+    text-align: center;
+    white-space: normal;
+    transform: translateX(-50%);
+  }
+
+  &__overlay--dark {
+    color: #404040;
+  }
+
+  // ── 情境圖：標題＋圖（＋溫度計），捲過時換圖 ──
+  &__steps {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0;
+  }
+
+  // 沒有標題的步驟（屏東 c）保留一行高，圖不跳動
+  &__steps-title {
+    min-height: 36px;
+    font-size: 18px;
+    line-height: 36px;
+    letter-spacing: 0.1em;
+  }
+
+  &__steps-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  &__steps-pic {
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  &__img--step {
+    opacity: 0;
+    transition: opacity $ease;
+  }
+
+  &__img--step-on {
+    opacity: 1;
+  }
+
+  // 溫度計：12×196 圓角條（白 → 橘漸層）＋直排文字
+  &__thermo {
+    display: flex;
+    flex: none;
+    gap: 6px;
+    align-items: flex-start;
+  }
+
+  &__thermo-bar {
+    width: 12px;
+    height: 196px;
+    background: linear-gradient(
+      to bottom,
+      #fff calc(var(--thermo-white) * 1%),
+      $orange calc(var(--thermo-orange) * 1%)
+    );
+    border-radius: 50px;
+    transition:
+      --thermo-white $ease,
+      --thermo-orange $ease;
+  }
+
+  &__thermo-label {
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 20px;
+    letter-spacing: 0.1em;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
   }
 }
