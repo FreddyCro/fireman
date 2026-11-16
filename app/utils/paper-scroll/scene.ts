@@ -15,6 +15,15 @@ export interface LoadedStrip {
   pixelRatio: number;
   /** sprite.kind = 'video' 時就是 source，播放由 syncVideo 控制 */
   video?: HTMLVideoElement;
+  /** sprite.srcs：一格一個檔，各自的 source 與 pixelRatio（此時 source 是第一格） */
+  frames?: { source: CanvasImageSource; pixelRatio: number }[];
+}
+
+/** 第 frame 格要從哪張圖的哪個位置取（裝置像素） */
+export function frameSource(strip: LoadedStrip, frame: number, cellW: number) {
+  const f = strip.frames?.[frame];
+  if (f) return { source: f.source, pr: f.pixelRatio, sx: 0 };
+  return { source: strip.source, pr: strip.pixelRatio, sx: frame * cellW * strip.pixelRatio };
 }
 
 export interface ElementRuntime {
@@ -227,8 +236,8 @@ export class PaperScene {
 
   /** 設計畫布 → 舞台（CSS px）的變換 */
   transform(stage: { w: number; h: number }): CoverTransform {
-    const { design, fit, anchor, maxCrop } = this.config;
-    return fitTransform(design, stage, fit, anchor, maxCrop);
+    const { design, fit, anchor, maxCrop, maxScale } = this.config;
+    return fitTransform(design, stage, fit, anchor, maxCrop, maxScale);
   }
 
   /** 卸載時停掉影片 */
@@ -277,8 +286,8 @@ export class PaperScene {
         ctx.globalAlpha = r.state.opacity;
         ctx.translate(stage.w / 2, stage.h / 2);
         ctx.scale(s, s);
-        const pr = strip.pixelRatio;
-        ctx.drawImage(strip.source, rt.frame * cellW * pr, 0, cellW * pr, cellH * pr, -cellW / 2, -cellH / 2, cellW, cellH);
+        const { source, pr, sx } = frameSource(strip, rt.frame, cellW);
+        ctx.drawImage(source, sx, 0, cellW * pr, cellH * pr, -cellW / 2, -cellH / 2, cellW, cellH);
         ctx.restore();
         continue;
       }
@@ -297,10 +306,10 @@ export class PaperScene {
       ctx.translate(r.state.x * design.w + rt.jitterX, r.state.y * design.h + rt.jitterY);
       ctx.rotate(((r.state.rot + rt.jitterRot) * Math.PI) / 180);
       ctx.scale(r.state.scale, r.state.scale);
-      const pr = strip.pixelRatio;
+      const { source, pr, sx } = frameSource(strip, rt.frame, cellW);
       ctx.drawImage(
-        strip.source,
-        rt.frame * cellW * pr,
+        source,
+        sx,
         0,
         cellW * pr,
         cellH * pr,

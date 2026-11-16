@@ -3,7 +3,7 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import type { Ref } from 'vue';
-import { loadStrip, loadVideo } from '~/utils/paper-scroll/assets';
+import { loadFrames, loadStrip, loadVideo } from '~/utils/paper-scroll/assets';
 import { PaperScene, type LoadedStrip, type ModeOverride } from '~/utils/paper-scroll/scene';
 import type { SequenceState } from '~/utils/paper-scroll/sequence';
 import type { SceneConfig } from '~/utils/paper-scroll/types';
@@ -15,6 +15,25 @@ export interface UsePaperSceneOptions {
   canvas: Ref<HTMLCanvasElement | null>;
   scene: SceneConfig;
   assetUrl: (path: string) => string;
+  /** 跑道接近畫面（前 LAZY_MARGIN）才開始載素材；給頁面中段、素材很大的場景用 */
+  lazy?: boolean;
+}
+
+const LAZY_MARGIN = '150% 0px';
+
+/** 元素進入（含 margin）畫面時 resolve */
+function whenNear(el: Element): Promise<void> {
+  return new Promise((resolve) => {
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        io.disconnect();
+        resolve();
+      },
+      { rootMargin: LAZY_MARGIN },
+    );
+    io.observe(el);
+  });
 }
 
 /** 平滑時間常數（ms）：越小追得越快 */
@@ -78,13 +97,22 @@ export function usePaperScene(opts: UsePaperSceneOptions) {
     const stage = opts.stage.value;
     const canvas = opts.canvas.value;
     if (!track || !stage || !canvas) return;
+    if (opts.lazy) await whenNear(track);
+    if (disposed) return;
 
     const strips = new Map<string, LoadedStrip>();
     const sprites = [...new Map(opts.scene.elements.map((e) => [e.sprite.src, e.sprite])).values()];
     await Promise.all(
       sprites.map(async (s) => {
         const url = opts.assetUrl(s.src);
-        strips.set(s.src, s.kind === 'video' ? await loadVideo(url, s.cellW) : await loadStrip(url, s.cellW, s.frames));
+        strips.set(
+          s.src,
+          s.srcs
+            ? await loadFrames(s.srcs.map(opts.assetUrl), s.cellW)
+            : s.kind === 'video'
+              ? await loadVideo(url, s.cellW)
+              : await loadStrip(url, s.cellW, s.frames),
+        );
       }),
     );
     // 載入期間元件可能已卸載（快速返回）：此時 onBeforeUnmount 已跑過，不能再掛任何東西

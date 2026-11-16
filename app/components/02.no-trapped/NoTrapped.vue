@@ -1,6 +1,6 @@
 <!--
   02 無人受困的火場。順序照設計稿 section2：
-  導言 → pin 圖表 → 過場 → blur 大標 → 台中案例 → 張賢龢留學故事 → 受訪者卡 → 3 項應變順序 → 段落 → 引言（blur）→（mob）插畫 → 美福倉儲段落＋照片
+  導言 → pin 圖表 → 過場 → blur 大標 → 台中案例 → 張賢龢留學故事 → 受訪者卡 → 3 項應變順序 → 段落 → 引言（blur）→ 超哥故事捲動動畫 → 美福倉儲段落＋照片
 -->
 <script setup lang="ts">
 import { CASES } from '~/utils/02.no-trapped/cases';
@@ -65,8 +65,8 @@ useScrollBlur(quote, quote);
       <span class="sec-no-trapped__quote-mark" aria-hidden="true">“</span>
       <p>{{ str.quote }}</p>
     </blockquote>
-    <!-- mob 稿引言後的插畫（362×448），素材未到先放 placeholder -->
-    <div class="sec-no-trapped__illust" aria-hidden="true" />
+    <!-- 引言延伸的「超哥故事」捲動動畫 -->
+    <NoTrappedEscape />
 
     <div class="sec-no-trapped__text">
       <p v-for="p in str.meifu.paragraphs" :key="p">{{ p }}</p>

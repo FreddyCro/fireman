@@ -287,19 +287,6 @@ $column: 620px;
     line-height: 1;
   }
 
-  // ── 引言後的插畫：只有 mob 稿有（362×448），素材未到先放 placeholder ──
-  &__illust {
-    max-width: $column;
-    margin: 0 auto 64px;
-    aspect-ratio: 362 / 448;
-    background: #1a1a1a;
-    outline: 1px dashed #444;
-
-    @include rwd-min('tablet') {
-      display: none;
-    }
-  }
-
   // ── 美福倉儲照片：mob 上下疊、tablet 以上並排 ──
   // pad 稿 654 寬（322×2＋10）、pc 820（402×2＋15）
   &__gallery {

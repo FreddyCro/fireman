@@ -21,7 +21,10 @@ export interface Keyframe {
 }
 
 export interface SpriteConfig {
+  /** 素材路徑；有 srcs 時只當快取 key（不載入），需全場景唯一 */
   src: string;
+  /** 一格一個檔（逐格分開交件的插畫）：frames 必須等於 srcs.length，每格的 cellW／cellH 相同 */
+  srcs?: string[];
   /** video：src 是影片，frames 固定 1，cellW／cellH 是影片在設計畫布上的尺寸 */
   kind?: 'image' | 'video';
   frames: number;
@@ -112,6 +115,8 @@ export interface SceneConfig {
   fit?: FitMode;
   /** smart 模式容許 cover 裁掉的比例，預設 0.25 */
   maxCrop?: number;
+  /** 設計畫布最多放大到幾倍（例：1 = 大螢幕不放大，多出來的露出背景色）；預設不限 */
+  maxScale?: number;
   /** 設計畫布在舞台中的對齊，預設靠上置中 {x: 0.5, y: 0} */
   anchor?: { x: number; y: number };
   background: BackgroundStop[];

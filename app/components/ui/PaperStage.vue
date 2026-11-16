@@ -4,10 +4,14 @@ import type { ModeOverride } from '~/utils/paper-scroll/scene';
 import { usePaperScene } from '~/composables/usePaperScene';
 import type { SceneConfig } from '~/utils/paper-scroll/types';
 
-const props = withDefaults(defineProps<{ scene: SceneConfig; trackVh?: number; debug?: boolean }>(), {
-  trackVh: 600,
-  debug: false,
-});
+const props = withDefaults(
+  defineProps<{ scene: SceneConfig; trackVh?: number; debug?: boolean; lazy?: boolean }>(),
+  {
+    trackVh: 600,
+    debug: false,
+    lazy: false,
+  },
+);
 
 const track = ref<HTMLElement | null>(null);
 const stage = ref<HTMLElement | null>(null);
@@ -20,6 +24,7 @@ const { target, progress, fps, viewport, designRect, elements, showClips, sequen
   canvas,
   scene: props.scene,
   assetUrl,
+  lazy: props.lazy,
 });
 
 const override = ref<ModeOverride>('config');

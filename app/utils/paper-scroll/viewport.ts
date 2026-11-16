@@ -40,11 +40,13 @@ export function fitTransform(
   fit: FitMode = 'cover',
   anchor: { x: number; y: number } = { x: 0.5, y: 0 },
   maxCrop = 0.25,
+  maxScale = Infinity,
 ): CoverTransform {
   const cover = Math.max(stage.w / design.w, stage.h / design.h);
   const contain = Math.min(stage.w / design.w, stage.h / design.h);
   // cover 時被裁的那一軸只看得到 contain/cover 這麼多
-  const scale = fit === 'contain' || (fit === 'smart' && 1 - contain / cover > maxCrop) ? contain : cover;
+  const fitted = fit === 'contain' || (fit === 'smart' && 1 - contain / cover > maxCrop) ? contain : cover;
+  const scale = Math.min(fitted, maxScale);
   return {
     scale,
     offsetX: (stage.w - design.w * scale) * anchor.x,

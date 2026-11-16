@@ -23,6 +23,25 @@ export async function loadStrip(url: string, cellW: number, frames: number): Pro
 }
 
 /**
+ * 一格一個檔（SpriteConfig.srcs）：逐張 decode，保留 HTMLImageElement 不轉 ImageBitmap。
+ * 這類多半是大張點陣插畫、張數多，全部常駐成 bitmap 很吃記憶體；交給瀏覽器管理解碼快取。
+ */
+export async function loadFrames(urls: string[], cellW: number): Promise<LoadedStrip> {
+  const frames = await Promise.all(
+    urls.map(async (url) => {
+      const img = new Image();
+      img.decoding = 'async';
+      img.src = url;
+      await img.decode().catch(() => {
+        throw new Error(`無法載入 ${url}`);
+      });
+      return { source: img as CanvasImageSource, pixelRatio: img.naturalWidth / cellW };
+    }),
+  );
+  return { source: frames[0]!.source, pixelRatio: frames[0]!.pixelRatio, frames };
+}
+
+/**
  * 載入影片（muted + playsinline 才能在 iOS 自動播放）。先 play 一下再暫停：
  * iOS Safari 不播放就不會解碼第一格，loadeddata 永遠等不到。
  */
