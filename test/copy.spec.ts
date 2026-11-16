@@ -48,8 +48,8 @@ describe('文案中英對照', () => {
     expect(leftovers).toEqual([]);
   });
 
-  it.each(['zh', 'en'])('%s：hero 殉職名單筆數與人數一致', (lang) => {
-    const hero = load(lang, 'section-hero.json');
-    expect(hero.roll.names).toHaveLength(Number.parseInt(hero.count.number));
+  it.each(['zh', 'en'])('%s：hero 殉職名單筆數與人數（中文「27名」）一致', (lang) => {
+    const total = Number.parseInt(load('zh', 'section-hero.json').count[0]);
+    expect(load(lang, 'section-hero.json').roll.names).toHaveLength(total);
   });
 });

@@ -1,7 +1,29 @@
-// overlay 是 container（PaperStage），字級用 cqw 跟著畫面寬（手機滿版、桌機置中直欄）縮放
+// overlay 是 container（PaperStage 的設計畫布：手機滿版、平板桌機置中的 9:16 直欄），
+// 對應設計稿 414×736 的文字欄（pc、pad 稿也是把同一欄置中），所以設計稿 px ÷ 4.14 ＝ cqw、÷ 7.36 ＝ cqh。
+// 字級、間距都用 cqw，三種載具共用；只有教訓文字的斷行依載具不同。
+//
+// 字型（設計稿標註）：中文小標、內文、「他沒能再走出來」用 Noto Serif TC Regular，人數、人名、日期、教訓用 Noto Sans TC；
+// 英文稿另外設計：大多是 Inter，只有教訓文字是 Noto Sans TC。字型在 nuxt.config.ts 從 Google Fonts 載入。
+$hero-serif: 'Noto Serif TC', 'Songti TC', 'PMingLiU', serif;
+$hero-sans: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+
+// 只有中文用襯線；英文沿用 .sec-hero:lang(en) 的 Inter
+@mixin hero-serif {
+  font-family: $hero-serif;
+
+  &:lang(en) {
+    font-family: inherit;
+  }
+}
+
 .sec-hero {
   background: #000;
   color: #fff;
+
+  // 英文稿用 Inter
+  &:lang(en) {
+    font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans TC', sans-serif;
+  }
 
   &__incident,
   &__line,
@@ -12,46 +34,113 @@
     left: 0;
     right: 0;
     margin: 0;
-    padding: 0 6cqw;
+    padding: 0 6.28cqw; // 26px
     text-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
     will-change: opacity, transform;
   }
 
+  // 設計稿 1-3：區塊底部距畫面底 48px；2-1：區塊頂端距畫面頂 51px。--t 0→1 從下移到上
   &__incident {
-    top: 12cqh;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2.42cqw; // 10px
+    transform: translateY(calc((100cqh - 100% - 6.52cqh) * (1 - var(--t, 0)) + 6.93cqh * var(--t, 0)));
   }
 
   &__incident-date {
-    margin: 0 0 6cqw;
-    font-family: 'Noto Serif TC', 'Songti TC', 'PMingLiU', serif;
-    font-size: 7cqw;
-    letter-spacing: 0.08em;
+    @include hero-serif;
+    margin: 0;
+    font-size: 6.76cqw; // 28px
+    line-height: 1.43; // 40px
+    letter-spacing: 0.1em;
     text-align: center;
+
+    &:lang(en) {
+      letter-spacing: 0;
+    }
   }
 
-  &__incident-body {
+  &__incident-body,
+  &__caption {
+    @include hero-serif;
     margin: 0;
-    font-size: 4cqw;
-    line-height: 2;
-    letter-spacing: 0.12em;
+    font-size: 4.35cqw; // 18px
+    line-height: 2; // 36px
+    letter-spacing: 0.1em;
+    text-align: justify;
+
+    &:lang(en) {
+      letter-spacing: 0;
+      text-align: left;
+    }
+  }
+
+  // 3-1 面罩字幕：設計稿頂端 546px
+  &__caption {
+    top: 74.18cqh;
+
+    // 4-1 說明文字：設計稿頂端 500px
+    &--victim {
+      top: 67.93cqh;
+    }
   }
 
   &__line {
     top: 50%;
     display: flex;
     flex-direction: column;
-    gap: 2cqw;
-    font-size: 4cqw;
-    letter-spacing: 0.12em;
+    align-items: center;
+    font-size: 5.31cqw; // 22px
+    line-height: 1.82; // 40px
+    letter-spacing: 0.1em;
     text-align: center;
     translate: 0 -50%;
+
+    &:lang(en) {
+      letter-spacing: 0;
+    }
+
+    // 「他沒能再走出來」：中文 Noto Serif TC Regular 斷兩行；英文稿 Inter Bold 一行
+    &--last {
+      @include hero-serif;
+
+      &:lang(en) {
+        font-weight: 700;
+      }
+    }
+
+    // 教訓：段落間距 mob 24px、pad/pc 10px；英文欄寬 262px
+    &--lesson {
+      gap: 5.8cqw;
+
+      @include rwd-min('tablet') {
+        gap: 2.42cqw;
+      }
+
+      // 英文稿這段用 Noto Sans TC（不是 Inter）
+      &:lang(en) {
+        gap: 2.42cqw;
+        padding: 0 18.36cqw; // (414 − 262) / 2
+        font-family: $hero-sans;
+      }
+    }
   }
 
-  &__caption {
-    bottom: 8cqh;
-    font-size: 3.6cqw;
-    line-height: 1.9;
-    letter-spacing: 0.1em;
+  &__lesson-para {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+
+    // 平板以上兩行接成一行
+    @include rwd-min('tablet') {
+      flex-direction: row;
+      justify-content: center;
+    }
+  }
+
+  &__lesson-text {
+    display: block;
   }
 
   // 教訓文字的時間淡入層：4-3 淡黑（400ms）後再花 600ms 淡入；關閉時立刻開始淡出。
@@ -76,34 +165,76 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4cqw;
+    gap: 8.94cqw; // 37px
     text-align: center;
-    letter-spacing: 0.1em;
     transform: translateY(calc(var(--t) * (-100% - 100cqh)));
   }
 
   &__roll-head {
     display: flex;
     flex-direction: column;
-    gap: 1cqw;
     margin: 0;
-    font-size: 4.4cqw;
+    font-size: 5.8cqw; // 24px
+    line-height: 1.67; // 40px
+    letter-spacing: 0.1em;
+
+    &:lang(en) {
+      font-size: 4.83cqw; // 20px
+      line-height: 1.8; // 36px
+      letter-spacing: 0;
+    }
   }
 
   &__roll-list {
     display: flex;
     flex-direction: column;
-    gap: 1.6cqw;
+    gap: 6.76cqw; // 28px
     margin: 0;
     padding: 0;
-    font-size: 3.6cqw;
-    line-height: 1.6;
     list-style: none;
+    mix-blend-mode: screen;
+  }
+
+  &__roll-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.9cqw; // 12px
+
+    &:lang(en) {
+      gap: 1.21cqw; // 5px
+    }
+  }
+
+  &__roll-name {
+    font-size: 8.21cqw; // 34px
+    line-height: 0.94; // 32px
+    letter-spacing: 0.15em;
+
+    &:lang(en) {
+      font-size: 5.31cqw; // 22px
+      font-weight: 500;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+  }
+
+  &__roll-date {
+    font-size: 2.9cqw; // 12px
+    line-height: 1;
+    letter-spacing: 0.1em;
+
+    &:lang(en) {
+      font-size: 3.14cqw; // 13px
+      font-weight: 500;
+      line-height: 1.38; // 18px
+      letter-spacing: 0;
+    }
   }
 
   &__title {
     top: 50%;
-    font-family: 'Noto Serif TC', 'Songti TC', 'PMingLiU', serif;
+    font-family: $hero-serif;
     font-size: 15cqw;
     font-weight: 900;
     line-height: 1.15;
@@ -113,5 +244,13 @@
     width: fit-content;
     padding: 0;
     translate: 0 -50%;
+
+    // 英文標題不直排
+    &:lang(en) {
+      width: auto;
+      padding: 0 6.28cqw;
+      font-size: 9cqw;
+      writing-mode: horizontal-tb;
+    }
   }
 }

@@ -75,6 +75,18 @@ export default defineNuxtConfig({
   },
 
   app: {
+    head: {
+      // 設計稿字型：中文襯線用 Noto Serif TC（hero 內文 400、各 section 標題 700、hero 標題 900），英文稿用 Inter。
+      // Google Fonts 的 CJK 字型會依 unicode-range 切片，瀏覽器只下載頁面用到的字。
+      link: [
+        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
+        {
+          rel: 'stylesheet',
+          href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Serif+TC:wght@400;700;900&display=swap',
+        },
+      ],
+    },
     // NUXT_URL 的 pathname 當 baseURL：子路徑部署（如 GitHub Pages 的 /fireman/）
     // 沒設的話 _nuxt 資源會 404。
     baseURL: (() => {

@@ -94,8 +94,8 @@ describe('hero 序列', () => {
 });
 
 describe('hero 文案', () => {
-  it('殉職名單佔位筆數與「27名」一致', () => {
-    expect(str.roll.names).toHaveLength(Number.parseInt(str.count.number));
+  it('殉職名單筆數與「27名」一致', () => {
+    expect(str.roll.names).toHaveLength(Number.parseInt(str.count[0]!));
   });
 });
 

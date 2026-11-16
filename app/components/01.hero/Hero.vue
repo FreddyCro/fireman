@@ -1,8 +1,9 @@
 <!-- 「消防員之死」捲動動畫，來自 POC C 版（/poc/fire-story-paced）。分鏡與時間軸在 utils/01.hero/scene.ts。 -->
 <script setup lang="ts">
-import { clamp01 } from '~/utils/paper-scroll/keyframes';
+import { clamp01, EASE } from '~/utils/paper-scroll/keyframes';
 import type { SequenceState } from '~/utils/paper-scroll/sequence';
 import {
+  HERO_INCIDENT_MOVE,
   HERO_ROLL,
   HERO_TEXT,
   HERO_TRACK_VH,
@@ -29,6 +30,13 @@ type Seq = SequenceState | null;
 const textStyle = (cue: HeroCue, p: number) => {
   const v = presence(cue, p);
   return { opacity: v, transform: `translateY(${(1 - v) * 12}px)`, visibility: v > 0 ? 'visible' : 'hidden' } as const;
+};
+
+/** 事件文字：淡入淡出之外，停留期間從畫面下方移到上方（設計稿 1-3 → 2-1）；--t 給 CSS 算位移 */
+const incidentStyle = (p: number) => {
+  const [a, b] = HERO_INCIDENT_MOVE;
+  const v = presence('incident', p);
+  return { opacity: v, '--t': EASE.inOut(clamp01((p - a) / (b - a))), visibility: v > 0 ? 'visible' : 'hidden' } as const;
 };
 
 /** 4-2 殉職名單：片尾字幕式，跟著捲動從畫面底部一路走到頂部；--t 給 CSS 算位移。要等 4-2 顯示後才可見 */
@@ -67,26 +75,32 @@ const titleStyle = (p: number, seq: Seq) => {
   <section id="hero" class="sec-hero">
     <PaperStage :scene="heroScene" :track-vh="HERO_TRACK_VH" :debug="debug">
       <template #default="{ progress, sequence }">
-        <div class="sec-hero__incident" :style="textStyle('incident', progress)">
+        <div class="sec-hero__incident" :style="incidentStyle(progress)">
           <p class="sec-hero__incident-date">{{ str.incident.date }}</p>
           <p class="sec-hero__incident-body">{{ str.incident.body }}</p>
         </div>
         <p class="sec-hero__caption" :style="textStyle('mask', progress)">{{ str.mask }}</p>
-        <p class="sec-hero__line" :style="textStyle('lastWords', progress)">{{ str.lastWords }}</p>
-        <p class="sec-hero__caption" :style="textStyle('victim', progress)">{{ str.victim }}</p>
+        <p class="sec-hero__line sec-hero__line--last" :style="textStyle('lastWords', progress)">
+          <span v-for="l in str.lastWords" :key="l">{{ l }}</span>
+        </p>
+        <p class="sec-hero__caption sec-hero__caption--victim" :style="textStyle('victim', progress)">{{ str.victim }}</p>
         <div class="sec-hero__roll" :style="rollStyle(progress, sequence)">
           <p class="sec-hero__roll-head">
-            <span>{{ str.count.number }}</span>
-            <span>{{ str.count.label }}</span>
+            <span v-for="l in str.count" :key="l">{{ l }}</span>
           </p>
           <ul class="sec-hero__roll-list">
-            <li v-for="name in str.roll.names" :key="name">{{ name }}</li>
+            <li v-for="p in str.roll.names" :key="p.name" class="sec-hero__roll-item">
+              <span class="sec-hero__roll-name">{{ p.name }}</span>
+              <span class="sec-hero__roll-date">{{ p.date }}</span>
+            </li>
           </ul>
         </div>
         <div class="sec-hero__lesson" :class="{ 'sec-hero__lesson--on': c4Done(sequence) }">
-          <p class="sec-hero__line" :style="lessonStyle(progress, sequence)">
-            <span v-for="l in str.lesson" :key="l">{{ l }}</span>
-          </p>
+          <div class="sec-hero__line sec-hero__line--lesson" :style="lessonStyle(progress, sequence)">
+            <p v-for="(para, i) in str.lesson" :key="i" class="sec-hero__lesson-para">
+              <span v-for="l in para" :key="l" class="sec-hero__lesson-text">{{ l }}</span>
+            </p>
+          </div>
         </div>
         <h1 class="sec-hero__title" :style="titleStyle(progress, sequence)">{{ str.pageTitle }}</h1>
       </template>

@@ -99,7 +99,8 @@ type TextRange = { in: [number, number]; out: [number, number] };
 
 /** 文字 overlay 的進出場（進度 p） */
 export const HERO_TEXT = {
-  incident: { in: range(178.5, 212.5), out: range(297.5, 323) },
+  /** 設計稿：1-3 時在畫面下方，2-1 時已在上方；停留期間由 HERO_INCIDENT_MOVE 往上移，2-2 蓋滿前退場 */
+  incident: { in: range(178.5, 212.5), out: range(440, 470) },
   /** 3-1 字幕：氧氣面罩，落在 3-1 可見區間內 */
   mask: { in: range(654.5, 680), out: range(765, 790.5) },
   lastWords: { in: range(1020, 1054), out: range(1130.5, 1156) },
@@ -112,6 +113,9 @@ export const HERO_TEXT = {
 } satisfies Record<string, TextRange>;
 
 export type HeroCue = keyof typeof HERO_TEXT;
+
+/** 事件文字從畫面下方（1-3）移到上方（2-1）的區間，配合 2-1 淡入 */
+export const HERO_INCIDENT_MOVE = range(230, 400);
 
 /** 4-2 殉職名單片尾式捲動的位置區間；可見與否另由 c4Mid 決定（4-2 顯示後才看得到） */
 export const HERO_ROLL = range(T1 + 200, T3);
