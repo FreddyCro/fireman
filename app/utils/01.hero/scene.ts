@@ -116,7 +116,7 @@ export const HERO_TEXT = {
   victim: { in: range(T1 + 80, T1 + 100), out: range(T1 + 180, T1 + 200) },
   /** 進場實際靠時間（4-3 播完後原地淡入），in 只是名目值；T3 後 200vh 才退場 */
   lesson: { in: range(T3 + 40, T3 + 60), out: range(T3 + 200, T3 + 220) },
-  /** 標題：out 段是粉末化消失（佔位效果，等動畫師交件） */
+  /** 標題影片：in 段淡入（停在第一格），淡入完成到 out 結束綁捲動播完（字粉末化消失）；見 HERO_TITLE_SCRUB */
   title: { in: range(T3 + 240, T3 + 260), out: range(T3 + 350, T3 + 415) },
 } satisfies Record<string, TextRange>;
 
@@ -139,6 +139,36 @@ function c4(name: string, d: Device): { sprite: SpriteConfig; cover?: ElementCon
   return { sprite: video(`${name}_mob`) };
 }
 
+/** 標題影片綁捲動播放的區間：淡入完成 → 原本文字標題退場結束 */
+export const HERO_TITLE_SCRUB: [number, number] = [HERO_TEXT.title.in[1], HERO_TEXT.title.out[1]];
+
+export type HeroLocale = 'zh' | 'en';
+
+/**
+ * 標題影片（1116 交件 Title 動畫，已轉成逐格 keyframe）：Pad 與 Mob 共用 pad 版（2026-11-17 確認）。
+ * PC（1920×1080）、Pad（1024×1364）蓋滿舞台；Mob 依設計稿「手機版 影片頂裝置寬」放進設計畫布、寬度頂滿（直式畫布在手機上是 cover）。
+ * 4-3 播完才出現（afterSequence，同原本文字標題的 c4Done）。
+ */
+function title(d: Device, locale: HeroLocale): ElementConfig {
+  const name = `title${locale === 'en' ? '_en' : ''}_${d === 'pc' ? 'pc' : 'pad'}`;
+  const sprite = d === 'pc' ? video(name, 1920, 1080) : d === 'pad' ? video(name, 1024, 1364) : video(name, W, (W * 1364) / 1024);
+  const [a, b] = HERO_TEXT.title.in;
+  return {
+    id: 'title',
+    sprite,
+    frameMode: 'hold',
+    holdFrame: 0,
+    cover: d === 'mob' ? undefined : 'stage',
+    playback: { mode: 'scroll', range: HERO_TITLE_SCRUB },
+    afterSequence: true,
+    keyframes: [
+      { p: 0, x: 0.5, y: 0.5, opacity: 0, layer: 16 },
+      { p: a, opacity: 0 },
+      { p: b, opacity: 1, ease: 'inOut' },
+    ],
+  };
+}
+
 /** 影片序列（三載具相同） */
 export const HERO_SEQUENCE: SequenceConfig = {
   steps: [
@@ -149,7 +179,7 @@ export const HERO_SEQUENCE: SequenceConfig = {
   fade: 0,
 };
 
-export const heroScene = (d: Device): SceneConfig => ({
+export const heroScene = (d: Device, locale: HeroLocale = 'zh'): SceneConfig => ({
   design: { w: W, h: H },
   fit: 'smart',
   anchor: { x: 0.5, y: 0.5 },
@@ -183,6 +213,7 @@ export const heroScene = (d: Device): SceneConfig => ({
     slide('4-1', c4('4-1', d).sprite, { layer: 13, cutIn: T1, playback: { mode: 'trigger' }, cover: c4('4-1', d).cover }),
     slide('4-2', c4('4-2', d).sprite, { layer: 14, hidden: true, playback: { mode: 'loop' }, cover: c4('4-2', d).cover }),
     slide('4-3', c4('4-3', d).sprite, { layer: 15, hidden: true, playback: { mode: 'trigger' }, cover: c4('4-3', d).cover }),
+    title(d, locale),
   ],
   sequence: HERO_SEQUENCE,
 });

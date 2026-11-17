@@ -13,7 +13,7 @@ export const GENERAL_NOTES: string[] = [
   'hero/ 的 1-1～3-5.webp 是捲動動畫 POC 用素材，不在 1106 交件內。',
   '1116 交件：3-6.webp（C03-6）、3-6.mp4（C03 轉場火焰 firewave，重新編碼成逐格 keyframe，22→5 MB）已換上。',
   '1116 交件：C04 火球依標示 loop 點 00:01:07～00:04:12（24fps 第 31～107 格）切成 4-1／4-2／4-3_{pc,pad,mob}。loop 點與導購動畫標示完全相同，待設計確認不是誤植。',
-  '1116 交件：title_{pc,pad}、title_en_{pc,pad} 已轉成逐格 keyframe 放上，尚未接到 hero 標題（不在本次優先清單、缺 mob 版）。',
+  '1116 交件：title_{pc,pad}、title_en_{pc,pad} 已轉成逐格 keyframe，接到 hero 標題（綁捲動播放）；Pad 與 Mob 共用 pad 版（2026-11-17 確認）。',
   '1116 交件：ending/fire-loop（導購動態火）取代 fire.png，fire.png 待確認後刪除。',
   'scrapbook/ 是 1030 交件的 POC 素材，仍是設計端原檔名（未正規化），影片 3.9–22.9 MB。',
   '1110 插畫初稿：story1-1～7-3 是「超哥故事」（02.no-trapped 引言後的捲動動畫），已搬到 no-trapped/escape/，由 utils/02.no-trapped/escape.ts 使用。',

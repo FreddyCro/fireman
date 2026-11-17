@@ -30,6 +30,7 @@ $hero-sans: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
   &__caption,
   &__roll,
   &__title {
+    // __title 只剩視覺隱藏（見檔尾），沿用 absolute 不佔版面
     position: absolute;
     left: 0;
     right: 0;
@@ -232,25 +233,13 @@ $hero-sans: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
     }
   }
 
+  // 畫面上的標題是場景裡的影片（綁捲動播放），h1 只給螢幕閱讀器與 SEO：視覺隱藏
   &__title {
-    top: 50%;
-    font-family: $hero-serif;
-    font-size: 15cqw;
-    font-weight: 900;
-    line-height: 1.15;
-    text-align: center;
-    writing-mode: vertical-rl;
-    margin: 0 auto;
-    width: fit-content;
+    width: 1px;
+    height: 1px;
     padding: 0;
-    translate: 0 -50%;
-
-    // 英文標題不直排
-    &:lang(en) {
-      width: auto;
-      padding: 0 6.28cqw;
-      font-size: 9cqw;
-      writing-mode: horizontal-tb;
-    }
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 }

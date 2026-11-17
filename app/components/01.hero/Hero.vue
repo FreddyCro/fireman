@@ -6,12 +6,12 @@ import type { SequenceState } from '~/utils/paper-scroll/sequence';
 import {
   HERO_INCIDENT_MOVE,
   HERO_ROLL,
-  HERO_TEXT,
   HERO_TRACK_VH,
   c4Done,
   c4Mid,
   exitPresence,
   heroScene,
+  type HeroLocale,
   presence,
   type HeroCue,
 } from '~/utils/01.hero/scene';
@@ -21,8 +21,11 @@ const str = useCopy().hero;
 
 // C4 影片三載具各一組。hero 在首屏，不能 prerender 先掛 pc 再換（會白載 pc 素材）：
 // client 在 setup 就依寬度決定；場景只影響 canvas，不影響 DOM，hydration 不會不一致。之後跨斷點才重掛
+// 標題影片依語系選檔（沒有動態切換語系，換語系＝換頁）
 const device = ref<Device>(import.meta.client ? deviceOfWidth(document.documentElement.clientWidth) : 'pc');
-const scene = computed(() => heroScene(device.value));
+const { locale } = useI18n();
+const heroLocale: HeroLocale = locale.value === 'en' ? 'en' : 'zh';
+const scene = computed(() => heroScene(device.value, heroLocale));
 const onResize = () => {
   device.value = deviceOfWidth(document.documentElement.clientWidth);
 };
@@ -67,19 +70,6 @@ const lessonStyle = (p: number, seq: Seq) => {
   return { opacity: v, visibility: v > 0 ? 'visible' : 'hidden' } as const;
 };
 
-/** 標題：退場用模糊、放大、字距拉開代替粉末化（佔位，等動畫師的版本）。要等 4-3 播完 */
-const titleStyle = (p: number, seq: Seq) => {
-  const { out: [c, d] } = HERO_TEXT.title;
-  const v = c4Done(seq) ? presence('title', p) : 0;
-  const t = clamp01((p - c) / (d - c));
-  return {
-    opacity: v,
-    filter: `blur(${t * 14}px)`,
-    letterSpacing: `${t * 0.6}em`,
-    transform: `scale(${1 + t * 0.15})`,
-    visibility: v > 0 ? 'visible' : 'hidden',
-  } as const;
-};
 </script>
 
 <template>
@@ -113,7 +103,8 @@ const titleStyle = (p: number, seq: Seq) => {
             </p>
           </div>
         </div>
-        <h1 class="sec-hero__title" :style="titleStyle(progress, sequence)">{{ str.pageTitle }}</h1>
+        <!-- 畫面上的標題是場景裡的影片（scene.ts title），這裡只留給螢幕閱讀器與 SEO -->
+        <h1 class="sec-hero__title">{{ str.pageTitle }}</h1>
       </template>
     </PaperStage>
   </section>

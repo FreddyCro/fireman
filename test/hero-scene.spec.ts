@@ -130,3 +130,27 @@ describe('hero 3-6v 捲動影片（設計師測試）', () => {
     for (const { in: [i], out: [, o] } of Object.values(HERO_TEXT)) expect(o <= a || i >= b).toBe(true);
   });
 });
+
+describe('hero 標題影片（Pad／Mob 共用 pad 版）', () => {
+  const files = {
+    pc: { zh: '/img/hero/title_pc.mp4', en: '/img/hero/title_en_pc.mp4' },
+    pad: { zh: '/img/hero/title_pad.mp4', en: '/img/hero/title_en_pad.mp4' },
+    mob: { zh: '/img/hero/title_pad.mp4', en: '/img/hero/title_en_pad.mp4' },
+  } as const;
+
+  it.each(devices.flatMap((d) => (['zh', 'en'] as const).map((l) => [d, l] as const)))('%s／%s 用對的檔', (d, l) => {
+    const el = heroScene(d, l).elements.find((e) => e.id === 'title')!;
+    expect(el.sprite.src).toBe(files[d][l]);
+    expect(existsSync(resolve(__dirname, '../public', `.${el.sprite.src}`))).toBe(true);
+    // Mob「頂裝置寬」：放進設計畫布、寬度等於畫布寬；PC／Pad 蓋滿舞台
+    expect(el.cover).toBe(d === 'mob' ? undefined : 'stage');
+    if (d === 'mob') expect(el.sprite.cellW).toBe(1080);
+  });
+
+  it('淡入完成後綁捲動播放到原本標題退場結束，且等 4-3 播完才出現', () => {
+    const el = scene.elements.find((e) => e.id === 'title')!;
+    expect(el.afterSequence).toBe(true);
+    expect(el.playback).toEqual({ mode: 'scroll', range: [HERO_TEXT.title.in[1], HERO_TEXT.title.out[1]] });
+    expect(el.keyframes.find((k) => k.opacity === 1)!.p).toBe(HERO_TEXT.title.in[1]);
+  });
+});

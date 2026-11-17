@@ -195,10 +195,18 @@ export class PaperScene {
       const state = drawStateOf(cfg, input.progress);
       const o = overrides?.get(rt.config.id);
       if (o !== undefined) state.opacity = o;
+      if (cfg.afterSequence && !this.sequenceDone()) state.opacity = 0;
       this.resolved.set(rt.config.id, { cfg, state });
       const video = this.strips.get(cfg.sprite.src)?.video;
       if (video && cfg.playback) syncVideo(video, cfg.playback, input.progress, state.opacity > 0.001, this.reduceMotion);
     }
+  }
+
+  /** sequence 已到最後一段且播完（沒有 sequence 視為已完成） */
+  sequenceDone(): boolean {
+    const steps = this.config.sequence?.steps;
+    if (!steps?.length) return true;
+    return this.sequence.step === steps.length - 1 && this.sequence.phase === 'ended';
   }
 
   private videoOf(id: string) {

@@ -94,6 +94,8 @@ export interface ElementConfig {
    * x、y 不作用，scale、opacity 照常；不受設計畫布的裁切範圍限制
    */
   cover?: 'stage';
+  /** 場景 sequence 最後一段播完前一律不顯示（opacity 0）；例：等收尾影片播完才出現的標題 */
+  afterSequence?: boolean;
   keyframes: Keyframe[];
   triggers?: Trigger[];
 }

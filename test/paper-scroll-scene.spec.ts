@@ -164,6 +164,20 @@ describe('PaperScene + sequence', () => {
     expect(s.stateOf('a')?.opacity).toBe(0);
     expect(s.stateOf('b')?.opacity).toBe(1);
   });
+
+  it('afterSequence：序列最後一段播完前不顯示，播完後照關鍵幀', () => {
+    const gated: ElementConfig = { ...vid('t'), playback: undefined, afterSequence: true, keyframes: [{ p: 0, x: 0.5, y: 0.5, opacity: 1 }] };
+    const cfg: SceneConfig = { ...base, elements: [vid('a'), gated], sequence: { steps: [{ trigger: 0.5, play: 'a' }], fade: 0 } };
+    const s = new PaperScene(cfg, new Map());
+    s.update({ progress: 0.4, scrollPx: 0, dtMs: 16, nowMs: 0 });
+    expect(s.stateOf('t')?.opacity).toBe(0);
+    s.update({ progress: 0.6, scrollPx: 0, dtMs: 16, nowMs: 16 }); // 進區，playing
+    expect(s.stateOf('t')?.opacity).toBe(0);
+    s.update({ progress: 0.6, scrollPx: 0, dtMs: 16, nowMs: 32 }); // 無影片 → ended
+    s.update({ progress: 0.6, scrollPx: 0, dtMs: 16, nowMs: 48 });
+    expect(s.sequenceDone()).toBe(true);
+    expect(s.stateOf('t')?.opacity).toBe(1);
+  });
 });
 
 describe('stageCoverScale', () => {
