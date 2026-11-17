@@ -3,20 +3,25 @@ import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import str from '../app/locales/zh/section-hero.json';
-import { HERO_ROLL, HERO_TEXT, HERO_TRACK_VH, exitPresence, heroScene } from '../app/utils/01.hero/scene';
+import { HERO_ROLL, HERO_SEQUENCE, HERO_TEXT, HERO_TRACK_VH, exitPresence, heroScene } from '../app/utils/01.hero/scene';
+import type { Device } from '../app/utils/get-device';
+
+const devices: Device[] = ['pc', 'pad', 'mob'];
+/** 只有 C4 依載具不同，其餘測試用 mob 版即可 */
+const scene = heroScene('mob');
 
 /** p → vh，取到 0.001vh 免得浮點誤差讓 ≥ 比較失敗 */
 const vh = (p: number) => Math.round(p * (HERO_TRACK_VH - 100) * 1000) / 1000;
 
-const seq = heroScene.sequence!;
+const seq = HERO_SEQUENCE;
 const [t1, t3] = seq.steps.map((s) => s.trigger) as [number, number];
 
 describe('hero 場景設定', () => {
-  it.each(heroScene.elements)('$id 的素材存在', (el) => {
+  it.each(scene.elements)('$id 的素材存在', (el) => {
     expect(existsSync(resolve(__dirname, '../public', `.${el.sprite.src}`))).toBe(true);
   });
 
-  it.each(heroScene.elements)('$id 的關鍵幀依 p 排序且在 0～1', (el) => {
+  it.each(scene.elements)('$id 的關鍵幀依 p 排序且在 0～1', (el) => {
     const ps = el.keyframes.map((k) => k.p);
     expect(ps).toEqual([...ps].sort((a, b) => a - b));
     ps.forEach((p) => expect(p).toBeGreaterThanOrEqual(0));
@@ -24,12 +29,12 @@ describe('hero 場景設定', () => {
   });
 
   it('影片元素都有 playback，圖片沒有', () => {
-    for (const el of heroScene.elements) expect(!!el.playback).toBe(el.sprite.kind === 'video');
+    for (const el of scene.elements) expect(!!el.playback).toBe(el.sprite.kind === 'video');
   });
 
   // 設計師回饋（2026-10-19）：只有 2-1 保留滾動放大，其他原尺寸切換
   it('只有 2-1 有縮放', () => {
-    for (const el of heroScene.elements) {
+    for (const el of scene.elements) {
       const zooms = el.keyframes.some((k) => k.scale !== undefined && k.scale !== 1);
       expect(zooms, el.id).toBe(el.id === '2-1');
     }
@@ -82,7 +87,7 @@ describe('hero 序列', () => {
   });
 
   it('4-1 淡入完成處就是第一個觸發點', () => {
-    const el = heroScene.elements.find((e) => e.id === '4-1')!;
+    const el = scene.elements.find((e) => e.id === '4-1')!;
     expect(el.keyframes.find((k) => k.opacity === 1)!.p).toBe(t1);
   });
 
@@ -100,7 +105,7 @@ describe('hero 文案', () => {
 });
 
 describe('hero 3-6v 捲動影片（設計師測試）', () => {
-  const el = heroScene.elements.find((e) => e.id === '3-6v')!;
+  const el = scene.elements.find((e) => e.id === '3-6v')!;
 
   it('綁捲動 scrub，播到最後一格就是第一個觸發點（硬切 4-1）', () => {
     expect(el.cover).toBe('stage');
@@ -111,7 +116,7 @@ describe('hero 3-6v 捲動影片（設計師測試）', () => {
   });
 
   it('3-6 靜態圖同樣 cover 舞台，在 3-6v 出現的同一點硬切消失', () => {
-    const still = heroScene.elements.find((e) => e.id === '3-6')!;
+    const still = scene.elements.find((e) => e.id === '3-6')!;
     expect(still.cover).toBe('stage');
     const range = el.playback!.mode === 'scroll' ? el.playback!.range : [0, 0];
     const gone = still.keyframes.find((k) => k.p >= range[0] && k.opacity === 0);

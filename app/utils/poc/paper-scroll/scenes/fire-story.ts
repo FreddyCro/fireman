@@ -169,15 +169,15 @@ function c4(variant: FireStoryVariant): Pick<SceneConfig, 'elements' | 'sequence
     // 4-1 滿版火收成一團（scrub）→ 4-2 火團 loop → 4-3 熄滅（scrub）
     return {
       elements: [
-        slide('4-1', video('4-1'), {
+        slide('4-1', video('4-1_mob'), {
           layer: 12,
           fadeIn: [0.72, 0.75],
           hideAt: 0.81,
           playback: { mode: 'scroll', range: [0.73, 0.8] },
         }),
         // 設計師回饋（2026-10-20）：影片之間直接切，不淡入淡出。上一支留到 hideAt 才隱藏沒關係，被不透明的下一支蓋住
-        slide('4-2', video('4-2'), { layer: 13, cutIn: 0.8, hideAt: 0.87, playback: { mode: 'loop' } }),
-        slide('4-3', video('4-3'), {
+        slide('4-2', video('4-2_mob'), { layer: 13, cutIn: 0.8, hideAt: 0.87, playback: { mode: 'loop' } }),
+        slide('4-3', video('4-3_mob'), {
           layer: 14,
           cutIn: 0.86,
           hideAt: 0.95,
@@ -190,9 +190,9 @@ function c4(variant: FireStoryVariant): Pick<SceneConfig, 'elements' | 'sequence
   const [fadeFrom, t1, t3] = variant === 'paced' ? [fromBase(0.72), PACED_T1, PACED_T3] : [0.72, AUTO_T1, AUTO_T3];
   return {
     elements: [
-      slide('4-1', video('4-1'), { layer: 12, fadeIn: [fadeFrom, t1], playback: { mode: 'trigger' } }),
-      slide('4-2', video('4-2'), { layer: 13, hidden: true, playback: { mode: 'loop' } }),
-      slide('4-3', video('4-3'), { layer: 14, hidden: true, playback: { mode: 'trigger' } }),
+      slide('4-1', video('4-1_mob'), { layer: 12, fadeIn: [fadeFrom, t1], playback: { mode: 'trigger' } }),
+      slide('4-2', video('4-2_mob'), { layer: 13, hidden: true, playback: { mode: 'loop' } }),
+      slide('4-3', video('4-3_mob'), { layer: 14, hidden: true, playback: { mode: 'trigger' } }),
     ],
     sequence: {
       steps: [

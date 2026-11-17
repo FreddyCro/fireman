@@ -2,13 +2,21 @@
 // C1～C3 是整張不透明的直式插畫，以幻燈片交叉淡化串接（只有 2-1 有 zoom）；
 // 3-6 換成橫式靜態圖、後接橫式影片 3-6v（設計師測試中，2026-11-10 版）：兩者都 cover: 'stage'（三載具同高、Pad/Mob 左右裁），
 // 3-5 → 3-6 淡入、3-6 → 3-6v 硬切（注意：3-6 與影片首格構圖不同，硬切會跳）、3-6v 綁捲動 scrub、3-6v → 4-1 硬切；
-// C4 是動畫師交的影片：捲到觸發點自動原速播放、播完接下一段，由 sequence 控制，影片之間硬切。
+// C4 是動畫師交的影片：捲到觸發點自動原速播放、播完接下一段，由 sequence 控制，影片之間硬切；三載具各一組檔（heroScene(device)）。
 // 文字在 Hero.vue 的 DOM overlay，與幻燈片同一條進度軸。
 //
 // 時間軸一律寫「捲到第幾 vh」（捲動距離 = 跑道 − 一個畫面），再換成引擎用的進度 p。
 import { clamp01, EASE } from '../paper-scroll/keyframes';
+import type { Device } from '../get-device';
 import type { SequenceState } from '../paper-scroll/sequence';
-import type { ElementConfig, Keyframe, PlaybackConfig, SceneConfig, SpriteConfig } from '../paper-scroll/types';
+import type {
+  ElementConfig,
+  Keyframe,
+  PlaybackConfig,
+  SceneConfig,
+  SequenceConfig,
+  SpriteConfig,
+} from '../paper-scroll/types';
 
 const DIR = '/img/hero';
 const W = 1080;
@@ -120,7 +128,28 @@ export const HERO_INCIDENT_MOVE = range(230, 400);
 /** 4-2 殉職名單片尾式捲動的位置區間；可見與否另由 c4Mid 決定（4-2 顯示後才看得到） */
 export const HERO_ROLL = range(T1 + 200, T3);
 
-export const heroScene: SceneConfig = {
+/**
+ * C4 火球（1116 交件 fireball_{PC,Pad,Mob}，原為一支 9 秒影片，依標示的 loop 點 00:01:07～00:04:12 切成三段）：
+ * 4-1 進場（0～1.29 秒）、4-2 loop（1.29～4.5 秒）、4-3 退場（4.5 秒～結束）。
+ * Mob 是 9:16 直式，和設計畫布同比例；Pad（1024×1366）、PC（1920×1080 橫式）不跟場景的 smart，蓋滿舞台。
+ */
+function c4(name: string, d: Device): { sprite: SpriteConfig; cover?: ElementConfig['cover'] } {
+  if (d === 'pc') return { sprite: video(`${name}_pc`, 1920, 1080), cover: 'stage' };
+  if (d === 'pad') return { sprite: video(`${name}_pad`, 1024, 1366), cover: 'stage' };
+  return { sprite: video(`${name}_mob`) };
+}
+
+/** 影片序列（三載具相同） */
+export const HERO_SEQUENCE: SequenceConfig = {
+  steps: [
+    { trigger: at(T1), play: '4-1', then: '4-2' },
+    { trigger: at(T3), play: '4-3' },
+  ],
+  // 設計師回饋（2026-10-20）：影片之間直接切，不淡入淡出
+  fade: 0,
+};
+
+export const heroScene = (d: Device): SceneConfig => ({
   design: { w: W, h: H },
   fit: 'smart',
   anchor: { x: 0.5, y: 0.5 },
@@ -139,9 +168,10 @@ export const heroScene: SceneConfig = {
     slide('3-3', image('3-3'), { layer: 8, fadeIn: [816, 884], hideAt: 969 }),
     slide('3-4', image('3-4'), { layer: 9, fadeIn: [901, 969], hideAt: 1054 }),
     slide('3-5', image('3-5'), { layer: 10, fadeIn: [986, 1054], hideAt: 1207 }),
-    // 3-6 橫式靜態圖（測試）：從 3-5 淡入，在 V0 硬切成影片；和 3-6v 一樣不跟場景的 smart
+    // 3-6 橫式靜態圖（1116 交件 C03-6）：從 3-5 淡入，在 V0 硬切成影片；和 3-6v 一樣不跟場景的 smart
     slide('3-6', image('3-6', 1920, 1080), { layer: 11, fadeIn: [1139, 1207], hideAt: V0, cover: 'stage' }),
-    // 3-6v 橫式影片（測試）：前後硬切、捲動 scrub；不跟場景的 smart，桌機滿版、平板手機高度頂滿左右裁
+    // 3-6v 橫式影片（1116 交件 C03 轉場火焰 firewave，重新編碼成逐格 keyframe 才能順暢 scrub）：
+    // 前後硬切、捲動 scrub；不跟場景的 smart，桌機滿版、平板手機高度頂滿左右裁
     slide('3-6v', video('3-6', 1920, 1080), {
       layer: 12,
       cutIn: V0,
@@ -150,19 +180,12 @@ export const heroScene: SceneConfig = {
       playback: { mode: 'scroll', range: range(V0, T1) },
     }),
     // C4：4-1 在 T1 硬切蓋掉 3-6v，越過 T1 後交給序列；4-2、4-3 完全由序列控制
-    slide('4-1', video('4-1'), { layer: 13, cutIn: T1, playback: { mode: 'trigger' } }),
-    slide('4-2', video('4-2'), { layer: 14, hidden: true, playback: { mode: 'loop' } }),
-    slide('4-3', video('4-3'), { layer: 15, hidden: true, playback: { mode: 'trigger' } }),
+    slide('4-1', c4('4-1', d).sprite, { layer: 13, cutIn: T1, playback: { mode: 'trigger' }, cover: c4('4-1', d).cover }),
+    slide('4-2', c4('4-2', d).sprite, { layer: 14, hidden: true, playback: { mode: 'loop' }, cover: c4('4-2', d).cover }),
+    slide('4-3', c4('4-3', d).sprite, { layer: 15, hidden: true, playback: { mode: 'trigger' }, cover: c4('4-3', d).cover }),
   ],
-  sequence: {
-    steps: [
-      { trigger: at(T1), play: '4-1', then: '4-2' },
-      { trigger: at(T3), play: '4-3' },
-    ],
-    // 設計師回饋（2026-10-20）：影片之間直接切，不淡入淡出
-    fade: 0,
-  },
-};
+  sequence: HERO_SEQUENCE,
+});
 
 /** 0 → 1 → 0：進場淡入、退場淡出 */
 export function presence(cue: HeroCue, p: number): number {
@@ -184,5 +207,5 @@ export function c4Mid(seq: SequenceState | null): boolean {
 
 /** 最後一區播完，C4 之後的文字才出現 */
 export function c4Done(seq: SequenceState | null): boolean {
-  return !!seq && seq.step === heroScene.sequence!.steps.length - 1 && seq.phase === 'ended';
+  return !!seq && seq.step === HERO_SEQUENCE.steps.length - 1 && seq.phase === 'ended';
 }

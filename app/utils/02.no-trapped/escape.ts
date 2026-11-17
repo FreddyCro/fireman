@@ -2,14 +2,13 @@
 // 分鏡來自 Figma「定版1106 (CH)」的「PC插畫編排」；Pad／Mob 沒有分鏡，依素材尺寸排。
 // 素材是逐格分開的插畫（SpriteConfig.srcs）：「輪播」用 time loop，「播一次」綁捲動（scroll + range）。
 // 文字在 NoTrappedEscape.vue 的 DOM overlay，與畫面同一條進度軸。
-import { PC_BREAKPOINTS, TABLET_BREAKPOINTS } from '../constants';
+import { deviceOfWidth, type Device } from '../get-device';
 import { EPS, presenceOf, timeline } from '../paper-scroll/timeline';
 import type { ElementConfig, Keyframe, SceneConfig, SpriteConfig } from '../paper-scroll/types';
 
-export type EscapeDevice = 'pc' | 'pad' | 'mob';
+export type EscapeDevice = Device;
 
-export const escapeDeviceOf = (width: number): EscapeDevice =>
-  width >= PC_BREAKPOINTS ? 'pc' : width >= TABLET_BREAKPOINTS ? 'pad' : 'mob';
+export const escapeDeviceOf = deviceOfWidth;
 
 const DIR = '/img/no-trapped/escape';
 

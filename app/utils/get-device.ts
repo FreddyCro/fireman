@@ -1,4 +1,10 @@
-import { PC_BREAKPOINTS } from './constants';
+import { PC_BREAKPOINTS, TABLET_BREAKPOINTS } from './constants';
+
+export type Device = 'pc' | 'pad' | 'mob';
+
+/** 純寬度判斷（可在 SSR／測試用）；界線同 getDeviceTypeByResolution 的預設 */
+export const deviceOfWidth = (width: number): Device =>
+  width >= PC_BREAKPOINTS ? 'pc' : width >= TABLET_BREAKPOINTS ? 'pad' : 'mob';
 
 /**
  * 依視窗寬度判斷該取哪一組裝置素材（mob / pad / pc）。

@@ -111,11 +111,17 @@ $text: #efefef;
     }
   }
 
+  // 動態火影片 302×406：火焰亮部約在 y 190～375，上方是往上竄的空間。
+  // 上下用負 margin 讓火焰落在原本靜態圖（207×206、下距 12）的位置；比文字欄寬 42px，左右各外推 21px。
+  // 黑底用 screen 疊掉，往上伸進前一塊也不會蓋住照片
   &__fire {
     display: block;
-    width: 207px;
+    flex-shrink: 0;
+    width: 302px;
     height: auto;
-    margin-bottom: 12px;
+    margin: -190px -21px -19px;
+    mix-blend-mode: screen;
+    pointer-events: none;
   }
 
   &__title {

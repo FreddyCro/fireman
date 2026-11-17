@@ -1,6 +1,7 @@
 <!-- 「消防員之死」捲動動畫，來自 POC C 版（/poc/fire-story-paced）。分鏡與時間軸在 utils/01.hero/scene.ts。 -->
 <script setup lang="ts">
 import { clamp01, EASE } from '~/utils/paper-scroll/keyframes';
+import { deviceOfWidth, type Device } from '~/utils/get-device';
 import type { SequenceState } from '~/utils/paper-scroll/sequence';
 import {
   HERO_INCIDENT_MOVE,
@@ -17,6 +18,16 @@ import {
 import './Hero.scss';
 
 const str = useCopy().hero;
+
+// C4 影片三載具各一組。hero 在首屏，不能 prerender 先掛 pc 再換（會白載 pc 素材）：
+// client 在 setup 就依寬度決定；場景只影響 canvas，不影響 DOM，hydration 不會不一致。之後跨斷點才重掛
+const device = ref<Device>(import.meta.client ? deviceOfWidth(document.documentElement.clientWidth) : 'pc');
+const scene = computed(() => heroScene(device.value));
+const onResize = () => {
+  device.value = deviceOfWidth(document.documentElement.clientWidth);
+};
+onMounted(() => window.addEventListener('resize', onResize));
+onBeforeUnmount(() => window.removeEventListener('resize', onResize));
 
 // 除錯面板在手機上會蓋住半個畫面，網址加 ?debug 才開；prerender 時不知道 query，掛載後才判斷以免 hydration 不一致
 const debug = ref(false);
@@ -73,7 +84,7 @@ const titleStyle = (p: number, seq: Seq) => {
 
 <template>
   <section id="hero" class="sec-hero">
-    <PaperStage :scene="heroScene" :track-vh="HERO_TRACK_VH" :debug="debug">
+    <PaperStage :key="device" :scene="scene" :track-vh="HERO_TRACK_VH" :debug="debug">
       <template #default="{ progress, sequence }">
         <div class="sec-hero__incident" :style="incidentStyle(progress)">
           <p class="sec-hero__incident-date">{{ str.incident.date }}</p>

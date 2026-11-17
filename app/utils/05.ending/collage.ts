@@ -5,7 +5,12 @@
 export const HERO = { id: 'hero', src: '/img/ending/hero.png', w: 1280, h: 519 };
 
 /** 支持區塊上方的火焰圖（207×206） */
-export const FIRE_SRC = '/img/ending/fire.png';
+/**
+ * 導購動態火（1116 交件「結尾｜導購動畫」loop banner，604×812＝302×406 @2x，24fps 4.5 秒）：
+ * 原速播放，播完跳回 loop 起點（標示 00:01:07 ＝ 第 31 格）重播到結尾。poster 是第 31 格。
+ * 取代原本的靜態圖 /img/ending/fire.png（檔案先留著，確認後可刪）；黑底以 mix-blend-mode: screen 疊在黑色 section 上。
+ */
+export const FIRE_LOOP = { src: '/img/ending/fire-loop', w: 302, h: 406, loopFrom: 31 / 24 };
 
 export interface CollagePhoto {
   id: string;

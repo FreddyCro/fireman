@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { FIRE_SRC, HERO, LAYOUTS, PHOTOS, type Breakpoint } from '~/utils/05.ending/collage';
+import { FIRE_LOOP, HERO, LAYOUTS, PHOTOS, type Breakpoint } from '~/utils/05.ending/collage';
 import './Ending.scss';
 
 const str = useCopy().ending;
@@ -58,8 +58,28 @@ const shown = useReveal(photoEls, { threshold: 0.3 });
 
 let ctx: gsap.Context | null = null;
 
+// 導購動態火：進入視窗才播、離開就停；播完跳回 loop 起點（減少動態時只顯示 poster）
+const fireVideo = ref<HTMLVideoElement | null>(null);
+let fireIo: IntersectionObserver | null = null;
+const onFireEnded = () => {
+  const v = fireVideo.value;
+  if (!v) return;
+  v.currentTime = FIRE_LOOP.loopFrom;
+  void v.play().catch(() => {});
+};
+
+onBeforeUnmount(() => fireIo?.disconnect());
+
 onMounted(() => {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const v = fireVideo.value;
+  if (v) {
+    fireIo = new IntersectionObserver(([e]) => {
+      if (e?.isIntersecting) void v.play().catch(() => {});
+      else v.pause();
+    });
+    fireIo.observe(v);
+  }
   gsap.registerPlugin(ScrollTrigger);
   ctx = gsap.context(() => {
     // 大圖：進入視窗時放大 1.25 倍，捲到離開時回到原尺寸（zoom out）
@@ -110,7 +130,20 @@ onBeforeUnmount(() => ctx?.revert());
     </div>
 
     <div class="sec-ending__support">
-      <img class="sec-ending__fire" :src="assetUrl(FIRE_SRC)" :alt="str.fireAlt" width="207" height="206" loading="lazy" />
+      <video
+        ref="fireVideo"
+        class="sec-ending__fire"
+        :src="assetUrl(`${FIRE_LOOP.src}.mp4`)"
+        :poster="assetUrl(`${FIRE_LOOP.src}.jpg`)"
+        :width="FIRE_LOOP.w"
+        :height="FIRE_LOOP.h"
+        role="img"
+        :aria-label="str.fireAlt"
+        muted
+        playsinline
+        preload="metadata"
+        @ended="onFireEnded"
+      />
       <h2 class="sec-ending__title">{{ str.support.title }}</h2>
       <p class="sec-ending__body">{{ str.support.body }}</p>
       <a class="sec-ending__cta" :href="str.support.href" target="_blank" rel="noopener noreferrer">
