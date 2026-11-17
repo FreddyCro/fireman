@@ -1,0 +1,1 @@
+import{$ as e,E as t,I as n}from"./B8FN9K0Q.js";import{t as r}from"./DiS0w5Xr.js";import{t as i}from"./B7LHhnqt.js";var a=n({__name:`fire-story-auto`,setup(n){return i({i18n:!1}),(n,i)=>{let a=r;return e(),t(a,{variant:`trigger`})}}});export{a as default};

@@ -1,0 +1,1 @@
+import{o as e}from"./B8FN9K0Q.js";function t(){let t=e().public.APP_ASSETS_PATH;return e=>!e||/^(https?:)?\/\//.test(e)||e.startsWith(`data:`)?e??``:`${t}${e}`}export{t};
