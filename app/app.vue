@@ -19,7 +19,7 @@ useSeoMeta({
   robots: APP_MODE === 'production' ? 'index, follow' : 'noindex, nofollow',
 });
 
-// <html lang>、hreflang（/ ↔ /en 互指）、og:locale；POC 頁（i18n: false）不輸出
+// <html lang>、hreflang（/ ↔ /en 互指）、og:locale
 const i18nHead = useLocaleHead();
 useHead(() => ({
   htmlAttrs: { lang: i18nHead.value.htmlAttrs.lang },

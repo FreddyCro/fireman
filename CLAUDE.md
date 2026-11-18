@@ -39,10 +39,10 @@
 - 首頁每個 section 一個資料夾：`app/components/NN.<name>/`（`01.hero`、`02.no-trapped`…），編號 ＝ 頁面順序。新增資料夾要在 `nuxt.config.ts` 的 `components` 補一筆 `pathPrefix: false`。
 - 資料夾內檔名一律以 section 名開頭：主元件 `NoTrapped.vue`，子元件 `NoTrappedChart.vue`。
 - section 的根元素是 `<section id="<name>" class="sec-<name>">`；`app/pages/index.vue` 只負責依序擺放 section。
-- 兩個以上 section 共用的元件搬到 `ui/`；section 之間不互相 import。元件只放在 section 資料夾、`ui/`、`poc/` 三處。
+- 兩個以上 section 共用的元件搬到 `ui/`；section 之間不互相 import。元件只放在 section 資料夾與 `ui/` 兩處。
 - section 專用的 utils / composables 用同一個資料夾名：`app/utils/02.no-trapped/`、`app/composables/02.no-trapped/`（巢狀不會 auto-import，需明確 import）。素材放 `public/img/<name>/`（如 `public/img/hero/`）。
 - section 的樣式寫在同資料夾的 `<Name>.scss`，由元件的 script `import './Hero.scss'`；元件檔不放 `<style>`。
-- 捲動動畫引擎（canvas 幻燈片＋影片序列）：`app/utils/paper-scroll/`、`app/composables/usePaperScene.ts`、`ui/PaperStage.vue`。場景設定放各 section 的 utils（如 `app/utils/01.hero/scene.ts`），POC 場景在 `app/utils/poc/paper-scroll/scenes/`。
+- 捲動動畫引擎（canvas 幻燈片＋影片序列）：`app/utils/paper-scroll/`、`app/composables/usePaperScene.ts`、`ui/PaperStage.vue`。場景設定放各 section 的 utils（如 `app/utils/01.hero/scene.ts`）。
 - header（`ui/AppHeader.vue`）用 common-components 的 `NmdHeader` 系列，選單項目在 `locales/{zh,en}/header.json`。
 
 ## 文案與中英文（i18n）
@@ -55,7 +55,6 @@
 - 共用檔：`meta.json`（SEO，在 `app.vue` 用 `useSeoMeta` 消費；分享網址由 `useShareUrls()` 依語系組）、`header.json`（漢堡選單）、`footer.json`（製作團隊名單；`NmdAuthor` 的 slot 名就是顯示的職稱）。
 - `meta.json` 的圖片路徑用 runtimeConfig 的 `APP_ASSETS_PATH` 組：`${ASSETS_PATH}/${meta.metaImage}`。
 - runtime 才組出來的素材路徑一律經過 `useAssetUrl()`。
-- POC 頁只有中文：page 加 `definePageMeta({ i18n: false })`，文案仍直接 import `app/locales/poc/*.json`。
 - `/en` 沒有連結可讓 crawler 抓到，已列在 `nuxt.config.ts` 的 `nitro.prerender.routes`。
 
 目的是把文案與排版分離，方便編輯校稿。
@@ -64,7 +63,7 @@
 
 - `.env.*.example` 是各部署目標的設定，`.env` 本身不進版控（開發時從 `.env.development.example` 複製）。
 - `NUXT_URL` 的 pathname 會被 `nuxt.config.ts` 拿來當 `app.baseURL`；`NUXT_PUBLIC_APP_ASSETS_PATH` 是素材的絕對 URL 前綴（og:image 靠它組出可分享的完整網址，不要改成相對路徑）。
-- 部署用 `./deploy-gh.sh [staging|nmdap|production]`：從目前 HEAD 重開目標 branch、`pnpm generate`、輸出放 `docs/`、force push。`docs/` 是部署產物，不要手動放東西進去。POC 一律放各目錄的 `poc/` 子目錄（`app/pages/poc/`、`app/components/poc/`…），純靜態 HTML POC 放 `public/poc/`。
+- 部署用 `./deploy-gh.sh [staging|nmdap|production]`：從目前 HEAD 重開目標 branch、`pnpm generate`、輸出放 `docs/`、force push。`docs/` 是部署產物，不要手動放東西進去。
 
 ## SCSS
 

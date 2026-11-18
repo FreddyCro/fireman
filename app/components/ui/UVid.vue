@@ -16,7 +16,7 @@
  *    媒體拍已啟動、readyState 4，但 paused: true / currentTime: 0。
  *    （udn-75 有 test/video-muted.spec.ts 守這條不變式，本專案尚未移植。）
  *
- * 使用範例（對應本專案 public/img，完整清單見 app/pages/poc/resources.vue）：
+ * 使用範例（對應本專案 public/img）：
  *
  * 1. 有裝置變體（三個尺寸各一支）：
  *    <UVid :src="{ mob: '/img/hero_mob', pad: '/img/hero_pad', pc: '/img/hero_pc' }" />

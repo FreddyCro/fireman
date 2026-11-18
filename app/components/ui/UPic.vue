@@ -6,7 +6,7 @@
  * 最後附一個 <img> 作為 fallback。支援裝置尺寸、WebP、Retina（@2x）。
  * src 路徑會被 runtimeConfig 的 APP_ASSETS_PATH 前綴（dev/prod 為空字串）。
  *
- * 使用範例（對應本專案 public/img 實況，完整清單見 app/pages/poc/resources.vue）：
+ * 使用範例（對應本專案 public/img 實況）：
  *
  * 1. 三斷點各一張（檔名含 _pc/_pad/_mob；usePrefix 預設 true）：
  *    <UPic src="/img/no-trapped/title0101" ext="svg" :use2x="false" :webp="false" alt="..." />

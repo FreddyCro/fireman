@@ -23,6 +23,5 @@ pnpm test       # vitest
 
 - `app/` — Nuxt 原始碼（文案在 `app/locales/*.json`）
 - `architecture/` — 設計文件
-- `public/poc/` — 獨立的純 HTML / JS POC（fire-edge、ink-edge）；Nuxt 內的 POC 放各目錄的 `poc/` 子目錄（頁面在 `app/pages/poc/`）
 - `docs/` — 部署產物，由 `deploy-gh.sh` 產生
 - `test/` — vitest

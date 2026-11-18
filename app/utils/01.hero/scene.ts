@@ -1,4 +1,4 @@
-// Hero「消防員之死」分鏡，來自 POC C 版（/poc/fire-story-paced，設計見 architecture/2026-10-22-fire-story-paced-design.md）。
+// Hero「消防員之死」分鏡，原為 fire-story POC 的 C 版（paced），設計見 architecture/archive/2026-10-22-fire-story-paced-design.md。
 // C1～C3 是整張不透明的直式插畫，以幻燈片交叉淡化串接（只有 2-1 有 zoom）；
 // 3-6 換成橫式靜態圖、後接橫式影片 3-6v（設計師測試中，2026-11-10 版）：兩者都 cover: 'stage'（三載具同高、Pad/Mob 左右裁），
 // 3-5 → 3-6 淡入、3-6 → 3-6v 硬切（注意：3-6 與影片首格構圖不同，硬切會跳）、3-6v 綁捲動 scrub、3-6v → 4-1 硬切；

@@ -1,4 +1,4 @@
-<!-- 「消防員之死」捲動動畫，來自 POC C 版（/poc/fire-story-paced）。分鏡與時間軸在 utils/01.hero/scene.ts。 -->
+<!-- 「消防員之死」捲動動畫，原為 fire-story POC 的 C 版（paced）。分鏡與時間軸在 utils/01.hero/scene.ts。 -->
 <script setup lang="ts">
 import { clamp01, EASE } from '~/utils/paper-scroll/keyframes';
 import { deviceOfWidth, type Device } from '~/utils/get-device';

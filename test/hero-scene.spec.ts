@@ -1,4 +1,4 @@
-// Hero「消防員之死」（來自 POC C 版 /poc/fire-story-paced）。設計見 architecture/2026-10-22-fire-story-paced-design.md
+// Hero「消防員之死」，原為 fire-story POC 的 C 版（paced）。設計見 architecture/archive/2026-10-22-fire-story-paced-design.md
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
