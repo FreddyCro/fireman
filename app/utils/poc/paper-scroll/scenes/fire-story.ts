@@ -5,11 +5,12 @@
 //   paced（C 版 /poc/fire-story-paced）：B 版的播放方式 + 紐時式節奏（觸發點沒有文字、區段比影片長），跑道較長。
 // 文字在頁面的 DOM overlay。分鏡進度見 architecture/2026-10-19-fire-story-design.md、2026-10-19-fire-story-auto-design.md
 // 與 2026-10-22-fire-story-paced-design.md。
-import { clamp01, EASE } from '../keyframes';
-import type { SequenceState } from '../sequence';
-import type { ElementConfig, Keyframe, PlaybackConfig, SceneConfig, SpriteConfig } from '../types';
+import { clamp01, EASE } from '../../../paper-scroll/keyframes';
+import type { SequenceState } from '../../../paper-scroll/sequence';
+import type { ElementConfig, Keyframe, PlaybackConfig, SceneConfig, SpriteConfig } from '../../../paper-scroll/types';
 
-const DIR = '/poc/fire-story';
+// 素材已移到正式的 hero 目錄，與 /poc/fire-story* 共用
+const DIR = '/img/hero';
 const W = 1080;
 const H = 1920;
 const CENTER: [number, number] = [0.5, 0.5];
@@ -168,15 +169,15 @@ function c4(variant: FireStoryVariant): Pick<SceneConfig, 'elements' | 'sequence
     // 4-1 滿版火收成一團（scrub）→ 4-2 火團 loop → 4-3 熄滅（scrub）
     return {
       elements: [
-        slide('4-1', video('4-1'), {
+        slide('4-1', video('4-1_mob'), {
           layer: 12,
           fadeIn: [0.72, 0.75],
           hideAt: 0.81,
           playback: { mode: 'scroll', range: [0.73, 0.8] },
         }),
         // 設計師回饋（2026-10-20）：影片之間直接切，不淡入淡出。上一支留到 hideAt 才隱藏沒關係，被不透明的下一支蓋住
-        slide('4-2', video('4-2'), { layer: 13, cutIn: 0.8, hideAt: 0.87, playback: { mode: 'loop' } }),
-        slide('4-3', video('4-3'), {
+        slide('4-2', video('4-2_mob'), { layer: 13, cutIn: 0.8, hideAt: 0.87, playback: { mode: 'loop' } }),
+        slide('4-3', video('4-3_mob'), {
           layer: 14,
           cutIn: 0.86,
           hideAt: 0.95,
@@ -189,9 +190,9 @@ function c4(variant: FireStoryVariant): Pick<SceneConfig, 'elements' | 'sequence
   const [fadeFrom, t1, t3] = variant === 'paced' ? [fromBase(0.72), PACED_T1, PACED_T3] : [0.72, AUTO_T1, AUTO_T3];
   return {
     elements: [
-      slide('4-1', video('4-1'), { layer: 12, fadeIn: [fadeFrom, t1], playback: { mode: 'trigger' } }),
-      slide('4-2', video('4-2'), { layer: 13, hidden: true, playback: { mode: 'loop' } }),
-      slide('4-3', video('4-3'), { layer: 14, hidden: true, playback: { mode: 'trigger' } }),
+      slide('4-1', video('4-1_mob'), { layer: 12, fadeIn: [fadeFrom, t1], playback: { mode: 'trigger' } }),
+      slide('4-2', video('4-2_mob'), { layer: 13, hidden: true, playback: { mode: 'loop' } }),
+      slide('4-3', video('4-3_mob'), { layer: 14, hidden: true, playback: { mode: 'trigger' } }),
     ],
     sequence: {
       steps: [

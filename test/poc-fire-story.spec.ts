@@ -13,8 +13,8 @@ import {
   fireStoryPacedScene,
   fireStoryScene,
 } from '../app/utils/poc/paper-scroll/scenes/fire-story';
-import { scrubTime } from '../app/utils/poc/paper-scroll/video';
-import { fitTransform, visibleDesignRect } from '../app/utils/poc/paper-scroll/viewport';
+import { scrubTime } from '../app/utils/paper-scroll/video';
+import { fitTransform, visibleDesignRect } from '../app/utils/paper-scroll/viewport';
 
 const design = { w: 1080, h: 1920 };
 

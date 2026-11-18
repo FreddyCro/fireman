@@ -13,6 +13,28 @@ export default defineNuxtConfig({
 
   ssr: true,
 
+  modules: ['@nuxtjs/i18n'],
+
+  // 中文 /、英文 /en，沒有動態切換、不偵測瀏覽器語言。
+  // 只用模組的路由與 SEO（<html lang>、hreflang）；文案不走 vue-i18n messages，見 composables/useCopy.ts。
+  i18n: {
+    strategy: 'prefix_except_default',
+    defaultLocale: 'zh',
+    locales: [
+      { code: 'zh', language: 'zh-TW' },
+      { code: 'en', language: 'en' },
+    ],
+    detectBrowserLanguage: false,
+    // hreflang 要絕對網址。只給 origin：模組會自己接上 app.baseURL（/fireman/），給完整 NUXT_URL 會重複
+    baseUrl: (() => {
+      try {
+        return new URL(process.env.NUXT_URL ?? '').origin;
+      } catch {
+        return '';
+      }
+    })(),
+  },
+
   experimental: {
     // 純靜態站用不到 /_nuxt/builds/meta/<id>.json（沒有 route rules、不需要偵測新版）。
     appManifest: false,
@@ -21,6 +43,15 @@ export default defineNuxtConfig({
   },
 
   components: [
+    // 首頁各 section 一個編號資料夾（沿用 udn-75 慣例）：編號 ＝ 頁面順序，檔案總管也照這個順序排。
+    // 資料夾內檔名一律以 section 名開頭（NoTrapped.vue、NoTrappedChart.vue…），
+    // pathPrefix: false 讓元件名只取檔名，不帶 02.no-trapped 這種前綴。
+    // 中間要插段落時用字母後綴（如 02a.xxx）：'.' < 'a'，會排在 02.xxx 之後、03.xxx 之前。
+    { path: '~/components/01.hero', pathPrefix: false },
+    { path: '~/components/02.no-trapped', pathPrefix: false },
+    { path: '~/components/03.violation', pathPrefix: false },
+    { path: '~/components/04.manpower', pathPrefix: false },
+    { path: '~/components/05.ending', pathPrefix: false },
     // ui/：跨 section 共用的無語意元件。pathPrefix: false 讓元件名只取檔名，
     // 否則會被最後那筆 '~/components'（預設 pathPrefix: true）命名成 <UiXxx>。
     { path: '~/components/ui', pathPrefix: false },
@@ -32,7 +63,7 @@ export default defineNuxtConfig({
       crawlLinks: true,
       failOnError: false,
       // 首頁沒有連到 POC 頁，crawler 抓不到，要明列（public/poc/ 的純靜態 POC 不需要）
-      routes: ['/poc/paper-scroll', '/poc/fire-story', '/poc/fire-story-auto', '/poc/fire-story-paced'],
+      routes: ['/poc/paper-scroll', '/poc/fire-story', '/poc/fire-story-auto', '/poc/fire-story-paced', '/poc/resources'],
     },
   },
 
@@ -44,6 +75,18 @@ export default defineNuxtConfig({
   },
 
   app: {
+    head: {
+      // 設計稿字型：中文襯線用 Noto Serif TC（hero 內文 400、各 section 標題 700、hero 標題 900），英文稿用 Inter。
+      // Google Fonts 的 CJK 字型會依 unicode-range 切片，瀏覽器只下載頁面用到的字。
+      link: [
+        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
+        {
+          rel: 'stylesheet',
+          href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Serif+TC:wght@400;700;900&display=swap',
+        },
+      ],
+    },
     // NUXT_URL 的 pathname 當 baseURL：子路徑部署（如 GitHub Pages 的 /fireman/）
     // 沒設的話 _nuxt 資源會 404。
     baseURL: (() => {
@@ -65,7 +108,8 @@ export default defineNuxtConfig({
       // vue-scrollto 為 CJS-only（common-components 內部會 import 它），
       // 預先 bundle 成 ESM 才有 default export；common-components 若是延遲載入，
       // Vite 初掃描不到，故明確列入，避免 dev 期間觸發整頁 reload。
-      include: ['vue-scrollto', '@udn-digital-center/common-components'],
+      // gsap 插件同理：02 scrapbook 的 Draggable / InertiaPlugin 晚於初掃描才被發現。
+      include: ['vue-scrollto', '@udn-digital-center/common-components', 'gsap/Draggable', 'gsap/InertiaPlugin'],
     },
     css: {
       preprocessorOptions: {

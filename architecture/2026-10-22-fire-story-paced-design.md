@@ -47,3 +47,13 @@
 - `pnpm test`（`test/poc-fire-story-paced.spec.ts`）：C1～C3 換算成 vh 與 B 版一致、觸發點沒有文字、區 0 ≥ 360vh、名單接在說明文字後面、教訓文字在 T3 後 ≥ 200vh 才退場、序列沿用 B 版。
 - `pnpm generate`：三頁都有輸出。
 - 實際手感由使用者在瀏覽器確認。
+
+## 2026-11-02：C 版移到正式 hero
+
+C 版定案，移到首頁 `01.hero`：
+
+- 場景：`app/utils/01.hero/scene.ts`。時間軸改用「捲到第幾 vh」來寫，不再經過 B 版的 `fromBase` 換算；數值和 POC 的 `fireStoryPacedScene` 一致（誤差 < 1e-4）。
+- 元件：`app/components/01.hero/Hero.vue` ＋ `Hero.scss`，文案在 `app/locales/section-hero.json`（拿掉 POC 的版本切換與前後說明段）。
+- 引擎搬出 poc：`app/utils/paper-scroll/`、`app/composables/usePaperScene.ts`、`app/components/ui/PaperStage.vue`（＋ `PaperDebug.vue`）。素材移到 `public/img/hero/`。
+- `/poc/fire-story*` 三頁仍保留，改用搬出來的引擎與素材，方便和 A、B 版比較。
+- 測試：`test/hero-scene.spec.ts`（節奏規則同本文〈驗證〉）；引擎測試改名為 `test/paper-scroll-*.spec.ts`。

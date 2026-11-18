@@ -1,0 +1,6 @@
+{
+  "menu": [
+    { "title": "fireman", "link": "#", "isCurrent": true },
+    { "title": "更多數位專題", "link": "https://udn.com/newmedia/office/" }
+  ]
+}

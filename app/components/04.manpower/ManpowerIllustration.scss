@@ -1,0 +1,98 @@
+// 04 8 人小分隊插畫（ManpowerIllustration.vue）
+// 設計稿：說明在插畫上方、間距 20；插畫 pc 620×500、pad 520×520、mob 362×362（註記 2423:15392～15394）
+@use './ManpowerTokens' as *;
+
+.mp-illustration {
+  height: calc(100svh + var(--steps) * 80vh);
+
+  &__stage {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    gap: $mp-gap-s;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    height: 100vh;
+    height: 100svh;
+    margin: 0;
+    padding: 0 $mp-gutter;
+  }
+
+  // 說明逐句疊在同一格
+  &__lines {
+    display: grid;
+    width: 100%;
+    max-width: 362px;
+
+    @include rwd-min('tablet') {
+      max-width: $mp-col-pad;
+    }
+
+    @include rwd-min('pc') {
+      max-width: $mp-col-pc;
+    }
+  }
+
+  &__line {
+    grid-area: 1 / 1;
+    align-self: end;
+    margin: 0;
+    opacity: 0;
+    transition: opacity $mp-fade-slow;
+    @include mp-body;
+
+    &--active {
+      opacity: 1;
+    }
+  }
+
+  // 插畫：兩張疊在同一格原地淡入淡出
+  &__pics {
+    display: grid;
+    width: 100%;
+    max-width: 362px;
+    // 矮螢幕時讓插畫縮，說明不被擠出舞台
+    max-height: 60svh;
+    aspect-ratio: 1;
+
+    @include rwd-min('tablet') {
+      max-width: $mp-col-pad;
+    }
+
+    @include rwd-min('pc') {
+      max-width: $mp-col-pc;
+      aspect-ratio: 620 / 500;
+    }
+
+    picture {
+      display: contents;
+    }
+  }
+
+  &__pic {
+    grid-area: 1 / 1;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 0;
+    transition: opacity $mp-fade;
+
+    // 蓋過 UPic 預設的 height: auto
+    &.u-pic-img {
+      height: 100%;
+    }
+
+    &--active {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &__line,
+    &__pic {
+      transition: none;
+    }
+  }
+}

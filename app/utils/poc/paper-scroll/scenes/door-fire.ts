@@ -1,6 +1,6 @@
 // 示範劇本：人走進門 → 門內失火 → 火蓋過人 → 火熄滅、背景轉黑 → 文字。
 // 分鏡進度見 architecture/2026-10-13-paper-scroll-design.md。
-import type { ElementConfig, SceneConfig, SpriteConfig } from '../types';
+import type { ElementConfig, SceneConfig, SpriteConfig } from '../../../paper-scroll/types';
 
 const BOTTOM: [number, number] = [0.5, 1];
 const WALKER: SpriteConfig = { src: '/poc/paper-scroll/walker.svg', frames: 4, cellW: 240, cellH: 320, anchor: BOTTOM };

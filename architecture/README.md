@@ -10,4 +10,5 @@
 | 元件 | `components.md` | 共用元件（`app/components/ui/`）清單與用法 |
 | 單一功能設計 | `YYYY-MM-DD-<topic>-design.md` | 動手實作前寫下的設計與取捨，日期是開始設計的那天 |
 | 主題整理 | `<topic>.md` | 跨多個設計、需要長期維護的主題（如 RWD、viewport 高度） |
+| 素材命名 | `assets-naming.md` | UPic / UVid 的素材檔名規則與改名清單 |
 | 回饋紀錄 | `<NAME>_FEEDBACK_<n>.md` | 設計師／客戶的回饋清單與處理狀態 |

@@ -1,0 +1,50 @@
+// 02「超哥故事」捲動動畫的字幕 overlay。舞台（canvas）樣式在 ui/PaperStage.vue。
+// 字幕：分鏡上 PC 是 441 寬兩行 80 高 → 16/40；Pad／Mob 沒有稿，暫放上方置中。
+$serif: 'Noto Serif TC', 'Songti TC', 'PMingLiU', serif;
+
+.no-trapped-escape {
+  // 滿版：抵銷 .sec-no-trapped 的左右 padding
+  margin: 0 -26px 64px;
+
+  @include rwd-min('tablet') {
+    margin: 0 -40px 96px;
+  }
+
+  &__caption {
+    position: absolute;
+    top: 6%;
+    left: 6.28%;
+    right: 6.28%;
+    margin: 0;
+    font-family: $serif;
+    font-size: 15px;
+    line-height: 2;
+    letter-spacing: 0.1em;
+    color: #fff;
+    text-align: justify;
+    text-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
+    will-change: opacity;
+
+    @include rwd-min('tablet') {
+      left: 10%;
+      right: 10%;
+      font-size: 16px;
+    }
+
+    // PC 的 left／top／width 由元件依分鏡給
+    @include rwd-min('pc') {
+      right: auto;
+      line-height: 2.5;
+    }
+
+    &:lang(en) {
+      letter-spacing: 0;
+      text-align: left;
+    }
+  }
+
+  &__caption--dark {
+    color: #111;
+    text-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+  }
+}

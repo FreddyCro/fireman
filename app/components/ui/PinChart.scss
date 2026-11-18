@@ -1,0 +1,177 @@
+// pin 住的圖表（ui/PinChart.vue）。跑道 --track vh 高；舞台 sticky、高度 auto，
+// top 用 JS 量到的 --stage-h 算成垂直置中（舞台高過視窗就貼頂）。
+// 下方文字（__after）在跑道之外，跑道走完才接著捲上來。
+.pin-chart {
+  width: 100%;
+  max-width: 620px; // pad 稿 620、pc 稿 700
+  margin: 0 auto;
+
+  @include rwd-min('pc') {
+    max-width: 700px;
+  }
+
+  &__track {
+    height: calc(var(--track) * 1vh);
+  }
+
+  &__stage {
+    position: sticky;
+    top: max(0px, calc((100vh - var(--stage-h)) / 2));
+    top: max(0px, calc((100svh - var(--stage-h)) / 2));
+    margin: 0;
+  }
+
+  // 標題＋圖例：兩組疊在同一格，淡入淡出
+  &__head {
+    display: grid;
+    margin-bottom: 16px;
+  }
+
+  &__text {
+    grid-area: 1 / 1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+
+    &.is-active {
+      opacity: 1;
+    }
+  }
+
+  // mob 稿標題 28、圖例 20；pad 稿 30、22
+  &__title {
+    margin: 0 0 8px;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.45;
+
+    @include rwd-min('tablet') {
+      font-size: 30px;
+    }
+  }
+
+  &__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 20px;
+    margin: 0;
+    font-size: 20px;
+    line-height: 1.6;
+
+    @include rwd-min('tablet') {
+      font-size: 22px;
+    }
+  }
+
+  &__legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    &::before {
+      content: '';
+      display: inline-block;
+      flex: none;
+      background: var(--swatch);
+    }
+  }
+
+  &__legend-item--line::before {
+    width: 14px;
+    height: 2px;
+  }
+
+  &__legend-item--bar::before {
+    width: 12px;
+    height: 12px;
+  }
+
+  // 圖表：一張圖，上面兩塊黑色半透明遮罩，只顯示目前那組的，opacity 交替
+  // 手機：圖寬＝容器 × --pan，遮罩在左半的那組向左橫移露出右半；平板以上 --pan: 1 不橫移
+  &__fig {
+    --pan: 1.9;
+    overflow: hidden;
+
+    @include rwd-min('tablet') {
+      --pan: 1;
+    }
+  }
+
+  &__pan {
+    position: relative;
+    width: calc(var(--pan) * 100%);
+    transition: transform 0.3s ease;
+  }
+
+  &__pan--right {
+    transform: translateX(calc(-100% * (1 - 1 / var(--pan))));
+  }
+
+  &__img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  &__mask {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+
+    &.is-active {
+      opacity: 1;
+    }
+  }
+
+  &__note {
+    margin: 16px 0 0;
+    font-size: 15px;
+    line-height: 22px;
+    color: #999;
+    text-align: justify;
+  }
+
+  // 圖表下方的文字段落：pad 稿 530 欄置中、18/36
+  &__after {
+    padding-top: 32px;
+    font-size: 14px;
+    line-height: 1.8;
+    color: #ccc;
+    text-align: justify;
+
+    @include rwd-min('tablet') {
+      max-width: 530px;
+      margin: 0 auto;
+      padding-top: 40px;
+      font-size: 18px;
+      line-height: 2;
+      color: #f0f0f0;
+    }
+
+    @include rwd-min('pc') {
+      max-width: none;
+      font-size: 15px;
+      line-height: 1.8;
+      color: #ccc;
+    }
+
+    p {
+      margin: 0 0 1.5em;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  // 減少動態：直接切換、不做過場
+  @media (prefers-reduced-motion: reduce) {
+    &__text,
+    &__pan,
+    &__mask {
+      transition: none;
+    }
+  }
+}
