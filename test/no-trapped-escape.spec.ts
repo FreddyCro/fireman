@@ -1,4 +1,4 @@
-// 02「超哥故事」捲動動畫。設計見 architecture/2026-11-16-no-trapped-escape-design.md
+// 02「超哥故事」捲動動畫。設計見 architecture/archive/2026-11-16-no-trapped-escape-design.md，轉場見 architecture/no-trapped-escape-transitions.md
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -6,6 +6,7 @@ import zh from '../app/locales/zh/section-no-trapped.json';
 import {
   ESCAPE_CUES,
   ESCAPE_TEXT,
+  ESCAPE_TRACK_VH,
   escapeDeviceOf,
   escapeScene,
   type EscapeDevice,
@@ -16,6 +17,58 @@ const devices: EscapeDevice[] = ['pc', 'pad', 'mob'];
 
 describe.each(devices)('escape 場景（%s）', (d) => {
   const scene = escapeScene(d);
+
+  // 設計師回饋（FEEDBACK_1 超哥-4）：邊緣遮罩參考樓梯；樓梯本身已有、白底逃跑段不套
+  it('除了樓梯與白底逃跑段，每張圖都有邊緣遮罩', () => {
+    const masked = scene.elements.filter((e) => e.edgeMask).map((e) => e.id);
+    expect(masked).toEqual(['fire', 'feet', 'walk', 'door', 'burn']);
+    for (const e of scene.elements) if (e.edgeMask) expect(e.cover).toBeUndefined();
+  });
+
+  // 設計師回饋（FEEDBACK_1 超哥-2）：圖片全部淡入淡出切換，規則見 architecture/no-trapped-escape-transitions.md
+  it('「播一次」的段落逐格交叉淡化 24vh，輪播段維持硬切', () => {
+    const vh = (p: number) => Math.round(p * (ESCAPE_TRACK_VH - 100));
+    for (const e of scene.elements) {
+      if (e.frameMode === 'scroll') expect(vh(e.crossfade ?? 0), e.id).toBe(24);
+      else expect(e.crossfade, e.id).toBeUndefined();
+    }
+  });
+
+  it('樓梯＋腳 → 走廊直接交叉淡化：樓梯與腳在走廊淡入完成的同一點才消失', () => {
+    const walk = scene.elements.find((e) => e.id === 'walk')!;
+    const full = walk.keyframes.find((k) => k.opacity === 1)!.p;
+    const start = walk.keyframes.filter((k) => k.opacity === 0 && k.p < full).at(-1)!.p;
+    for (const id of ['stair', 'feet']) {
+      const el = scene.elements.find((e) => e.id === id)!;
+      // 走廊淡入期間仍完整顯示，淡入完成時消失
+      const before = el.keyframes.filter((k) => k.opacity !== undefined && k.p <= start).at(-1)!;
+      expect(before.opacity, id).toBe(1);
+      expect(el.keyframes.find((k) => k.p >= full && k.opacity === 0)?.p, id).toBe(full);
+    }
+  });
+
+  it('逃跑 6-1 淡入（不硬切）', () => {
+    const run = scene.elements.find((e) => e.id === 'run')!;
+    const zeroAt = run.keyframes.filter((k) => k.opacity === 0)[1]!.p;
+    const oneAt = run.keyframes.find((k) => k.opacity === 1)!.p;
+    expect(oneAt - zeroAt).toBeGreaterThan(0.001);
+  });
+
+  // 設計師回饋（FEEDBACK_1 超哥-3）：最後兩個人不用 zoom，直接切黑底
+  it('6-2（兩個人）播完的同一點背景硬切成黑，沒有 6-3 放大特寫', () => {
+    expect(scene.elements.some((e) => e.sprite.srcs?.some((s) => s.includes('story6-3')))).toBe(false);
+    const run = scene.elements.find((e) => e.id === 'run')!;
+    for (const k of run.keyframes) if (k.scale !== undefined) expect(k.scale).toBe(1);
+    const gone = run.keyframes.filter((k) => k.opacity === 0).at(-1)!.p;
+    const black = scene.background!.find((b) => b.p >= gone && b.color === '#000000');
+    expect(black?.p).toBe(gone);
+  });
+
+  // 設計師回饋（FEEDBACK_1 超哥-5）：交件檔名的第 2、3 張順序反了
+  it('腳踩水依 3-1 → 3-3 → 3-2 播放', () => {
+    const feet = scene.elements.find((e) => e.id === 'feet')!;
+    expect(feet.sprite.srcs!.map((s) => s.match(/story3-(\d)/)![1])).toEqual(['1', '3', '2']);
+  });
 
   it.each(scene.elements)('$id 的每一格素材都存在、格數一致', (el) => {
     const srcs = el.sprite.srcs!;

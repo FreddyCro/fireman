@@ -1,10 +1,26 @@
-// 02「超哥故事」捲動動畫：無人受困的工廠裡死裡逃生。設計見 architecture/2026-11-16-no-trapped-escape-design.md。
+// 02「超哥故事」捲動動畫：無人受困的工廠裡死裡逃生。設計見 architecture/archive/2026-11-16-no-trapped-escape-design.md，
+// 轉場規則與時間點見 architecture/no-trapped-escape-transitions.md（改時間軸時一併更新）。
 // 分鏡來自 Figma「定版1106 (CH)」的「PC插畫編排」；Pad／Mob 沒有分鏡，依素材尺寸排。
 // 素材是逐格分開的插畫（SpriteConfig.srcs）：「輪播」用 time loop，「播一次」綁捲動（scroll + range）。
 // 文字在 NoTrappedEscape.vue 的 DOM overlay，與畫面同一條進度軸。
 import { deviceOfWidth, type Device } from '../get-device';
+import { STAIR_EDGE, type EdgeMaskConfig } from '../paper-scroll/edge-mask';
 import { EPS, presenceOf, timeline } from '../paper-scroll/timeline';
 import type { ElementConfig, Keyframe, SceneConfig, SpriteConfig } from '../paper-scroll/types';
+
+/**
+ * 邊緣模糊遮罩（設計師回饋 FEEDBACK_1 超哥-4「有色差的邊緣寫遮罩，參考樓梯的效果」）：
+ * 圖的邊緣亮度不是 0（火燒工廠 8～9、走廊 7～20），黑底上會看到方框，所以四邊淡出成透明。
+ * 比例與顆粒仿樓梯圖畫在圖裡的暗角；樓梯本身已經有、不重複套；白底的逃跑段（6-1～6-3）不套（往黑淡出會變黑框）。
+ */
+export const ESCAPE_EDGE = STAIR_EDGE;
+
+/** 走廊圖（story4-*_walk）自帶硬邊黑帶：實測內容框外的比例，遮罩從內容的邊開始淡出 */
+const WALK_INSET: Record<EscapeDevice, NonNullable<EdgeMaskConfig['inset']>> = {
+  pc: { bottom: 0.108 },
+  pad: { bottom: 0.135 },
+  mob: { top: 0.12, bottom: 0.319 },
+};
 
 export type EscapeDevice = Device;
 
@@ -13,11 +29,17 @@ export const escapeDeviceOf = deviceOfWidth;
 const DIR = '/img/no-trapped/escape';
 
 /** 跑道長度（vh） */
-export const ESCAPE_TRACK_VH = 2550;
+export const ESCAPE_TRACK_VH = 2390;
 const { at, range, cue } = timeline(ESCAPE_TRACK_VH);
 
-/** 輪播（火、水簾）的 fps */
+/** 輪播（火、水簾）的 fps；輪播格之間維持硬切（淡化會讓火光、雨水糊成一片） */
 const LOOP_FPS = 6;
+
+/**
+ * 設計師回饋（FEEDBACK_1 超哥-2）：圖片全部用淡入淡出切換。
+ * 段落之間交叉淡化 60vh；同一段「播一次」的逐格交叉淡化 24vh（以格與格的交界為中心，各 12vh）
+ */
+const FRAME_XF = 24;
 
 // ── 段落位置（vh）──
 /** 1 火燒 → 2 水簾洞（交叉淡化） */
@@ -27,22 +49,24 @@ const STAIR_PAN: [number, number] = [260, 520];
 /** 3 腳踩水：淡入後綁捲動播一次 */
 const FEET_IN: [number, number] = [500, 540];
 const FEET_PLAY: [number, number] = [540, 700];
-/** 播完連同樓梯底圖一起淡出 */
-const STAIR_OUT: [number, number] = [720, 780];
-/** 4 走廊 */
-const WALK_IN: [number, number] = [780, 840];
+/** 4 走廊：直接淡入蓋掉樓梯＋腳（交叉淡化，不經過黑畫面）；樓梯與腳在淡入完成時才消失 */
+const WALK_IN: [number, number] = [720, 780];
 const WALK_PLAY: [number, number] = [840, 1000];
 /** 5 開關門（淡入蓋掉走廊） */
 const DOOR_IN: [number, number] = [1020, 1080];
 const DOOR_PLAY: [number, number] = [1080, 1380];
 const DOOR_OUT: [number, number] = [1400, 1440];
-/** 7 畫面變白、逃跑；6-3 放大到整個畫面被剪影蓋黑 */
+/**
+ * 7 畫面變白、逃跑 6-1 → 6-2；6-2（兩個人）播完直接切黑底。
+ * 設計師回饋（FEEDBACK_1 超哥-3）：不用 zoom，所以原本接在後面放大到全黑的 6-3 剪影特寫整段拿掉（素材仍留在 public）
+ */
 const WHITE: [number, number] = [1640, 1680];
+/** 白底淡入完成後，6-1 再淡入 */
+const RUN_IN: [number, number] = [1680, 1720];
 const RUN_PLAY: [number, number] = [1700, 1900];
-const RUN_ZOOM: [number, number] = [1900, 2040];
-const BLACK = 2060;
+const BLACK = RUN_PLAY[1];
 /** 8 工廠大火 */
-const BURN_IN: [number, number] = [2100, 2160];
+const BURN_IN: [number, number] = [1940, 2000];
 
 /** 文字 overlay 的進出場（進度 p） */
 export const ESCAPE_TEXT = {
@@ -55,7 +79,7 @@ export const ESCAPE_TEXT = {
   explosion: cue(1470, 1500, 1600, 1630),
   run: cue(1720, 1750, 1880, 1900),
   // 最後一段不退場，跟著舞台捲走
-  burn: cue(2180, 2210, ESCAPE_TRACK_VH, ESCAPE_TRACK_VH + 50),
+  burn: cue(2020, 2050, ESCAPE_TRACK_VH, ESCAPE_TRACK_VH + 50),
 };
 
 export type EscapeCue = keyof typeof ESCAPE_TEXT;
@@ -147,6 +171,9 @@ function files(n: number, name: string, count: number, d: EscapeDevice, ext: str
   });
 }
 
+/** 依索引重排播放順序（交件檔名順序和實際動作不一致時用） */
+const reorder = <T>(list: T[], order: number[]): T[] => order.map((i) => list[i]!);
+
 function sprite(key: string, srcs: string[], cell: Cell, anchor: [number, number] = [0.5, 0.5]): SpriteConfig {
   return { src: `${DIR}#${key}`, srcs, frames: srcs.length, cellW: cell.w, cellH: cell.h, anchor };
 }
@@ -184,6 +211,7 @@ export function escapeScene(d: EscapeDevice): SceneConfig {
     // 1 火燒工廠：輪播；字幕在上方，圖稍微往下
     {
       id: 'fire',
+      edgeMask: ESCAPE_EDGE,
       sprite: sprite('fire', files(1, 'loop', 3, d, 'jpg'), s.fire),
       frameMode: 'time',
       fps: LOOP_FPS,
@@ -198,28 +226,33 @@ export function escapeScene(d: EscapeDevice): SceneConfig {
       keyframes: keys(
         [{ p: 0, x: 0.5, y: 0, scale: s.stairScale, layer: 2 }],
         [{ p: at(STAIR_PAN[0]), y: 0 }, { p: at(STAIR_PAN[1]), y: stairEndY, ease: 'inOut' }],
-        opacity({ fadeIn: STAIR_IN, fadeOut: STAIR_OUT }),
+        opacity({ fadeIn: STAIR_IN, hideAt: WALK_IN[1] }),
       ),
     },
-    // 3 腳踩水：PNG 疊在樓梯底上，捲動播一次，播完連底圖一起淡出
+    // 3 腳踩水：PNG 疊在樓梯底上，捲動播一次（逐格交叉淡化），走廊淡入蓋滿後連底圖一起消失。
+    // 設計師回饋（FEEDBACK_1 超哥-5）：交件檔名的第 2、3 張順序反了，播放順序是 3-1 → 3-3 → 3-2
     {
       id: 'feet',
-      sprite: sprite('feet', files(3, 'foot', 3, d, 'png'), s.scene),
+      edgeMask: ESCAPE_EDGE,
+      sprite: sprite('feet', reorder(files(3, 'foot', 3, d, 'png'), [0, 2, 1]), s.scene),
       frameMode: 'scroll',
       range: range(...FEET_PLAY),
+      crossfade: at(FRAME_XF),
       loop: 'clamp',
       maxStepPerTick: 0,
       keyframes: keys(
         [{ p: 0, x: 0.5, y: 0.5, scale: d === 'mob' ? 1 : s.stairScale, layer: 3 }],
-        opacity({ fadeIn: FEET_IN, fadeOut: STAIR_OUT }),
+        opacity({ fadeIn: FEET_IN, hideAt: WALK_IN[1] }),
       ),
     },
     // 4 走廊
     {
       id: 'walk',
+      edgeMask: { ...ESCAPE_EDGE, inset: WALK_INSET[d] },
       sprite: sprite('walk', files(4, 'walk', 3, d, (i) => (d === 'mob' && i === 2 ? 'png' : 'jpg')), s.scene),
       frameMode: 'scroll',
       range: range(...WALK_PLAY),
+      crossfade: at(FRAME_XF),
       loop: 'clamp',
       maxStepPerTick: 0,
       keyframes: keys([{ p: 0, x: 0.5, y: 0.5, layer: 4 }], opacity({ fadeIn: WALK_IN, hideAt: DOOR_IN[1] })),
@@ -227,39 +260,30 @@ export function escapeScene(d: EscapeDevice): SceneConfig {
     // 5 開關門
     {
       id: 'door',
+      edgeMask: ESCAPE_EDGE,
       sprite: sprite('door', files(5, 'opendoor', s.doorFrames, d, 'jpg'), s.scene),
       frameMode: 'scroll',
       range: range(...DOOR_PLAY),
+      crossfade: at(FRAME_XF),
       loop: 'clamp',
       maxStepPerTick: 0,
       keyframes: keys([{ p: 0, x: 0.5, y: 0.5, layer: 5 }], opacity({ fadeIn: DOOR_IN, fadeOut: DOOR_OUT })),
     },
-    // 7 逃跑：白底上 6-1 → 6-2 硬切
+    // 7 逃跑：白底上 6-1 淡入 → 6-2 交叉淡化，播完連同白底一起硬切成黑底
     {
       id: 'run',
       sprite: sprite('run', files(6, 'run', 2, d, 'jpg'), s.run),
       frameMode: 'scroll',
       range: range(...RUN_PLAY),
+      crossfade: at(FRAME_XF),
       loop: 'clamp',
       maxStepPerTick: 0,
-      keyframes: keys([{ p: 0, x: 0.5, y: 0.5, layer: 6 }], opacity({ cutIn: RUN_PLAY[0], hideAt: RUN_PLAY[1] })),
-    },
-    // 6-3 蓋滿整個舞台（不受 maxScale 與設計畫布裁切限制，白底延伸），放大到剪影把畫面蓋黑
-    {
-      id: 'run-zoom',
-      sprite: sprite('run-zoom', [`${DIR}/story6-3_run_${d}.jpg`], s.design),
-      frameMode: 'hold',
-      holdFrame: 0,
-      cover: 'stage',
-      keyframes: keys(
-        [{ p: 0, x: 0.5, y: 0.5, scale: 1, layer: 7 }],
-        [{ p: at(RUN_ZOOM[0]), scale: 1 }, { p: at(RUN_ZOOM[1]), scale: 7, ease: 'in' }],
-        opacity({ cutIn: RUN_PLAY[1], hideAt: BLACK }),
-      ),
+      keyframes: keys([{ p: 0, x: 0.5, y: 0.5, layer: 6 }], opacity({ fadeIn: RUN_IN, hideAt: RUN_PLAY[1] })),
     },
     // 8 工廠大火：輪播
     {
       id: 'burn',
+      edgeMask: ESCAPE_EDGE,
       sprite: sprite('burn', files(7, 'fireloop', 3, d, 'png'), s.burn),
       frameMode: 'time',
       fps: LOOP_FPS,

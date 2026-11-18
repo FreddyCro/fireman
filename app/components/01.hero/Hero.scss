@@ -41,12 +41,17 @@ $hero-sans: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
   }
 
   // 設計稿 1-3：區塊底部距畫面底 48px；2-1：區塊頂端距畫面頂 51px。--t 0→1 從下移到上
+  // 文字動態 a「向上滾動」（事件、面罩字幕、名單）：元素頂端貼齊容器底部，--t 0→1 時往上移「自身高度 + 容器高度」，
+  // 所以 t=1 時元素底部剛好離開容器頂端（translateY 的 % 是相對自身高度）。--t 由 Hero.vue 依 HERO_SCROLL 給
+  &__scroll {
+    top: 100%;
+    transform: translateY(calc(var(--t, 0) * (-100% - 100cqh)));
+  }
+
   &__incident {
-    top: 0;
     display: flex;
     flex-direction: column;
     gap: 2.42cqw; // 10px
-    transform: translateY(calc((100cqh - 100% - 6.52cqh) * (1 - var(--t, 0)) + 6.93cqh * var(--t, 0)));
   }
 
   &__incident-date {
@@ -77,14 +82,13 @@ $hero-sans: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
     }
   }
 
-  // 3-1 面罩字幕：設計稿頂端 546px
-  &__caption {
-    top: 74.18cqh;
-
-    // 4-1 說明文字：設計稿頂端 500px
-    &--victim {
-      top: 67.93cqh;
-    }
+  // 4-1 說明文字：放在名單（__roll）最前面一起往上捲，不再自己定位；
+  // 設計稿底部到「27名」頂端 180px（扣掉 __roll 的 gap 37px）
+  &__caption--victim {
+    position: static;
+    align-self: stretch;
+    margin-bottom: 34.54cqw; // 143px
+    padding: 0;
   }
 
   &__line {
@@ -159,16 +163,13 @@ $hero-sans: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
     }
   }
 
-  // 片尾字幕式名單：元素頂端貼齊容器底部，--t 0→1 時往上移「自身高度 + 容器高度」，
-  // 所以 t=1 時名單底部剛好離開容器頂端（translateY 的 % 是相對自身高度）
+  // 片尾字幕式名單（說明文字 + 27 名 + 人名），位移見 __scroll
   &__roll {
-    top: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 8.94cqw; // 37px
     text-align: center;
-    transform: translateY(calc(var(--t) * (-100% - 100cqh)));
   }
 
   &__roll-head {

@@ -100,21 +100,31 @@ export function usePaperScene(opts: UsePaperSceneOptions) {
     if (opts.lazy) await whenNear(track);
     if (disposed) return;
 
+    // 所有素材同時開始載；有 priority 素材時只等它們（首屏）就開始畫，其餘載到才補進 strips（場景與這裡共用同一個 Map）
     const strips = new Map<string, LoadedStrip>();
+    const pending = new Set<string>();
     const sprites = [...new Map(opts.scene.elements.map((e) => [e.sprite.src, e.sprite])).values()];
-    await Promise.all(
-      sprites.map(async (s) => {
-        const url = opts.assetUrl(s.src);
-        strips.set(
-          s.src,
-          s.srcs
-            ? await loadFrames(s.srcs.map(opts.assetUrl), s.cellW)
-            : s.kind === 'video'
-              ? await loadVideo(url, s.cellW)
-              : await loadStrip(url, s.cellW, s.frames),
-        );
-      }),
-    );
+    const loads = sprites.map(async (s) => {
+      pending.add(s.src);
+      const url = opts.assetUrl(s.src);
+      try {
+        const strip = s.srcs
+          ? await loadFrames(s.srcs.map(opts.assetUrl), s.cellW)
+          : s.kind === 'video'
+            ? await loadVideo(url, s.cellW)
+            : await loadStrip(url, s.cellW, s.frames);
+        // 已卸載才載到的影片要停掉，免得在背景播
+        if (disposed) strip.video?.pause();
+        else strips.set(s.src, strip);
+      } finally {
+        pending.delete(s.src);
+        scene?.pending.delete(s.src);
+      }
+    });
+    // 背景載入的失敗不會被 await 到：記下來就好（那個元素不畫，序列把它當播完）
+    for (const [i, l] of loads.entries()) l.catch((e) => console.warn(`[paper-scene] 無法載入 ${sprites[i]!.src}`, e));
+    const first = sprites.map((s, i) => (s.priority ? loads[i] : null)).filter((l) => l !== null);
+    await Promise.all(first.length ? first : loads);
     // 載入期間元件可能已卸載（快速返回）：此時 onBeforeUnmount 已跑過，不能再掛任何東西
     if (disposed) {
       for (const s of strips.values()) s.video?.pause();
@@ -122,6 +132,7 @@ export function usePaperScene(opts: UsePaperSceneOptions) {
     }
 
     scene = new PaperScene(opts.scene, strips);
+    for (const src of pending) scene.pending.add(src);
     scene.reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     stopWatch = watchViewport((vp) => {

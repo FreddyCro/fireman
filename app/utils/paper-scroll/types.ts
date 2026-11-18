@@ -1,4 +1,6 @@
 // 場景設定檔的型別。所有數值都是「進度 p（0～1）的函數」，往回捲自然可逆。
+import type { EdgeMaskConfig } from './edge-mask';
+
 export type EaseName = 'linear' | 'in' | 'out' | 'inOut';
 export type FrameMode = 'time' | 'scroll' | 'hold';
 export type LoopMode = 'repeat' | 'pingpong' | 'clamp';
@@ -32,6 +34,11 @@ export interface SpriteConfig {
   cellH: number;
   /** 定位與旋轉錨點（格子的比例），預設 [0.5, 1] 底部中央 */
   anchor?: [number, number];
+  /**
+   * 首屏素材：場景一等到所有 priority 素材載完就開始繪製，其餘素材在背景繼續載、載到才畫。
+   * 場景裡沒有任何 priority 時維持舊行為（全部載完才開始）。
+   */
+  priority?: boolean;
 }
 
 /**
@@ -82,6 +89,11 @@ export interface ElementConfig {
   loop?: LoopMode;
   /** 每 tick 最多前進幾格（0 = 不限），預設 1 */
   maxStepPerTick?: number;
+  /**
+   * scroll + range 才有效：格與格之間交叉淡化的長度（進度 p），以交界為中心；0 或省略 = 硬切。
+   * 開啟後格數直接由進度決定（不經過 maxStepPerTick），見 frame.ts scrollBlend
+   */
+  crossfade?: number;
   /** hold 模式 */
   holdFrame?: number;
   /** 換格時的隨機擺動：rot 度、px 設計畫布像素 */
@@ -96,6 +108,8 @@ export interface ElementConfig {
   cover?: 'stage';
   /** 場景 sequence 最後一段播完前一律不顯示（opacity 0）；例：等收尾影片播完才出現的標題 */
   afterSequence?: boolean;
+  /** 四邊淡出成透明（見 edge-mask.ts）；cover: 'stage' 的元素不支援 */
+  edgeMask?: EdgeMaskConfig;
   keyframes: Keyframe[];
   triggers?: Trigger[];
 }

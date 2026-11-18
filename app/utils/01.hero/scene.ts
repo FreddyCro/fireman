@@ -1,9 +1,10 @@
 // Hero「消防員之死」分鏡，原為 fire-story POC 的 C 版（paced），設計見 architecture/archive/2026-10-22-fire-story-paced-design.md。
 // C1～C3 是整張不透明的直式插畫，以幻燈片交叉淡化串接（只有 2-1 有 zoom）；
 // 3-6 換成橫式靜態圖、後接橫式影片 3-6v（設計師測試中，2026-11-10 版）：兩者都 cover: 'stage'（三載具同高、Pad/Mob 左右裁），
-// 3-5 → 3-6 淡入、3-6 → 3-6v 硬切（注意：3-6 與影片首格構圖不同，硬切會跳）、3-6v 綁捲動 scrub、3-6v → 4-1 硬切；
+// 3-5 → 3-6 淡入、3-6 → 3-6v 硬切（注意：3-6 與影片首格構圖不同，硬切會跳）、3-6v 綁捲動 scrub、3-6v 播完硬切成全黑（「然而最後…」原地淡入淡出）、再硬切 4-1；
 // C4 是動畫師交的影片：捲到觸發點自動原速播放、播完接下一段，由 sequence 控制，影片之間硬切；三載具各一組檔（heroScene(device)）。
-// 文字在 Hero.vue 的 DOM overlay，與幻燈片同一條進度軸。
+// 文字在 Hero.vue 的 DOM overlay，與幻燈片同一條進度軸。設計師回饋（FEEDBACK_1 hero-2）：文字動態只有兩種——
+// 向上滾動（HERO_SCROLL：從畫面底下進來、往上滑走）與原地淡入淡出（HERO_TEXT）。
 //
 // 時間軸一律寫「捲到第幾 vh」（捲動距離 = 跑道 − 一個畫面），再換成引擎用的進度 p。
 import { clamp01, EASE } from '../paper-scroll/keyframes';
@@ -19,12 +20,15 @@ import type {
 } from '../paper-scroll/types';
 
 const DIR = '/img/hero';
+
+/** 首屏的第一張窗戶圖：Hero.vue 用它加 <link rel="preload">，場景也標成 priority，載完就開始畫 */
+export const HERO_FIRST_IMAGE = `${DIR}/1-1.webp`;
 const W = 1080;
 const H = 1920;
 const CENTER: [number, number] = [0.5, 0.5];
 
 /** 跑道長度（vh）；捲動距離 = 跑道 − 一個畫面（舞台 100lvh） */
-export const HERO_TRACK_VH = 2350;
+export const HERO_TRACK_VH = 2490;
 const DIST = HERO_TRACK_VH - 100;
 
 /** 捲動位置（vh）→ 進度 p */
@@ -34,8 +38,9 @@ const range = (a: number, b: number): [number, number] => [at(a), at(b)];
 /** 硬切、隱藏用的極小進度差 */
 const EPS = 0.0001;
 
-const image = (name: string, cellW = W, cellH = H): SpriteConfig => ({
+const image = (name: string, cellW = W, cellH = H, priority = false): SpriteConfig => ({
   src: `${DIR}/${name}.webp`,
+  priority: priority || undefined,
   frames: 1,
   cellW,
   cellH,
@@ -98,22 +103,21 @@ function slide(id: string, sprite: SpriteConfig, o: SlideOpts): ElementConfig {
 const V0 = 1275;
 /** 3-6v 的 scrub 長度：3.6 秒 36 格（10fps），約每 4vh 一格 */
 const V_LEN = 150;
-/** 3-6v 到最後一格、硬切 4-1 並觸發播放（3 秒）；C4 的段落都以這裡為起點排 */
-const T1 = V0 + V_LEN;
+/** 3-6v 到最後一格、硬切成全黑 */
+const V1 = V0 + V_LEN;
+/** 全黑空檔長度：「然而最後，他沒能再走出來。」在這段原地淡入淡出（設計稿 3-6 → 4-1 之間的黑底格） */
+const BLACK_LEN = 140;
+/** 黑底結束、硬切 4-1 並觸發播放（3 秒）；C4 的段落都以這裡為起點排 */
+const T1 = V1 + BLACK_LEN;
 /** 觸發 4-3（3 秒），硬切蓋掉 4-2 loop。區 0 拉到 400vh，參考紐時 6 秒影片配約 360vh */
 const T3 = T1 + 400;
 
 type TextRange = { in: [number, number]; out: [number, number] };
 
-/** 文字 overlay 的進出場（進度 p） */
+/** 原地淡入淡出的文字（進度 p） */
 export const HERO_TEXT = {
-  /** 設計稿：1-3 時在畫面下方，2-1 時已在上方；停留期間由 HERO_INCIDENT_MOVE 往上移，2-2 蓋滿前退場 */
-  incident: { in: range(178.5, 212.5), out: range(440, 470) },
-  /** 3-1 字幕：氧氣面罩，落在 3-1 可見區間內 */
-  mask: { in: range(654.5, 680), out: range(765, 790.5) },
-  lastWords: { in: range(1020, 1054), out: range(1130.5, 1156) },
-  /** 4-1 先在沒有字的畫面播 80vh，說明文字才進場；退場後才輪到名單 */
-  victim: { in: range(T1 + 80, T1 + 100), out: range(T1 + 180, T1 + 200) },
+  /** 3-6v 播完後的黑底（設計稿 4-1 黑底格標註「原地淡入淡出」） */
+  lastWords: { in: range(V1 + 20, V1 + 45), out: range(V1 + 95, V1 + 120) },
   /** 進場實際靠時間（4-3 播完後原地淡入），in 只是名目值；T3 後 200vh 才退場 */
   lesson: { in: range(T3 + 40, T3 + 60), out: range(T3 + 200, T3 + 220) },
   /** 標題影片：in 段淡入（停在第一格），淡入完成到 out 結束綁捲動播完（字粉末化消失）；見 HERO_TITLE_SCRUB */
@@ -122,11 +126,20 @@ export const HERO_TEXT = {
 
 export type HeroCue = keyof typeof HERO_TEXT;
 
-/** 事件文字從畫面下方（1-3）移到上方（2-1）的區間，配合 2-1 淡入 */
-export const HERO_INCIDENT_MOVE = range(230, 400);
+/**
+ * 向上滾動的文字（設計稿標註「向上滾動」）：區間起點時元素頂端貼齊畫面底、終點時底端離開畫面頂，中間線性跟著捲動。
+ * 區間由設計稿各格的文字位置反推（文字欄 414×736，位置以該格幻燈片淡入完成時為準）。
+ */
+export const HERO_SCROLL = {
+  /** 事件文字：1-3 時頂端在 556px（底距 48px）、2-1 時在 45px，2-2 蓋滿前已離開 */
+  incident: range(126, 455),
+  /** 氧氣面罩字幕：3-1 時頂端在 578px、3-2 在 283px、3-3 在 29px */
+  mask: range(642, 938),
+  /** 4-1 說明文字＋27 名＋殉職名單，片尾字幕式一起往上；可見與否另由 c4Mid 決定（4-1 播完才出現後面的文字） */
+  roll: range(T1 + 80, T3),
+} satisfies Record<string, [number, number]>;
 
-/** 4-2 殉職名單片尾式捲動的位置區間；可見與否另由 c4Mid 決定（4-2 顯示後才看得到） */
-export const HERO_ROLL = range(T1 + 200, T3);
+export type HeroScrollCue = keyof typeof HERO_SCROLL;
 
 /**
  * C4 火球（1116 交件 fireball_{PC,Pad,Mob}，原為一支 9 秒影片，依標示的 loop 點 00:01:07～00:04:12 切成三段）：
@@ -186,7 +199,7 @@ export const heroScene = (d: Device, locale: HeroLocale = 'zh'): SceneConfig => 
   background: [{ p: 0, color: '#000000' }],
   elements: [
     // C1 窗內小火 → 越燒越旺
-    slide('1-1', image('1-1'), { layer: 1, hideAt: 136 }),
+    slide('1-1', image('1-1', W, H, true), { layer: 1, hideAt: 136 }),
     slide('1-2', image('1-2'), { layer: 2, fadeIn: [59.5, 119], hideAt: 221 }),
     slide('1-3', image('1-3'), { layer: 3, fadeIn: [136, 195.5], hideAt: 425 }),
     // C2 火焰延燒出窗外、佔滿畫面：2-1 從原尺寸 zoom in 到 1.6，2-2 原尺寸淡入
@@ -201,15 +214,15 @@ export const heroScene = (d: Device, locale: HeroLocale = 'zh'): SceneConfig => 
     // 3-6 橫式靜態圖（1116 交件 C03-6）：從 3-5 淡入，在 V0 硬切成影片；和 3-6v 一樣不跟場景的 smart
     slide('3-6', image('3-6', 1920, 1080), { layer: 11, fadeIn: [1139, 1207], hideAt: V0, cover: 'stage' }),
     // 3-6v 橫式影片（1116 交件 C03 轉場火焰 firewave，重新編碼成逐格 keyframe 才能順暢 scrub）：
-    // 前後硬切、捲動 scrub；不跟場景的 smart，桌機滿版、平板手機高度頂滿左右裁
+    // 前後硬切、捲動 scrub，播完切成全黑（背景）；不跟場景的 smart，桌機滿版、平板手機高度頂滿左右裁
     slide('3-6v', video('3-6', 1920, 1080), {
       layer: 12,
       cutIn: V0,
-      hideAt: T1,
+      hideAt: V1,
       cover: 'stage',
-      playback: { mode: 'scroll', range: range(V0, T1) },
+      playback: { mode: 'scroll', range: range(V0, V1) },
     }),
-    // C4：4-1 在 T1 硬切蓋掉 3-6v，越過 T1 後交給序列；4-2、4-3 完全由序列控制
+    // C4：4-1 在 T1 從黑底硬切出現，越過 T1 後交給序列；4-2、4-3 完全由序列控制
     slide('4-1', c4('4-1', d).sprite, { layer: 13, cutIn: T1, playback: { mode: 'trigger' }, cover: c4('4-1', d).cover }),
     slide('4-2', c4('4-2', d).sprite, { layer: 14, hidden: true, playback: { mode: 'loop' }, cover: c4('4-2', d).cover }),
     slide('4-3', c4('4-3', d).sprite, { layer: 15, hidden: true, playback: { mode: 'trigger' }, cover: c4('4-3', d).cover }),
@@ -223,6 +236,12 @@ export function presence(cue: HeroCue, p: number): number {
   const { in: [a, b], out: [c, d] } = HERO_TEXT[cue];
   if (p < c) return EASE.out(clamp01((p - a) / (b - a)));
   return 1 - EASE.in(clamp01((p - c) / (d - c)));
+}
+
+/** 向上滾動的進度 0 → 1（區間外夾住） */
+export function scrollT(cue: HeroScrollCue, p: number): number {
+  const [a, b] = HERO_SCROLL[cue];
+  return clamp01((p - a) / (b - a));
 }
 
 /** 只看退場的存在感（1 → 0）：教訓文字在 4-3 播完後靠時間在原地淡入，進度只決定它何時退場 */

@@ -1,6 +1,7 @@
 // 場景核心。update() 把進度與 dt 變成每個元素的「格數 + 繪製狀態」，
 // draw() 依圖層排序後畫到 canvas。所有狀態都是進度的函數，往回捲自然可逆。
-import { advanceTime, loopIndex, scrollTargetRaw, stepToward } from './frame';
+import { Composer } from './compose';
+import { advanceTime, loopIndex, scrollBlend, scrollTargetRaw, stepToward } from './frame';
 import { sampleColor, sampleNumber, sampleStep } from './keyframes';
 import { INITIAL_SEQUENCE, advanceSequence, sequenceOpacities, type SequenceState } from './sequence';
 import type { ClipConfig, ElementConfig, SceneConfig, SpriteConfig } from './types';
@@ -34,6 +35,9 @@ export interface ElementRuntime {
   /** scroll 模式目前的 raw index */
   raw: number;
   frame: number;
+  /** 逐格交叉淡化（crossfade）：淡入中的下一格與它的權重；沒有淡化時 mix = 0 */
+  next?: number;
+  mix?: number;
   jitterRot: number;
   jitterX: number;
   jitterY: number;
@@ -85,6 +89,14 @@ export function nextFrame(rt: ElementRuntime, cfg: ElementConfig, input: TickInp
       return loopIndex(Math.floor(rt.acc + rt.phase), frames, loop);
     }
     case 'scroll': {
+      if (cfg.crossfade && cfg.range) {
+        const b = scrollBlend(input.progress, cfg.range, frames, cfg.crossfade);
+        rt.raw = b.frame;
+        rt.next = b.next;
+        rt.mix = b.mix;
+        return b.frame;
+      }
+      rt.mix = 0;
       const target = scrollTargetRaw({
         progress: input.progress,
         scrollPx: input.scrollPx,
@@ -159,8 +171,11 @@ export class PaperScene {
   readonly runtimes: ElementRuntime[];
   /** 影片序列目前的狀態（沒有 sequence 的場景永遠是 INITIAL_SEQUENCE）；物件只在狀態改變時換新 */
   sequence: SequenceState = INITIAL_SEQUENCE;
+  /** 還在載入中的素材 src（漸進載入時由外部維護）：序列不能把還沒載到的影片當成播完而跳過 */
+  readonly pending = new Set<string>();
   private resolved = new Map<string, Resolved>();
   private srcOf: Map<string, string>;
+  private composer = new Composer();
 
   constructor(
     readonly config: SceneConfig,
@@ -224,6 +239,8 @@ export class PaperScene {
       now,
       // 找不到影片（載入失敗）就當播完；有影片則連同「進區後經過的時間」一起判斷，play() 被拒絕也不會卡在 playing
       ended: (id) => {
+        const src = this.srcOf.get(id);
+        if (src && this.pending.has(src)) return false;
         const v = this.videoOf(id);
         return !v || videoEnded(v, now - this.sequence.since);
       },
@@ -315,17 +332,18 @@ export class PaperScene {
       ctx.rotate(((r.state.rot + rt.jitterRot) * Math.PI) / 180);
       ctx.scale(r.state.scale, r.state.scale);
       const { source, pr, sx } = frameSource(strip, rt.frame, cellW);
-      ctx.drawImage(
-        source,
-        sx,
-        0,
-        cellW * pr,
-        cellH * pr,
-        -anchor[0] * cellW,
-        -anchor[1] * cellH,
-        cellW,
-        cellH,
-      );
+      const mix = rt.mix ?? 0;
+      if (r.cfg.edgeMask || mix > 0) {
+        // 交叉淡化或邊緣遮罩：先在暫存 canvas 合成（見 compose.ts）
+        const layer = (f: number, weight: number) => {
+          const s = frameSource(strip, f, cellW);
+          return { source: s.source, sx: s.sx, sy: 0, sw: cellW * s.pr, sh: cellH * s.pr, weight };
+        };
+        const layers = mix > 0 ? [layer(rt.frame, 1 - mix), layer(rt.next ?? rt.frame, mix)] : [layer(rt.frame, 1)];
+        this.composer.draw(ctx, layers, -anchor[0] * cellW, -anchor[1] * cellH, cellW, cellH, r.cfg.edgeMask);
+      } else {
+        ctx.drawImage(source, sx, 0, cellW * pr, cellH * pr, -anchor[0] * cellW, -anchor[1] * cellH, cellW, cellH);
+      }
       ctx.restore();
     }
     ctx.restore();
