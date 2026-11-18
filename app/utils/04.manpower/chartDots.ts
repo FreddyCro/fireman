@@ -1,9 +1,11 @@
 // 04 各國消防員服務比：圓點動畫的版面計算（純函式，ManpowerChart.vue 用 Canvas 畫）。
 // 每顆點有固定身分（國家＋序號），四個 stage 各有一組位置，捲動時在相鄰 stage 之間內插：
 //   0 一位民眾：日本第 0 顆是大白點，其餘點藏在它身上
-//   1 日本：大白點縮成日本方塊第一格，其餘 723 顆從它身上依序冒出、由下往上長滿（一列 30 點）
-//   2 日本 vs 台灣：日本方塊左移；台灣前 724 顆（白）從日本方塊複製滑到右邊，556 顆橘點一列列疊上去
-//   3 五國長條：全部重排成一列 10 點的長條、點變小；台灣保留白底＋橘頂；南韓、美國、新加坡從底部長出
+//   1 日本：大白點縮成日本方塊第一格，其餘 723 顆從它身上展開到方塊各格（一列 30 點）
+//   2 日本 vs 台灣：日本方塊左移；台灣前 724 顆（白）從日本方塊複製滑到右邊，556 顆橘點從上方落下疊上去
+//   3 五國長條：全部重排成一列 10 點的長條、點變小；台灣保留白底＋橘頂；南韓、美國、新加坡從底部往上長出。
+//     長條點數四捨五入到整列（barCount），頂端是平的矩形：多的點在轉場中縮小消失、不夠的補點從底部一起長出（數字標籤仍顯示實際值）
+// 設計師回饋：轉場不要扭動的感覺，直接位移——所有點同時出發、沿直線移到下一個位置（不錯開起跑時間）。
 import { COUNTRIES, COMPARE } from './staffing';
 import type { CountryId } from './staffing';
 
@@ -33,7 +35,6 @@ export interface DotStates {
 export interface ChartLayout {
   n: number;
   stages: DotStates[]; // 0..3
-  delays: Float32Array[]; // 轉場 0→1、1→2、2→3 每顆點的起跑延遲（0～0.5）
   /** 各國標籤中心 x（每個 stage）與標籤頂端 y */
   labelX: Record<CountryId, number[]>;
   labelTop: number;
@@ -60,6 +61,9 @@ const metrics = (wide: boolean) => ({
 });
 
 const country = (id: CountryId) => COUNTRIES.find((c) => c.id === id)!;
+
+/** stage 3 長條的點數：四捨五入到整列，長條頂端是平的（日本 724 → 720、南韓 766 → 770、美國 926 → 930、新加坡 933 → 930、台灣 1280 不變） */
+export const barCount = (perFirefighter: number) => Math.round(perFirefighter / BAR_COLS) * BAR_COLS;
 
 /**
  * 點的格位：count 顆排成 cols 欄、由下往上；最上面不滿一列的靠右。
@@ -103,9 +107,12 @@ export function buildLayout(g: ChartGeom): ChartLayout {
       c.id === jp.id ? [g.w / 2, g.w / 2, pairJp, s3] : c.id === tw.id ? [pairTw, pairTw, pairTw, s3] : [s3, s3, s3, s3];
   }
 
-  // 點的清單：依 COUNTRIES 順序，每國 perFirefighter 顆
-  const owners: { id: CountryId; i: number; count: number }[] = [];
-  for (const c of COUNTRIES) for (let i = 0; i < c.perFirefighter; i++) owners.push({ id: c.id, i, count: c.perFirefighter });
+  // 點的清單：依 COUNTRIES 順序，每國 max(實際人數, 長條點數) 顆；超過實際人數的是長條補點（只在 stage 3 出現）
+  const owners: { id: CountryId; i: number; count: number; bar: number }[] = [];
+  for (const c of COUNTRIES) {
+    const bar = barCount(c.perFirefighter);
+    for (let i = 0; i < Math.max(c.perFirefighter, bar); i++) owners.push({ id: c.id, i, count: c.perFirefighter, bar });
+  }
   const n = owners.length;
 
   const mk = (): DotStates => ({
@@ -116,7 +123,6 @@ export function buildLayout(g: ChartGeom): ChartLayout {
     c: new Float32Array(n),
   });
   const stages = [mk(), mk(), mk(), mk()];
-  const delays = [new Float32Array(n), new Float32Array(n), new Float32Array(n)];
 
   const set = (s: DotStates, k: number, x: number, y: number, r: number, a: number, c: number) => {
     s.x[k] = x;
@@ -134,12 +140,22 @@ export function buildLayout(g: ChartGeom): ChartLayout {
   const r3 = barPitch * DOT_RATIO;
   const jpCount = jp.perFirefighter;
 
-  owners.forEach(({ id, i, count }, k) => {
-    const [bx, by] = blockPos(slotX(id), i, count, BAR_COLS, barPitch);
-    const isTwTop = id === tw.id && i >= jpCount; // 台灣多出來的橘點
+  owners.forEach(({ id, i, count, bar }, k) => {
+    // 長條是 bar 顆的滿矩形；超出 bar 的點縮進長條頂端消失
+    const extra = i >= bar;
+    const [bx, by] = blockPos(slotX(id), Math.min(i, bar - 1), bar, BAR_COLS, barPitch);
+    const s3r = extra ? 0 : r3;
+    const s3a = extra ? 0 : 1;
+    const isTwTop = id === tw.id && i >= jpCount && i < count; // 台灣多出來的橘點
     const s3c = isTwTop ? 1 : 0;
 
-    if (id === jp.id || (id === tw.id && i < jpCount)) {
+    if (i >= count) {
+      // 長條補點：stage 3 才從長條底部長出
+      set(stages[0]!, k, bx, baseline, 0, 0, 0);
+      set(stages[1]!, k, bx, baseline, 0, 0, 0);
+      set(stages[2]!, k, bx, baseline, 0, 0, 0);
+      set(stages[3]!, k, bx, by, r3, 1, 0);
+    } else if (id === jp.id || (id === tw.id && i < jpCount)) {
       // 日本，以及台灣的白底（stage 0、1 與日本同位置，stage 2 才滑開）
       const [x1, y1] = blockPos(g.w / 2, i, jpCount, BLOCK_COLS, pitch);
       const big = id === jp.id && i === 0;
@@ -148,35 +164,25 @@ export function buildLayout(g: ChartGeom): ChartLayout {
       const [x2, y2] =
         id === jp.id ? blockPos(pairJp, i, jpCount, BLOCK_COLS, pitch) : blockPos(pairTw, i, tw.perFirefighter, BLOCK_COLS, pitch);
       set(stages[2]!, k, x2, y2, r1, 1, 0);
-      set(stages[3]!, k, bx, by, r3, 1, s3c);
-      delays[0]![k] = 0.5 * (i / jpCount); // 由第一顆往後依序冒出
-      delays[1]![k] = 0;
-      delays[2]![k] = 0.3 * (i / count);
+      set(stages[3]!, k, bx, by, s3r, s3a, s3c);
     } else if (isTwTop) {
-      // 台灣橘點：stage 2 從上方一列列落下
+      // 台灣橘點：stage 2 從上方落下
       const [x2, y2] = blockPos(pairTw, i, tw.perFirefighter, BLOCK_COLS, pitch);
       set(stages[0]!, k, x2, y2 - 40, r1, 0, 1);
       set(stages[1]!, k, x2, y2 - 40, r1, 0, 1);
       set(stages[2]!, k, x2, y2, r1, 1, 1);
-      set(stages[3]!, k, bx, by, r3, 1, 1);
-      const j = (i - jpCount) / (count - jpCount);
-      delays[0]![k] = 0;
-      delays[1]![k] = 0.15 + 0.35 * j;
-      delays[2]![k] = 0.3 * (i / count);
+      set(stages[3]!, k, bx, by, s3r, s3a, 1);
     } else {
       // 南韓、美國、新加坡：stage 3 才從長條底部長出
       set(stages[0]!, k, bx, baseline, 0, 0, 0);
       set(stages[1]!, k, bx, baseline, 0, 0, 0);
       set(stages[2]!, k, bx, baseline, 0, 0, 0);
-      set(stages[3]!, k, bx, by, r3, 1, 0);
-      delays[0]![k] = 0;
-      delays[1]![k] = 0;
-      delays[2]![k] = 0.5 * (i / count);
+      set(stages[3]!, k, bx, by, s3r, s3a, 0);
     }
   });
 
   const twTopRows = Math.ceil(tw.perFirefighter / BLOCK_COLS);
-  return { n, stages, delays, labelX, labelTop, diffY: baseline - twTopRows * pitch, baseline };
+  return { n, stages, labelX, labelTop, diffY: baseline - twTopRows * pitch, baseline };
 }
 
 /** 捲動進度 → 連續的 stage 位置（0～3）：每段前 55% 是轉場、後面停住 */
@@ -198,12 +204,12 @@ export function drawDots(ctx: CanvasRenderingContext2D, L: ChartLayout, pos: num
   const t = pos - k;
   const A = L.stages[k]!;
   const B = L.stages[k + 1]!;
-  const D = L.delays[k]!;
+  // 所有點共用同一個進度：整群一起位移，不會因為起跑時間不同而扭動
+  const tt = ease(t);
 
   // 依顏色＋透明度分桶，一桶一個 Path2D，減少 fillStyle 切換
   const buckets = new Map<string, Path2D>();
   for (let i = 0; i < L.n; i++) {
-    const tt = ease(Math.min(Math.max((t - D[i]!) / 0.5, 0), 1));
     const r = A.r[i]! + (B.r[i]! - A.r[i]!) * tt;
     const a = A.a[i]! + (B.a[i]! - A.a[i]!) * tt;
     if (r < 0.2 || a < 0.02) continue;
@@ -224,7 +230,7 @@ export function drawDots(ctx: CanvasRenderingContext2D, L: ChartLayout, pos: num
   }
 }
 
-/** 標籤用：在兩個 stage 之間內插（不錯開） */
+/** 標籤用：在兩個 stage 之間內插（與圓點同一條緩動曲線） */
 export function lerpStage(values: number[], pos: number): number {
   const k = Math.min(Math.floor(pos), STAGES - 2);
   const t = ease(pos - k);

@@ -1,6 +1,9 @@
 <!--
   04 分隊駐點的四縣市地圖（設計稿 pc 2423:5605、pad 2423:26598、mob 2423:16361）。
   上方：目前縣市的說明＋圖例（文字欄寬）；下方：滿版地圖帶輪播，中間那張全亮、左右 30%，左右箭頭切換，點旁邊的圖也能切。
+  循環輪播：最後一張的下一張接回第一張，兩側永遠有鄰圖、箭頭不停用。
+  做法：pos 是不設上限的虛擬位置（目前縣市 = pos mod 4），只畫 pos 前後各 SPAN 張、以虛擬位置當 key；
+  每張依「與 pos 的距離」平移，捲動時既有的圖各自滑動、畫面外的一端補新圖另一端移除，不會倒捲回第一張。
   地圖用鄉鎮界圖資畫（useTaiwanTowns），鄉鎮依火災通報數上色、疊消防分隊據點（資料在 utils/04.manpower/maps.ts，POC 先留空）。
   中間那張的鄉鎮可 hover／點擊，彈出鄉鎮名稱與通報數（設計註記 2477:7203）。
 -->
@@ -23,7 +26,13 @@ const props = defineProps<{
 
 const assetUrl = useAssetUrl();
 const { locale } = useI18n();
-const active = ref(REGION_START);
+/** 虛擬位置（不設上限）；目前縣市 = active */
+const pos = ref(REGION_START);
+const N = REGIONS.length;
+const mod = (v: number) => ((v % N) + N) % N;
+const active = computed(() => mod(pos.value));
+/** 前後各畫幾張：±2 在 pc 1990px 以下的寬度都在畫面外，多一張給更寬的螢幕 */
+const SPAN = 3;
 
 const towns = useTaiwanTowns(REGIONS.map((r) => r.county));
 
@@ -54,8 +63,17 @@ const regions = computed(() =>
   }),
 );
 
-const go = (i: number) => {
-  active.value = Math.min(Math.max(i, 0), REGIONS.length - 1);
+/** 地圖帶上實際畫出的圖：虛擬位置 v、相對目前位置的距離 offset、對應的縣市 */
+const slots = computed(() =>
+  Array.from({ length: SPAN * 2 + 1 }, (_, k) => {
+    const v = pos.value - SPAN + k;
+    return { v, offset: v - pos.value, region: regions.value[mod(v)]! };
+  }),
+);
+
+/** 往前／往後走 step 張（循環） */
+const go = (step: number) => {
+  pos.value += step;
   popup.value = null;
 };
 
@@ -104,13 +122,15 @@ function hidePopup(e: PointerEvent) {
     </figcaption>
 
     <div ref="strip" class="mp-maps__strip" @pointerleave="popup = null">
-      <ul class="mp-maps__list" :style="{ '--i': active }">
+      <ul class="mp-maps__list">
         <li
-          v-for="(r, i) in regions"
-          :key="r.id"
+          v-for="{ v, offset, region: r } in slots"
+          :key="v"
           class="mp-maps__item"
-          :class="{ 'mp-maps__item--active': i === active }"
-          @click="i !== active && go(i)"
+          :class="{ 'mp-maps__item--active': offset === 0 }"
+          :style="{ '--o': offset }"
+          :aria-hidden="offset !== 0"
+          @click="offset !== 0 && go(offset)"
         >
           <svg
             v-if="r.viewBox"
@@ -127,10 +147,10 @@ function hidePopup(e: PointerEvent) {
               :class="{ 'mp-maps__town--hover': popup?.code === t.code }"
               :d="t.d"
               :style="{ fill: t.fill }"
-              @pointerenter="i === active && showPopup($event, t)"
-              @pointermove="i === active && showPopup($event, t)"
+              @pointerenter="offset === 0 && showPopup($event, t)"
+              @pointermove="offset === 0 && showPopup($event, t)"
               @pointerleave="hidePopup"
-              @click.stop="i === active && showPopup($event as PointerEvent, t)"
+              @click.stop="offset === 0 && showPopup($event as PointerEvent, t)"
             />
             <!-- 據點：白邊＋灰點（同圖例） -->
             <path class="mp-maps__pin mp-maps__pin--ring" :d="r.pins" />
@@ -144,18 +164,16 @@ function hidePopup(e: PointerEvent) {
       <button
         type="button"
         class="mp-maps__arrow mp-maps__arrow--prev"
-        :disabled="active === 0"
         :aria-label="data.prev"
-        @click="go(active - 1)"
+        @click="go(-1)"
       >
         <img :src="assetUrl(MAP_ARROW)" alt="" width="17" height="18" />
       </button>
       <button
         type="button"
         class="mp-maps__arrow mp-maps__arrow--next"
-        :disabled="active === regions.length - 1"
         :aria-label="data.next"
-        @click="go(active + 1)"
+        @click="go(1)"
       >
         <img :src="assetUrl(MAP_ARROW)" alt="" width="17" height="18" />
       </button>

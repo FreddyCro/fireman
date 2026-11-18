@@ -89,28 +89,27 @@
     }
   }
 
-  // 從中線往左推，讓第 --i 張置中
+  // 循環輪播：每張各自定位在中線，依與目前位置的距離 --o（…−1、0、1…）左右排開
   &__list {
     position: absolute;
-    top: 0;
-    left: 50%;
-    display: flex;
-    gap: var(--gap);
-    height: 100%;
+    inset: 0;
     margin: 0;
     padding: 0;
     list-style: none;
-    transform: translateX(calc(-1 * (var(--i) + 0.5) * var(--item) - var(--i) * var(--gap)));
-    transition: transform $mp-fade-slow ease;
   }
 
   &__item {
-    flex: none;
+    position: absolute;
+    top: 0;
+    left: 50%;
     width: var(--item);
     height: 100%;
     opacity: 0.3;
     cursor: pointer;
-    transition: opacity $mp-fade-slow;
+    transform: translateX(calc(-50% + var(--o) * (var(--item) + var(--gap))));
+    transition:
+      transform $mp-fade-slow ease,
+      opacity $mp-fade-slow;
 
     &--active {
       opacity: 1;
@@ -199,11 +198,6 @@
     cursor: pointer;
     transform: translateY(-50%);
 
-    &:disabled {
-      opacity: 0.3;
-      cursor: default;
-    }
-
     // mob 貼齊文字欄邊緣；tablet 以上貼在中間那張地圖兩側
     &--prev {
       left: calc($mp-gutter - 14px);
@@ -227,7 +221,6 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    &__list,
     &__item {
       transition: none;
     }
