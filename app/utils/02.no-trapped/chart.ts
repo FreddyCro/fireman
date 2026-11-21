@@ -10,10 +10,11 @@ export const CHART: PinChartLayout = {
     { id: 'deaths', shape: 'bar', color: '#ed7223' },
   ],
   slides: [
+    // 遮罩只蓋到 x 軸（圖高 343，年份標籤從 311 起 → 離底 10%），年份標籤不遮
     // 前 10 年：遮住右半（近 10 年）。設計稿 620 寬的圖，遮罩 280 寬
-    { id: 'before', mask: { left: 50.5, width: 45 } },
+    { id: 'before', mask: { left: 50.5, width: 45, bottom: 10 } },
     // 近 10 年：遮住左半（前 10 年）
-    { id: 'after', mask: { left: 4.5, width: 45.5 } },
+    { id: 'after', mask: { left: 4.5, width: 45.5, bottom: 10 } },
   ],
   trackVh: 200,
   switchAt: 0.5,

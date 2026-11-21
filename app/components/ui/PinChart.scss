@@ -6,6 +6,15 @@
   max-width: 620px; // pad 稿 620、pc 稿 700
   margin: 0 auto;
 
+  // 手機圖寬＝容器 × --pan（mob 稿：620 寬的圖放在 388 的窗內，620/388≈1.6），平板以上 1 不放大
+  // 圖放大時上下間距也跟著放大一點：基底 20（mob/pad 稿），每多放大 1 倍加 15 → mob 29、pad 以上 20
+  --pan: 1.6;
+  --gap: calc(20px + (var(--pan) - 1) * 15px);
+
+  @include rwd-min('tablet') {
+    --pan: 1;
+  }
+
   @include rwd-min('pc') {
     max-width: 700px;
   }
@@ -24,7 +33,7 @@
   // 標題＋圖例：兩組疊在同一格，淡入淡出
   &__head {
     display: grid;
-    margin-bottom: 16px;
+    margin-bottom: var(--gap);
   }
 
   &__text {
@@ -86,14 +95,9 @@
   }
 
   // 圖表：一張圖，上面兩塊黑色半透明遮罩，只顯示目前那組的，opacity 交替
-  // 手機：圖寬＝容器 × --pan，遮罩在左半的那組向左橫移露出右半；平板以上 --pan: 1 不橫移
+  // 手機：圖寬＝容器 × --pan（定義在根），遮罩在左半的那組向左橫移露出右半；平板以上不橫移
   &__fig {
-    --pan: 1.9;
     overflow: hidden;
-
-    @include rwd-min('tablet') {
-      --pan: 1;
-    }
   }
 
   &__pan {
@@ -126,7 +130,7 @@
   }
 
   &__note {
-    margin: 16px 0 0;
+    margin: var(--gap) 0 0;
     font-size: 15px;
     line-height: 22px;
     color: #999;

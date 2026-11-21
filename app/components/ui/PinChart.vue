@@ -6,7 +6,7 @@
   所以文字放在跑道之後：圖表 pin 住的期間先切換遮罩（過 switchAt 切第二組），跑道走完舞台鬆開，
   文字緊接著從圖表下方捲上來，看起來仍是同一塊。
 
-  切換：標題／圖例淡入淡出；圖上兩塊黑色半透明遮罩 opacity 交替，位置在 layout.slides[].mask。
+  切換：標題／圖例淡入淡出；圖上兩塊黑色半透明遮罩 opacity 交替，位置在 layout.slides[].mask（bottom 讓遮罩停在 x 軸上方，不蓋到年份）。
   手機：圖比容器寬（scss 的 --pan），看的那半邊跟著遮罩走——遮罩在左就整張圖向左橫移露出右半，遮罩在右就看左半。
 -->
 <script setup lang="ts">
@@ -29,7 +29,7 @@ const slides = computed(() =>
       id: s.id,
       title: copy?.title ?? '',
       legend: props.layout.legend.map((l) => ({ ...l, text: copy?.legend[l.id] ?? '' })),
-      maskStyle: { left: `${s.mask.left}%`, width: `${s.mask.width}%` },
+      maskStyle: { left: `${s.mask.left}%`, width: `${s.mask.width}%`, bottom: `${s.mask.bottom ?? 0}%` },
       // 手機要看的是沒被遮的那半：遮罩在左半就橫移露出右半
       panRight: s.mask.left < 50,
     };
