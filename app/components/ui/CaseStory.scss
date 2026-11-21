@@ -25,10 +25,10 @@ $ease: 0.3s ease;
   --list-w: min(100vw, 414px);
   --w-idle: 63.29%; // 262 / 414
   --w-wide: 87.44%; // 362 / 414：文件標題、情境圖
-  --gap-grow: 10px; // active 素材上下各多出的間距
+  --gap-grow: 10px; // active 上下多出的間距
   display: flex;
   flex-direction: column;
-  margin: 0 auto 40px; // 設計師回饋：案例結尾後下一段往上推（原 80／120／160）
+  margin: 0 auto 40px;
   color: $text;
 
   @include rwd-min('tablet') {
@@ -47,9 +47,7 @@ $ease: 0.3s ease;
     margin-bottom: 80px;
   }
 
-  // ── 左欄：PC sticky 在視窗垂直置中（top 用量到的 --intro-h 算，sticky 盒就是內容本身的高）；pad／mob 一般排列。
-  // 盒子只有內容高，右欄捲完（容器下緣碰到左欄下緣）左欄就跟著一起往上收，最後一張自然與左欄齊底，
-  // 下一段緊接在 margin-bottom 之後，不會多出半個視窗的空白（設計師回饋：案例結尾後下一段往上推） ──
+  // PC 左欄 sticky 盒只有內容高，右欄捲完就一起往上收，下一段不會多出空白
   &__intro {
     @include rwd-min('pc') {
       position: sticky;
@@ -173,13 +171,11 @@ $ease: 0.3s ease;
     overflow-anchor: none;
 
     @include rwd-min('pc') {
-      // 第一張從視窗下方滑上來，案例貼頂時停在 107px；下方不留 padding，齊底由左欄的 sticky 盒高決定（見 __intro）
       margin: 0;
       padding: 107px 0 0;
     }
   }
 
-  // active 放大時上下間距也跟著放大一點（--gap-grow），放大前後的間距上下一致；跟寬度一起 transition
   &__item {
     width: var(--w-idle);
     transition:
@@ -195,8 +191,6 @@ $ease: 0.3s ease;
     width: var(--w-wide);
   }
 
-  // 情境圖（C40-P 存放過量、排風管防破壞）：idle 跟文件一樣寬、active 一樣放大
-  // （設計師回饋 FEEDBACK_1 section 3-5／3-7；原本固定 362 不放大）。上下間距走 active 的規則，不另外加固定邊距
   &__item--steps {
     width: var(--w-wide);
 
@@ -205,7 +199,7 @@ $ease: 0.3s ease;
     }
   }
 
-  // 放在 steps 之後，active 才蓋得過；放大時上下各多 --gap-grow（跟相鄰素材的距離 20 → mob 30、pad/pc 40）
+  // 放在 steps 之後，active 才蓋得過
   &__item--active {
     width: 100%;
     margin: var(--gap-grow) 0;

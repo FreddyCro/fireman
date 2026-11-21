@@ -1,15 +1,6 @@
 <!--
-  案例區（02 no-trapped、03 violation 共用），設計稿 1110 定版。
-  PC：左右切割。左欄（日期／標題／內文＋殉職人數）sticky 置中；右欄素材（文件、照片、情境圖）垂直排列往上捲。
-  pad／mob：文字、殉職人數在上，素材欄在下，一樣往上捲。
-
-  ・進場：左側文字一組、殉職人數一組，時間差 fade up（各 0.3s）。
-  ・active：跨過視窗中線的素材放大（PC／pad 400 → 500、mob 262 → 414），文件同時換成焦點圖；回滾縮回去。情境圖（steps）也一樣放大。放大的素材上下間距各多 --gap-grow（scss），上下一致。
-  ・情境圖（steps）：中線從圖的上緣走到下緣的過程依序換圖（a → b → c），溫度計漸層跟著變。
-  ・退場：右欄捲完時下緣剛好與左欄齊底（PC 右欄 padding-bottom 依左欄高度算），之後整組一起往上收，
-    綁捲動 opacity 1 → 0。
-  active、換圖、退場都在同一個 rAF 節流的 scroll handler 裡算：active 素材會改變高度、推動下方素材，
-  事先算好觸發點的 ScrollTrigger／IntersectionObserver 會跟著失準，每次即時量 getBoundingClientRect 最穩。
+  案例區：跨過視窗中線的素材放大（active），情境圖依中線位置換圖。
+  都在 scroll handler 裡即時量位置：active 會改變高度、推動下方素材，事先算好的 ScrollTrigger 會失準。
 -->
 <script setup lang="ts">
 import { isMedia, stepAt, type CaseItem, type CaseLayout } from '~/utils/case-story';
@@ -70,7 +61,7 @@ const countShown = useReveal(countEl, { threshold: 0.3 });
 const active = ref<number | null>(null);
 /** steps item 的目前步驟，key 是 item id */
 const steps = reactive<Record<string, number>>({});
-/** 左欄高度：PC 左欄 sticky 的 top 用它算垂直置中（scss --intro-h） */
+/** 左欄高度，PC sticky 垂直置中用 */
 const introH = ref(0);
 
 let raf = 0;
@@ -100,7 +91,7 @@ const update = () => {
   else if (media[0] && media[0].node.getBoundingClientRect().top > mid) active.value = null;
   // 中線落在素材間距或已過最後一個：維持上一個 active（最後一張停在放大狀態一起往上收）
 
-  // 退場：下緣離開視窗底後，捲到視窗 50% 高時淡到 0（原 30%；縮短讓下一段接得更快）
+  // 退場：下緣離開視窗底後綁捲動淡出
   const fade = (vh - rect.bottom) / (vh * 0.5);
   el.style.opacity = fade > 0 ? String(Math.max(0, 1 - fade)) : '';
 };

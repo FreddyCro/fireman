@@ -11,10 +11,7 @@ export interface PinChartLegend {
 
 export interface PinChartSlide {
   id: string;
-  /**
-   * 黑色半透明遮罩（佔圖的 %）：left 起點、width 寬度，蓋住「不是在講的那段」；
-   * bottom 是遮罩離圖底的距離（佔圖高的 %），讓遮罩停在 x 軸、不蓋到年份標籤，省略＝蓋到底
-   */
+  /** 遮罩位置（佔圖的 %）；bottom 讓遮罩停在 x 軸上方，不蓋年份 */
   mask: { left: number; width: number; bottom?: number };
 }
 
