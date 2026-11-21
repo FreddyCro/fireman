@@ -4,7 +4,7 @@
   pad／mob：文字、殉職人數在上，素材欄在下，一樣往上捲。
 
   ・進場：左側文字一組、殉職人數一組，時間差 fade up（各 0.3s）。
-  ・active：跨過視窗中線的素材放大（PC／pad 400 → 500、mob 262 → 414），文件同時換成焦點圖；回滾縮回去。
+  ・active：跨過視窗中線的素材放大（PC／pad 400 → 500、mob 262 → 414），文件同時換成焦點圖；回滾縮回去。情境圖（steps）也一樣放大。放大的素材上下間距各多 --gap-grow（scss），上下一致。
   ・情境圖（steps）：中線從圖的上緣走到下緣的過程依序換圖（a → b → c），溫度計漸層跟著變。
   ・退場：右欄捲完時下緣剛好與左欄齊底（PC 右欄 padding-bottom 依左欄高度算），之後整組一起往上收，
     綁捲動 opacity 1 → 0。
@@ -70,7 +70,7 @@ const countShown = useReveal(countEl, { threshold: 0.3 });
 const active = ref<number | null>(null);
 /** steps item 的目前步驟，key 是 item id */
 const steps = reactive<Record<string, number>>({});
-/** 左欄高度：PC 右欄 padding-bottom 用它算齊底 */
+/** 左欄高度：PC 左欄 sticky 的 top 用它算垂直置中（scss --intro-h） */
 const introH = ref(0);
 
 let raf = 0;
@@ -100,8 +100,8 @@ const update = () => {
   else if (media[0] && media[0].node.getBoundingClientRect().top > mid) active.value = null;
   // 中線落在素材間距或已過最後一個：維持上一個 active（最後一張停在放大狀態一起往上收）
 
-  // 退場：下緣離開視窗底後，捲到視窗 30% 高時淡到 0
-  const fade = (vh - rect.bottom) / (vh * 0.7);
+  // 退場：下緣離開視窗底後，捲到視窗 50% 高時淡到 0（原 30%；縮短讓下一段接得更快）
+  const fade = (vh - rect.bottom) / (vh * 0.5);
   el.style.opacity = fade > 0 ? String(Math.max(0, 1 - fade)) : '';
 };
 
