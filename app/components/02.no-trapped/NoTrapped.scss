@@ -19,14 +19,9 @@ $column: 620px;
     padding: 96px 40px;
   }
 
-  // ── 導言 ──
   &__intro {
     max-width: $column;
-    margin: 0 auto 64px;
-
-    @include rwd-min('tablet') {
-      margin-bottom: 96px;
-    }
+    margin: 0 auto;
   }
 
   &__intro-title {
@@ -90,13 +85,8 @@ $column: 620px;
     }
   }
 
-  // 圖表與大標之間的過場段落：上下各留一個視窗高的呼吸空間
-  &__text--transition {
-    margin: 96px auto;
-
-    @include rwd-min('tablet') {
-      margin: 160px auto;
-    }
+  &__text--pin {
+    margin: 0 auto;
   }
 
   // 大標改用 ui/BlurTitle（SVG + 滾動 blur），這裡只管與案例的間距
@@ -203,7 +193,7 @@ $column: 620px;
   &__priorities-item {
     display: flex;
     gap: 24px;
-    align-items: center;
+    align-items: flex-start;
     opacity: 0;
     transition: opacity 0.3s ease;
 
@@ -216,10 +206,11 @@ $column: 620px;
     opacity: 1;
   }
 
-  // 中文版：整行是 SVG（設計稿 350×100 / 370×95 / 339×107），依寬縮放
+  // 寬度由元件依 SVG 自然寬設定，三張同比例縮放，數字欄才對得齊
   &__priorities-img {
     display: block;
     width: 100%;
+    max-width: 100%;
     height: auto;
   }
 
@@ -251,11 +242,10 @@ $column: 620px;
     font-size: 16px;
   }
 
-  // ── 引言：置中襯線粗體，上下留白讓它獨占一屏 ──
   &__quote {
     max-width: 532px;
     margin: 0 auto;
-    padding: 120px 0;
+    padding: 0;
     font-family: $serif;
     font-size: 30px;
     font-weight: 700;
@@ -263,11 +253,9 @@ $column: 620px;
     letter-spacing: 0.1em;
     color: #f5f5f5;
     text-align: center;
-    will-change: filter; // 隨捲動 blur（NoTrapped.vue useScrollBlur）
 
     @include rwd-min('tablet') {
       max-width: 530px;
-      padding: 200px 0;
       font-size: 30px;
       line-height: 50px;
     }

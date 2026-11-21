@@ -1,6 +1,6 @@
 <!--
   02 無人受困的火場。順序照設計稿 section2：
-  導言 → pin 圖表 → 過場 → blur 大標 → 台中案例 → 張賢龢留學故事 → 受訪者卡 → 3 項應變順序 → 段落 → 引言（blur）→ 超哥故事捲動動畫 → 美福倉儲段落＋照片
+  導言（pin）→ pin 圖表 → 過場（pin）→ blur 大標 → 「做與不做都兩難」（pin）→ 台中案例 → 張賢龢留學故事 → 受訪者卡 → 3 項應變順序 → 段落 → 引言（pin＋blur）→ 超哥故事捲動動畫 → 美福倉儲段落＋照片
 -->
 <script setup lang="ts">
 import { CASES } from '~/utils/02.no-trapped/cases';
@@ -14,24 +14,24 @@ const str = useCopy().noTrapped;
 const caseCopy = (id: string) => str.cases[id as keyof typeof str.cases];
 
 const meifuPhotos = MEIFU_PHOTOS.map((src, i) => ({ src, alt: str.meifu.alt[i] ?? '' }));
-
-// 引言隨捲動從模糊變清楚（同 BlurTitle 的效果）
-const quote = ref<HTMLElement | null>(null);
-useScrollBlur(quote, quote);
 </script>
 
 <template>
   <section id="no-trapped" class="sec-no-trapped">
-    <header class="sec-no-trapped__intro">
-      <h2 class="sec-no-trapped__intro-title">{{ str.intro.title }}</h2>
-      <p class="sec-no-trapped__intro-lead">{{ str.intro.lead }}</p>
-    </header>
+    <PinText>
+      <header class="sec-no-trapped__intro">
+        <h2 class="sec-no-trapped__intro-title">{{ str.intro.title }}</h2>
+        <p class="sec-no-trapped__intro-lead">{{ str.intro.lead }}</p>
+      </header>
+    </PinText>
 
     <PinChart :layout="CHART" :copy="str.chart" />
 
-    <div class="sec-no-trapped__text sec-no-trapped__text--transition">
-      <p>{{ str.transition }}</p>
-    </div>
+    <PinText>
+      <div class="sec-no-trapped__text sec-no-trapped__text--pin">
+        <p>{{ str.transition }}</p>
+      </div>
+    </PinText>
 
     <BlurTitle
       class="sec-no-trapped__title"
@@ -39,10 +39,14 @@ useScrollBlur(quote, quote);
       :svg-narrow="str.titleSvgNarrow"
       :svg-mob="str.titleSvgMob"
       :alt="str.title"
-      :label="str.titleLabel"
       natural
       pin
     />
+    <PinText>
+      <div class="sec-no-trapped__text sec-no-trapped__text--pin">
+        <p>{{ str.dilemma }}</p>
+      </div>
+    </PinText>
     <CaseStory v-for="c in CASES" :key="c.id" :layout="c" :copy="caseCopy(c.id)" />
 
     <div class="sec-no-trapped__text">
@@ -61,10 +65,12 @@ useScrollBlur(quote, quote);
       <p v-for="p in str.afterPriorities" :key="p">{{ p }}</p>
     </div>
 
-    <blockquote ref="quote" class="sec-no-trapped__quote">
-      <span class="sec-no-trapped__quote-mark" aria-hidden="true">“</span>
-      <p>{{ str.quote }}</p>
-    </blockquote>
+    <PinText blur>
+      <blockquote class="sec-no-trapped__quote">
+        <span class="sec-no-trapped__quote-mark" aria-hidden="true">“</span>
+        <p>{{ str.quote }}</p>
+      </blockquote>
+    </PinText>
     <!-- 引言延伸的「超哥故事」捲動動畫 -->
     <NoTrappedEscape />
 

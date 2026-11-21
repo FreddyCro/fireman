@@ -3,7 +3,6 @@
   svg 沒給（如該語系還沒有正式稿）就直接渲染 alt 文字，一樣 blur。
   svgNarrow 有給時，pc 斷點以下改用它（如 03 大標 mob／pad 是直書、pc 是橫書）。
   svgMob 有給時，tablet 斷點以下再改用它（如 04 英文版 mob 另有一張）；不給就沿用 svgNarrow。
-  label 有給就在上方顯示小標（白底黑字），小標不 blur。
   natural：大標 SVG 照檔案本身的尺寸顯示（02、03 章節標題：pc 高 120、pad 直書寬 150、mob 直書寬 120），不撐滿欄寬。
 
   兩種模式：
@@ -26,8 +25,6 @@ const props = withDefaults(
     svgMob?: string;
     /** 大標文字，給 <img alt> 與 SEO 用 */
     alt: string;
-    /** 上方小標；不給就不顯示 */
-    label?: string;
     /** 標題標籤 */
     tag?: 'h1' | 'h2' | 'h3';
     /** 起始模糊半徑（px） */
@@ -48,7 +45,6 @@ const props = withDefaults(
     svg: '',
     svgNarrow: '',
     svgMob: '',
-    label: undefined,
     tag: 'h2',
     maxBlur: 10,
     start: 'top 85%',
@@ -77,7 +73,6 @@ useScrollBlur(
 <template>
   <div ref="root" class="blur-title" :class="{ 'blur-title--pin': pin, 'blur-title--natural': natural }" :style="pin ? { '--track': trackVh } : undefined">
     <div class="blur-title__stage">
-      <p v-if="label" class="blur-title__label">{{ label }}</p>
       <component :is="tag" class="blur-title__title">
         <picture v-if="svg">
           <source v-if="svgMob" :media="`(max-width: ${TABLET_BREAKPOINTS - 0.02}px)`" :srcset="assetUrl(svgMob)" />

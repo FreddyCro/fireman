@@ -15,7 +15,6 @@ export const CASES: CaseLayout[] = [
         ratio: '808/827',
       },
       { kind: 'photo', id: 'aerial', src: '/img/no-trapped/pic0104.jpg', ratio: '800/450' },
-      { kind: 'quote', id: 'quote' },
       { kind: 'photo', id: 'rescue', src: '/img/no-trapped/pic0103.jpg', ratio: '800/536' },
     ],
   },

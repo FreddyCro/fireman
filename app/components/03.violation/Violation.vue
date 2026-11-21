@@ -1,6 +1,6 @@
 <!--
   03 工安違法事實。順序照設計稿 section3：
-  blur 大標 → 屏東明揚案例 → 桃園敬鵬案例 → 消防年報段落 → pin 圖表＋訪談段落
+  blur 大標 → 開頭段落（pin，設計稿 1121 新增）→ 屏東明揚案例 → 桃園敬鵬案例 → 消防年報段落 → pin 圖表＋訪談段落
 -->
 <script setup lang="ts">
 import { CASES } from '~/utils/03.violation/cases';
@@ -21,10 +21,14 @@ const caseCopy = (id: string) => str.cases[id as keyof typeof str.cases];
       :svg-narrow="str.titleSvgNarrow"
       :svg-mob="str.titleSvgMob"
       :alt="str.title"
-      :label="str.titleLabel"
       natural
       pin
     />
+    <PinText>
+      <div class="sec-violation__text sec-violation__text--pin">
+        <p>{{ str.opening }}</p>
+      </div>
+    </PinText>
     <CaseStory v-for="c in CASES" :key="c.id" :layout="c" :copy="caseCopy(c.id)" />
 
     <div class="sec-violation__text">

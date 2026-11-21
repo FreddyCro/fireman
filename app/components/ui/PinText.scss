@@ -1,0 +1,20 @@
+// 內容的寬度、字級由各 section 的 class 決定。
+.pin-text {
+  height: calc(var(--track) * 1vh);
+
+  &__stage {
+    position: sticky;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    height: 100vh;
+    height: 100svh;
+  }
+
+  &__content {
+    width: 100%;
+    will-change: opacity, filter;
+  }
+}
