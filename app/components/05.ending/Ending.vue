@@ -1,22 +1,22 @@
 <!--
-  05 ending（黑底）。順序照設計稿：
-  滿版大圖（捲動 zoom out）→ 照片拼貼（各張進入視窗時原地淡入；敬鵬擦汗那張在框內捲動 zoom in）→ 火焰圖＋支持聯合報區塊
-  版面座標在 app/utils/05.ending/collage.ts：mob／pad／pc 各一份（各稿 px），這裡換算成百分比，
-  以 CSS 變數 --{d,l,t,w,ar,z}-{mob,pad,pc} 交給 Ending.scss 依斷點套用；某斷點沒列到的照片 display: none。
+  大圖 → 照片拼貼 → 最後一幕（照片與導購交叉淡入淡出）。
+  大圖是拼貼裡的一格，捲動時用 transform 從蓋滿前面的空位縮回自己的格子。
 -->
 <script setup lang="ts">
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { FIRE_LOOP, HERO, LAYOUTS, PHOTOS, type Breakpoint } from '~/utils/05.ending/collage';
+import { FINALE, FIRE_LOOP, HERO, LAYOUTS, PHOTOS, type Breakpoint } from '~/utils/05.ending/collage';
+import { TABLET_BREAKPOINTS } from '~/utils/constants';
 import './Ending.scss';
 
 const str = useCopy().ending;
 const assetUrl = useAssetUrl();
 
 const BPS: Breakpoint[] = ['mob', 'pad', 'pc'];
+const MQ_MOB = `(max-width: ${TABLET_BREAKPOINTS - 0.02}px)`;
 const pct = (v: number, base: number) => `${((v / base) * 100).toFixed(3)}%`;
 
-/** 單張照片在各斷點的位置（框的百分比）、比例、疊放順序；沒列到＝不顯示 */
+/** 各斷點的位置（框的 %）；沒列到＝不顯示 */
 const photoVars = (id: string) => {
   const vars: Record<string, string | number> = {};
   for (const bp of BPS) {
@@ -37,9 +37,9 @@ const photoVars = (id: string) => {
   return vars;
 };
 
+const heroStyle = photoVars(HERO.id);
 const photos = PHOTOS.map((p) => ({ ...p, alt: str.photos[p.id as keyof typeof str.photos] ?? '', style: photoVars(p.id) }));
 
-/** 拼貼框：各斷點的比例、最大寬、疊進大圖的比例（相對框寬） */
 const collageStyle = Object.fromEntries(
   BPS.flatMap((bp) => {
     const { frame } = LAYOUTS[bp];
@@ -52,13 +52,29 @@ const collageStyle = Object.fromEntries(
 );
 
 const root = ref<HTMLElement | null>(null);
+const heroSpacer = ref<HTMLElement | null>(null);
+const collage = ref<HTMLElement | null>(null);
+const hero = ref<HTMLElement | null>(null);
 const heroImg = ref<HTMLElement | null>(null);
 const photoEls = ref<HTMLElement[]>([]);
-const shown = useReveal(photoEls, { threshold: 0.3 });
+// 上緣過視窗中線才淡入
+const shown = useReveal(photoEls, { rootMargin: '0px 0px -50% 0px', threshold: 0 });
+let dockSt: ScrollTrigger | null = null;
+
+const finale = ref<HTMLElement | null>(null);
+const finaleSupport = ref(false);
+let finaleSt: ScrollTrigger | null = null;
+const finaleStyle = {
+  '--track': FINALE.trackVh,
+  '--finale-w-mob': `${FINALE.w.mob}px`,
+  '--finale-w-pad': `${FINALE.w.pad}px`,
+  '--finale-w-pc': `${FINALE.w.pc}px`,
+  '--finale-scale-mob': FINALE.mobScale,
+};
 
 let ctx: gsap.Context | null = null;
 
-// 導購動態火：進入視窗才播、離開就停；播完跳回 loop 起點（減少動態時只顯示 poster）
+// 動態火：進入視窗才播，播完跳回 loop 起點
 const fireVideo = ref<HTMLVideoElement | null>(null);
 let fireIo: IntersectionObserver | null = null;
 const onFireEnded = () => {
@@ -71,6 +87,37 @@ const onFireEnded = () => {
 onBeforeUnmount(() => fireIo?.disconnect());
 
 onMounted(() => {
+  gsap.registerPlugin(ScrollTrigger);
+  // 減少動態時也要看得到導購，所以不受 reduced-motion 影響
+  const setFinaleP = gsap.quickSetter(finale.value, '--finale-p');
+  const applyFinale = (self: ScrollTrigger) => {
+    const p = gsap.utils.clamp(0, 1, (self.progress - (FINALE.switchAt - FINALE.fadeSpan)) / (FINALE.fadeSpan * 2));
+    setFinaleP(p);
+    finaleSupport.value = p >= 0.5;
+  };
+  finaleSt = ScrollTrigger.create({ trigger: finale.value, start: 'top top', end: 'bottom bottom', onUpdate: applyFinale, onRefresh: applyFinale });
+
+  // 大圖縮小定位；減少動態時也要做，否則空位是一塊黑
+  const dockFrom = () => {
+    const c = collage.value!;
+    const h = hero.value!;
+    const sp = heroSpacer.value!;
+    return {
+      x: sp.offsetLeft - c.offsetLeft - h.offsetLeft,
+      y: sp.offsetTop - c.offsetTop - h.offsetTop,
+      scale: sp.offsetWidth / h.offsetWidth,
+    };
+  };
+  dockSt = gsap.fromTo(hero.value, dockFrom(), {
+    x: 0,
+    y: 0,
+    scale: 1,
+    ease: 'none',
+    scrollTrigger: { trigger: heroSpacer.value, start: 'top top', end: 'bottom 25%', scrub: true, invalidateOnRefresh: true },
+  }).scrollTrigger!;
+  // invalidateOnRefresh 只重算 to 端
+  ScrollTrigger.addEventListener('refreshInit', () => gsap.set(hero.value, dockFrom()));
+
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const v = fireVideo.value;
   if (v) {
@@ -80,15 +127,13 @@ onMounted(() => {
     });
     fireIo.observe(v);
   }
-  gsap.registerPlugin(ScrollTrigger);
   ctx = gsap.context(() => {
-    // 大圖：進入視窗時放大 1.25 倍，捲到離開時回到原尺寸（zoom out）
+    // 以空位當 trigger，不受縮小定位的 transform 影響
     gsap.fromTo(
       heroImg.value,
       { scale: 1.25 },
-      { scale: 1, ease: 'none', scrollTrigger: { trigger: heroImg.value, start: 'top bottom', end: 'bottom top', scrub: true } },
+      { scale: 1, ease: 'none', scrollTrigger: { trigger: heroSpacer.value, start: 'top bottom', end: 'bottom top', scrub: true } },
     );
-    // 指定的照片：框不動、圖在框內慢慢放大（zoom in）
     root.value!.querySelectorAll<HTMLElement>('[data-zoom]').forEach((img) => {
       gsap.fromTo(
         img,
@@ -99,24 +144,29 @@ onMounted(() => {
   }, root.value!);
 });
 
-onBeforeUnmount(() => ctx?.revert());
+onBeforeUnmount(() => {
+  ctx?.revert();
+  dockSt?.kill();
+  finaleSt?.kill();
+});
 </script>
 
 <template>
   <section id="ending" ref="root" class="sec-ending">
-    <div class="sec-ending__hero">
-      <img
-        ref="heroImg"
-        class="sec-ending__hero-img"
-        :src="assetUrl(HERO.src)"
-        :alt="str.hero.alt"
-        :width="HERO.w"
-        :height="HERO.h"
-        loading="lazy"
-      />
-    </div>
+    <div ref="heroSpacer" class="sec-ending__hero" aria-hidden="true" />
 
-    <div class="sec-ending__collage" :style="collageStyle">
+    <div ref="collage" class="sec-ending__collage" :style="collageStyle">
+      <figure ref="hero" class="sec-ending__photo sec-ending__photo--hero" :style="heroStyle">
+        <img
+          ref="heroImg"
+          class="sec-ending__photo-img sec-ending__hero-img"
+          :src="assetUrl(HERO.src)"
+          :alt="str.hero.alt"
+          :width="HERO.w"
+          :height="HERO.h"
+          loading="lazy"
+        />
+      </figure>
       <figure
         v-for="(p, i) in photos"
         :key="p.id"
@@ -125,11 +175,19 @@ onBeforeUnmount(() => ctx?.revert());
         :class="{ 'sec-ending__photo--shown': shown[i] }"
         :style="p.style"
       >
-        <img class="sec-ending__photo-img" :src="assetUrl(p.src)" :alt="p.alt" :data-zoom="p.zoom ? '' : undefined" loading="lazy" />
+        <picture>
+          <source v-if="p.srcMob" :media="MQ_MOB" :srcset="assetUrl(p.srcMob)" />
+          <img class="sec-ending__photo-img" :src="assetUrl(p.src)" :alt="p.alt" :data-zoom="p.zoom ? '' : undefined" loading="lazy" />
+        </picture>
       </figure>
     </div>
 
-    <div class="sec-ending__support">
+    <div ref="finale" class="sec-ending__finale" :class="{ 'sec-ending__finale--support': finaleSupport }" :style="finaleStyle">
+      <div class="sec-ending__finale-stage">
+        <figure class="sec-ending__finale-photo">
+          <img class="sec-ending__finale-img" :src="assetUrl(FINALE.src)" :alt="str.photos.gear" loading="lazy" />
+        </figure>
+    <div class="sec-ending__support" :aria-hidden="!finaleSupport">
       <video
         ref="fireVideo"
         class="sec-ending__fire"
@@ -152,6 +210,8 @@ onBeforeUnmount(() => ctx?.revert());
           <path d="M1.5 1.5L6 6l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.6" />
         </svg>
       </a>
+    </div>
+      </div>
     </div>
   </section>
 </template>

@@ -1,36 +1,46 @@
-// 05 ending：大圖＋照片拼貼的版面（中英文共用），alt 在 locales/{zh,en}/section-ending.json 以 id 對應。
-// 三個斷點各一份（mob 414 稿、pad 768 稿、pc 1280 稿），座標是該稿上的 px；元件換算成拼貼框的百分比等比縮放。
+// 座標是各斷點設計稿上的 px，以大圖上緣為 y=0。
 
-/** 頂部滿版大圖（1280×519），隨捲動 zoom out */
+/** 縮小後的位置是各斷點 stack 裡的 'hero' */
 export const HERO = { id: 'hero', src: '/img/ending/hero.png', w: 1280, h: 519 };
 
-/** 支持區塊上方的火焰圖（207×206） */
-/**
- * 導購動態火（1116 交件「結尾｜導購動畫」loop banner，604×812＝302×406 @2x，24fps 4.5 秒）：
- * 原速播放，播完跳回 loop 起點（標示 00:01:07 ＝ 第 31 格）重播到結尾。poster 是第 31 格。
- * 取代原本的靜態圖 /img/ending/fire.png（檔案先留著，確認後可刪）；黑底以 mix-blend-mode: screen 疊在黑色 section 上。
- */
+/** 導購動態火：24fps，播完從第 31 格重播 */
 export const FIRE_LOOP = { src: '/img/ending/fire-loop', w: 302, h: 406, loopFrom: 31 / 24 };
 
 export interface CollagePhoto {
   id: string;
   src: string;
-  /** 隨捲動在框內慢慢放大（zoom in） */
+  /** mob 裁切不同時另給一張 */
+  srcMob?: string;
+  /** 框內隨捲動放大 */
   zoom?: boolean;
 }
 
 export const PHOTOS: CollagePhoto[] = [
-  { id: 'xufu', src: '/img/ending/photo-xufu.png' },
-  { id: 'ladder', src: '/img/ending/photo-chengzhong-ladder.png' },
-  { id: 'meifu', src: '/img/ending/photo-meifu.png' },
-  { id: 'rest', src: '/img/ending/photo-jingpeng-rest.png', zoom: true },
-  { id: 'funeral', src: '/img/ending/photo-taichung-funeral.png' },
-  { id: 'rescue', src: '/img/ending/photo-chengzhong-rescue.png' },
-  { id: 'masks', src: '/img/ending/photo-chengzhong-masks.png' },
-  { id: 'mingyang', src: '/img/ending/photo-mingyang.png' },
-  { id: 'feili', src: '/img/ending/photo-feili.png' },
-  { id: 'gear', src: '/img/ending/photo-jingpeng-gear.png' },
+  { id: 'rest', src: '/img/ending/photo-jingpeng-rest.jpg', zoom: true },
+  { id: 'search', src: '/img/ending/photo-chengzhong-search.jpg' },
+  { id: 'sleep', src: '/img/ending/photo-chengzhong-sleep.jpg', zoom: true },
+  { id: 'funeral', src: '/img/ending/photo-taichung-funeral.jpg' },
+  { id: 'meifu', src: '/img/ending/photo-meifu.jpg' },
+  { id: 'luzhou', src: '/img/ending/photo-luzhou.jpg', srcMob: '/img/ending/photo-luzhou-mob.jpg' },
+  { id: 'quanzhou', src: '/img/ending/photo-quanzhou.jpg' },
+  { id: 'search2', src: '/img/ending/photo-chengzhong-search2.jpg' },
+  { id: 'feili', src: '/img/ending/photo-feili.jpg' },
+  { id: 'sleep2', src: '/img/ending/photo-chengzhong-sleep2.jpg', zoom: true },
 ];
+
+/** 最後一幕：照片 pin 在中央，捲動中與導購交叉淡入淡出 */
+export const FINALE = {
+  id: 'gear',
+  src: '/img/ending/photo-jingpeng-gear.jpg',
+  w: { mob: 260, pad: 171, pc: 171 },
+  /** mob 一開始放大到滿版 */
+  mobScale: 414 / 260,
+  trackVh: 200,
+  /** 交叉淡入淡出的中點（跑道進度） */
+  switchAt: 0.5,
+  /** 中點前後各多少進度做漸變 */
+  fadeSpan: 0.15,
+};
 
 export interface CollageRect {
   id: string;
@@ -41,61 +51,60 @@ export interface CollageRect {
 }
 
 export interface CollageLayout {
-  /**
-   * 拼貼框在該稿上的範圍（px）。overlap＝框上緣疊進大圖的高度（負數＝與大圖之間留空）。
-   * maxW：框的最大寬度（px）；不給＝跟著螢幕寬等比縮放。
-   */
+  /** overlap：框上緣疊進大圖的高度；maxW 不給＝隨螢幕寬縮放 */
   frame: { x: number; y: number; w: number; h: number; overlap: number; maxW?: number };
-  /** 陣列順序＝疊放順序（後面的在上）；沒列到的照片在這個斷點不顯示 */
+  /** 陣列順序＝疊放順序；沒列到＝不顯示 */
   stack: CollageRect[];
 }
 
 export type Breakpoint = 'mob' | 'pad' | 'pc';
 
 export const LAYOUTS: Record<Breakpoint, CollageLayout> = {
-  // mob 稿（414 寬）：滿版、照片由上往下交錯，公祭照貼左緣
+  // mob 大圖不縮，照片滿版往下排
   mob: {
-    frame: { x: 0, y: 0, w: 414, h: 1424, overlap: 0 },
+    frame: { x: 0, y: 0, w: 414, h: 3301, overlap: 500 },
     stack: [
-      { id: 'xufu', x: 57, y: 0, w: 197, h: 122 },
-      { id: 'meifu', x: 188, y: 150, w: 200, h: 289 },
-      { id: 'ladder', x: 13, y: 245, w: 203, h: 144 },
-      { id: 'rest', x: 63, y: 481, w: 256, h: 184 },
-      { id: 'rescue', x: 104, y: 633, w: 268, h: 249 },
-      { id: 'mingyang', x: 22, y: 758, w: 134, h: 85 },
-      { id: 'funeral', x: 0, y: 957, w: 172, h: 115 },
-      { id: 'feili', x: 241, y: 895, w: 173, h: 118 },
-      { id: 'masks', x: 169, y: 1022, w: 144, h: 166 },
-      { id: 'gear', x: 120, y: 1205, w: 172, h: 218 },
+      { id: 'hero', x: 0, y: 0, w: 414, h: 500 },
+      { id: 'rest', x: 0, y: 520, w: 414, h: 472 },
+      { id: 'search', x: 0, y: 1012, w: 414, h: 384 },
+      { id: 'funeral', x: 0, y: 1416, w: 414, h: 304 },
+      { id: 'sleep', x: 0, y: 1740, w: 414, h: 445 },
+      { id: 'luzhou', x: 0, y: 2205, w: 414, h: 466 },
+      { id: 'sleep2', x: 0, y: 2691, w: 414, h: 276 },
+      { id: 'feili', x: 0, y: 2987, w: 414, h: 314 },
     ],
   },
-  // pad 稿（768 寬）：7 張、彼此不重疊，大圖下方留 16px；框維持 768 寬置中
+  // pad 沒有大圖縮小的稿，hero 照 pc 等比
   pad: {
-    frame: { x: 0, y: 327, w: 768, h: 706, overlap: -16, maxW: 768 },
+    frame: { x: 0, y: 55, w: 768, h: 866, overlap: 256, maxW: 768 },
     stack: [
-      { id: 'ladder', x: 79, y: 368, w: 180, h: 128 },
-      { id: 'meifu', x: 270, y: 406, w: 154, h: 223 },
-      { id: 'rescue', x: 434, y: 327, w: 261, h: 242 },
-      { id: 'rest', x: 84, y: 617, w: 266, h: 191 },
-      { id: 'masks', x: 463, y: 583, w: 178, h: 205 },
-      { id: 'feili', x: 432, y: 800, w: 239, h: 163 },
-      { id: 'gear', x: 270, y: 836, w: 154, h: 195 },
+      { id: 'sleep', x: 39, y: 359, w: 119, h: 128 },
+      { id: 'sleep2', x: 176, y: 772, w: 224, h: 149 },
+      { id: 'luzhou', x: 0, y: 518, w: 244, h: 191 },
+      { id: 'quanzhou', x: 333, y: 607, w: 179, h: 147 },
+      { id: 'hero', x: 478, y: 55, w: 290, h: 118 },
+      { id: 'funeral', x: 478, y: 434, w: 239, h: 175 },
+      { id: 'meifu', x: 230, y: 448, w: 119, h: 173 },
+      { id: 'search', x: 371, y: 289, w: 188, h: 175 },
+      { id: 'search2', x: 649, y: 656, w: 119, h: 137 },
+      { id: 'rest', x: 148, y: 248, w: 153, h: 175 },
+      { id: 'feili', x: 455, y: 717, w: 202, h: 154 },
     ],
   },
-  // pc 稿（1280 寬）：框 x 113–1167（以 640 為中心），上緣疊進大圖 519 − 457 = 62px
   pc: {
-    frame: { x: 113, y: 457, w: 1054, h: 1056, overlap: 62, maxW: 1054 },
+    frame: { x: 0, y: 92, w: 1280, h: 1444, overlap: 426, maxW: 1280 },
     stack: [
-      { id: 'xufu', x: 337, y: 457, w: 196, h: 122 },
-      { id: 'ladder', x: 137, y: 605, w: 200, h: 142 },
-      { id: 'meifu', x: 409, y: 646, w: 199, h: 288 },
-      { id: 'rest', x: 197, y: 881, w: 297, h: 214 },
-      { id: 'funeral', x: 728, y: 717, w: 439, h: 293 },
-      { id: 'rescue', x: 681, y: 499, w: 267, h: 248 },
-      { id: 'masks', x: 617, y: 843, w: 199, h: 230 },
-      { id: 'mingyang', x: 462, y: 1101, w: 132, h: 84 },
-      { id: 'feili', x: 728, y: 1095, w: 264, h: 180 },
-      { id: 'gear', x: 555, y: 1295, w: 172, h: 218 },
+      { id: 'sleep', x: 65, y: 598, w: 198, h: 213 },
+      { id: 'sleep2', x: 293, y: 1287, w: 374, h: 249 },
+      { id: 'luzhou', x: 0, y: 864, w: 406, h: 318 },
+      { id: 'quanzhou', x: 555, y: 1012, w: 298, h: 245 },
+      { id: 'hero', x: 797, y: 92, w: 483, h: 196 },
+      { id: 'funeral', x: 797, y: 723, w: 398, h: 292 },
+      { id: 'meifu', x: 383, y: 747, w: 198, h: 288 },
+      { id: 'search', x: 619, y: 482, w: 314, h: 291 },
+      { id: 'search2', x: 1082, y: 1094, w: 198, h: 229 },
+      { id: 'rest', x: 246, y: 414, w: 255, h: 291 },
+      { id: 'feili', x: 759, y: 1195, w: 337, h: 256 },
     ],
   },
 };

@@ -1,19 +1,15 @@
-// 05 ending：黑底。大圖滿版；拼貼框依斷點換版面（mob 414 稿滿版縮放、pad 768 置中、pc 1054 置中疊進大圖）；
-// 支持區塊置中 260 寬。設計稿：標題 24、內文 14/25 #efefef、按鈕 120×37 膠囊；
-// pad／pc 標題下紅線 260×2 #ca2528、按鈕紅框，mob 沒有紅線、按鈕白框。
 $red: #ca2528;
 $text: #efefef;
 
 .sec-ending {
+  position: relative; // 量大圖定位起點用的 offsetParent
   padding-bottom: 80px;
   color: #fff;
   background: #000;
   overflow-x: clip;
 
-  // ── 滿版大圖：mob 裁成較高的比例，tablet 以上照稿 1280×519 ──
   &__hero {
-    overflow: hidden;
-    aspect-ratio: 414 / 260;
+    aspect-ratio: 414 / 500;
 
     @include rwd-min('tablet') {
       aspect-ratio: 1280 / 519;
@@ -21,15 +17,10 @@ $text: #efefef;
   }
 
   &__hero-img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
     transform-origin: 50% 60%;
     will-change: transform;
   }
 
-  // ── 照片拼貼：位置是框的百分比（Ending.vue 由 collage.ts 換算成 CSS 變數），上緣依 overlap 疊進大圖 ──
   &__collage {
     position: relative;
     width: 100%;
@@ -61,7 +52,7 @@ $text: #efefef;
     overflow: hidden;
     aspect-ratio: var(--ar-mob);
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity 1s ease-out;
 
     @include rwd-min('tablet') {
       top: var(--t-pad);
@@ -90,6 +81,12 @@ $text: #efefef;
     opacity: 1;
   }
 
+  &__photo--hero {
+    opacity: 1;
+    transform-origin: 0 0;
+    will-change: transform;
+  }
+
   &__photo-img {
     display: block;
     width: 100%;
@@ -97,23 +94,66 @@ $text: #efefef;
     object-fit: cover;
   }
 
-  // ── 支持聯合報 ──
+  &__finale {
+    height: calc(var(--track) * 1vh);
+  }
+
+  &__finale-stage {
+    position: sticky;
+    top: 0;
+    display: grid;
+    place-items: center;
+    box-sizing: border-box;
+    height: 100vh;
+    height: 100svh;
+  }
+
+  // --finale-p：0＝照片、1＝導購，由 Ending.vue 依捲動寫入
+  &__finale {
+    --finale-p: 0;
+  }
+
+  &__finale-photo {
+    grid-area: 1 / 1;
+    width: var(--finale-w-mob);
+    margin: 0;
+    opacity: calc(1 - var(--finale-p));
+    transform: scale(calc(1 + (var(--finale-scale-mob) - 1) * (1 - var(--finale-p))));
+    will-change: opacity, transform;
+
+    @include rwd-min('tablet') {
+      width: var(--finale-w-pad);
+      transform: none;
+    }
+
+    @include rwd-min('pc') {
+      width: var(--finale-w-pc);
+    }
+  }
+
+  &__finale-img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
   &__support {
+    grid-area: 1 / 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     max-width: 260px;
-    margin: 150px auto 0;
+    margin: 0 auto;
     text-align: center;
-
-    @include rwd-min('tablet') {
-      margin-top: 80px;
-    }
+    opacity: var(--finale-p);
+    pointer-events: none;
   }
 
-  // 動態火影片 302×406：火焰亮部約在 y 190～375，上方是往上竄的空間。
-  // 上下用負 margin 讓火焰落在原本靜態圖（207×206、下距 12）的位置；比文字欄寬 42px，左右各外推 21px。
-  // 黑底用 screen 疊掉，往上伸進前一塊也不會蓋住照片
+  &__finale--support &__support {
+    pointer-events: auto;
+  }
+
+  // 影片上方是火焰往上竄的空間，用負 margin 讓火焰對齊文字；黑底用 screen 疊掉
   &__fire {
     display: block;
     flex-shrink: 0;
