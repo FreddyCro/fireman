@@ -29,7 +29,7 @@ export const escapeDeviceOf = deviceOfWidth;
 const DIR = '/img/no-trapped/escape';
 
 /** 跑道長度（vh） */
-export const ESCAPE_TRACK_VH = 2390;
+export const ESCAPE_TRACK_VH = 2420;
 const { at, range, cue } = timeline(ESCAPE_TRACK_VH);
 
 /** 輪播（火、水簾）的 fps；輪播格之間維持硬切（淡化會讓火光、雨水糊成一片） */
@@ -65,8 +65,9 @@ const WHITE: [number, number] = [1640, 1680];
 const RUN_IN: [number, number] = [1680, 1720];
 const RUN_PLAY: [number, number] = [1700, 1900];
 const BLACK = RUN_PLAY[1];
-/** 8 工廠大火 */
+/** 8 工廠大火：跑道尾端原地淡到黑再鬆開 */
 const BURN_IN: [number, number] = [1940, 2000];
+const BURN_OUT: [number, number] = [2220, 2280]; // 不能超過 ESCAPE_TRACK_VH − 100
 
 /** 文字 overlay 的進出場（進度 p） */
 export const ESCAPE_TEXT = {
@@ -78,8 +79,7 @@ export const ESCAPE_TEXT = {
   closeDoor: cue(1260, 1290, 1370, 1400),
   explosion: cue(1470, 1500, 1600, 1630),
   run: cue(1720, 1750, 1880, 1900),
-  // 最後一段不退場，跟著舞台捲走
-  burn: cue(2020, 2050, ESCAPE_TRACK_VH, ESCAPE_TRACK_VH + 50),
+  burn: cue(2020, 2050, BURN_OUT[0], BURN_OUT[1]),
 };
 
 export type EscapeCue = keyof typeof ESCAPE_TEXT;
@@ -287,7 +287,7 @@ export function escapeScene(d: EscapeDevice): SceneConfig {
       sprite: sprite('burn', files(7, 'fireloop', 3, d, 'png'), s.burn),
       frameMode: 'time',
       fps: LOOP_FPS,
-      keyframes: keys([{ p: 0, x: 0.5, y: 0.56, layer: 8 }], opacity({ fadeIn: BURN_IN })),
+      keyframes: keys([{ p: 0, x: 0.5, y: 0.56, layer: 8 }], opacity({ fadeIn: BURN_IN, fadeOut: BURN_OUT })),
     },
   ];
 

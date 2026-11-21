@@ -65,6 +65,22 @@ describe.each(devices)('escape 場景（%s）', (d) => {
   });
 
   // 設計師回饋（FEEDBACK_1 超哥-5）：交件檔名的第 2、3 張順序反了
+  // 設計師回饋（FEEDBACK_1 超哥-6）：最後的火 pin 住原地淡出到黑，再往下走
+  it('工廠大火在捲動結束前淡到 0，字幕跟著淡出', () => {
+    const burn = scene.elements.find((e) => e.id === 'burn')!;
+    const ks = burn.keyframes.filter((k) => k.opacity !== undefined);
+    const last = ks.at(-1)!;
+    expect(last.opacity).toBe(0);
+    expect(last.p).toBeLessThan(1);
+    expect(last.p).toBeGreaterThan(0.9);
+    // 淡出是漸變（不是硬切）
+    const prev = ks.at(-2)!;
+    expect(prev.opacity).toBe(1);
+    expect(last.p - prev.p).toBeGreaterThan(0.01);
+    // 字幕的退場區間＝火的淡出區間
+    expect(ESCAPE_TEXT.burn.out).toEqual([prev.p, last.p]);
+  });
+
   it('腳踩水依 3-1 → 3-3 → 3-2 播放', () => {
     const feet = scene.elements.find((e) => e.id === 'feet')!;
     expect(feet.sprite.srcs!.map((s) => s.match(/story3-(\d)/)![1])).toEqual(['1', '3', '2']);
