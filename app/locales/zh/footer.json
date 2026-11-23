@@ -1,8 +1,20 @@
 {
+  "_credits": "設計稿 pc 2423:5665～2423:5718（team_*）；title 就是 NmdAuthor 的 slot 名稱（顯示的職稱），names 以「、」分隔。「名名名」是設計稿的佔位，待補真名",
   "credits": [
-    { "title": "網頁策展、製作", "names": "" },
-    { "title": "工程師", "names": "" }
+    { "title": "視覺故事", "names": "陳志儒" },
+    { "title": "插畫視覺", "names": "柳佳妘" },
+    { "title": "網頁設計", "names": "陳志儒、柳佳妘" },
+    { "title": "動畫", "names": "名名名、名名名、名名名、柳佳妘" },
+    { "title": "視覺監製", "names": "董谷音" },
+    {
+      "title": "影像",
+      "names": "黃仲裕、余采瀅、林佩均、劉學聖、侯永全、報系資料照、桃園市消防局提供、台中市消防局提供、民眾提供"
+    },
+    { "title": "工程師", "names": "楊若榆" },
+    { "title": "文字核閱", "names": "名名名、李彥民" },
+    { "title": "監製", "names": "范凌嘉、王茂臻、林修全" },
+    { "title": "製作單位", "names": "聯合報新聞部視覺設計中心" }
   ],
-  "date": "",
+  "date": "2026.12",
   "logoAlt": "聯合報系 United Daily News Group"
 }

@@ -43,6 +43,12 @@ const CURRENT_YEAR = new Date().getFullYear();
   &__info {
     padding-bottom: 50px;
     background-color: #f1f1f1;
+
+    // NmdAuthor 把每個名字與「、」各自當 flex 項目換行，8 字的名字（桃園市消防局提供）後面的「、」會單獨掉到下一行；
+    // 名單欄改回一般文字流：同設計稿逐字換行，瀏覽器的避頭點規則也不會讓「、」出現在行首
+    .author-grid__item:nth-child(even) {
+      display: block;
+    }
   }
 }
 </style>

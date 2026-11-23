@@ -47,7 +47,7 @@
 
 ## 文案與中英文（i18n）
 
-中文在 `/`、英文在 `/en`，用 `@nuxtjs/i18n`（`prefix_except_default`）處理路由、`<html lang>`、hreflang。**沒有動態切換**，不偵測瀏覽器語言，也不放語系切換鈕。
+中文在 `/`、英文在 `/en`，用 `@nuxtjs/i18n`（`prefix_except_default`）處理路由、`<html lang>`、hreflang。**沒有動態切換**，不偵測瀏覽器語言；漢堡選單頂端的 CH｜EN（`ui/AppHeader.vue`）是一般連結，整頁換到另一個語系的網址。
 
 - **文案不走 vue-i18n 的 messages**（不用 `$t` / `tm` / `rt`）：依 section / component 分檔放 `app/locales/zh/*.json` 與 `app/locales/en/*.json`（兩邊檔名、結構相同），元件用 `const str = useCopy().noTrapped` 取目前語系的那份。新增檔案要在 `app/composables/useCopy.ts` 的 zh、en 各補一筆。
 - `test/copy.spec.ts` 會檢查中英文的檔案、key 結構一致，且英文沒有殘留中文；`_` 開頭的 key 是備註，不檢查。

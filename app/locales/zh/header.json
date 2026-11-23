@@ -1,6 +1,8 @@
 {
+  "_menu": "設計稿 menu_pc 2423:15246：系列三篇，本篇 isCurrent（灰字＋紅箭頭）。另外兩篇設計稿沒有連結，link 待補；沒有 link 的項目 NmdMenuItem 會顯示成 30% 淡色、不可點",
   "menu": [
-    { "title": "fireman", "link": "#", "isCurrent": true },
-    { "title": "更多數位專題", "link": "https://udn.com/newmedia/office/" }
+    { "title": "無人受困火場 為何還派消防員入內？", "link": "#", "isCurrent": true },
+    { "title": "消防員更頻繁出入高風險火場" },
+    { "title": "人力不足還要挨家挨戶推火災警報器" }
   ]
 }

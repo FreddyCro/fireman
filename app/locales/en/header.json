@@ -1,13 +1,8 @@
 {
+  "_menu": "英文設計稿 menu_pc 2464:12590",
   "menu": [
-    {
-      "title": "fireman",
-      "link": "#",
-      "isCurrent": true
-    },
-    {
-      "title": "More Digital Projects",
-      "link": "https://udn.com/newmedia/office/"
-    }
+    { "title": "Why Enter an Empty Fire?", "link": "#", "isCurrent": true },
+    { "title": "More High-Risk Fire Entries" },
+    { "title": "Understaffed, Yet Going Door to Door" }
   ]
 }

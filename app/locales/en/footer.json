@@ -1,14 +1,5 @@
 {
-  "credits": [
-    {
-      "title": "Curation & Production",
-      "names": ""
-    },
-    {
-      "title": "Engineering",
-      "names": ""
-    }
-  ],
-  "date": "",
+  "_credits": "英文設計稿（2464:1099 等）的製作團隊名單仍是中文、沒有翻譯：credits 省略，執行時整段用中文補",
+  "date": "2026.12",
   "logoAlt": "United Daily News Group"
 }

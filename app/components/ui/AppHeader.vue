@@ -27,8 +27,9 @@ const strHeader = useCopy().header;
       </ClientOnly>
       <NmdHamburger />
     </NmdHeader>
-    <!-- NmdMenuItem 一律 target="_blank"，放站內錨點會另開分頁，選單只放外部連結。 -->
+    <!-- NmdMenuItem 一律 target="_blank"，放站內錨點會另開分頁，選單只放外部連結；語系切換另見 AppMenuLangs。 -->
     <NmdMenu>
+      <AppMenuLangs />
       <NmdMenuItem
         v-for="item in strHeader.menu"
         :key="item.title"
