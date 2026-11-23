@@ -122,8 +122,8 @@ $ease: 0.3s ease;
     font-family: $serif;
     font-size: 30px;
     font-weight: 700;
-    line-height: 38px;
-    letter-spacing: 0.07em;
+    line-height: 40px;
+    letter-spacing: 0.1em;
     color: #f5f5f5;
 
     @include rwd-min('tablet') {
@@ -195,7 +195,7 @@ $ease: 0.3s ease;
     width: var(--w-wide);
 
     @include rwd-min('tablet') {
-      width: var(--w-idle);
+      width: 72.4%; // 362 / 500
     }
   }
 
@@ -310,6 +310,16 @@ $ease: 0.3s ease;
   // 沒有標題的步驟（屏東 c）保留一行高，圖不跳動
   &__steps-title {
     min-height: 36px;
+    transition: padding $ease;
+
+    // mob 放大到滿版時文字不貼邊
+    .case-story__item--active & {
+      padding: 0 10px;
+
+      @include rwd-min('tablet') {
+        padding: 0;
+      }
+    }
     font-size: 18px;
     line-height: 36px;
     letter-spacing: 0.1em;
@@ -342,6 +352,16 @@ $ease: 0.3s ease;
     flex: none;
     gap: 6px;
     align-items: flex-start;
+    transition: margin $ease;
+
+    // mob 放大到滿版時不貼邊
+    .case-story__item--active & {
+      margin-right: 10px;
+
+      @include rwd-min('tablet') {
+        margin-right: 0;
+      }
+    }
   }
 
   &__thermo-bar {

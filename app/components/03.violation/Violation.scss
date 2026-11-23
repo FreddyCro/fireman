@@ -26,22 +26,22 @@ $column: 620px;
   // 內文段落：pad 稿 530 欄、pc 稿 620 欄，18/36、#f0f0f0
   &__text {
     max-width: $column;
-    margin: 0 auto 64px;
+    margin: 0 auto 40px;
     font-size: 18px;
     line-height: 2;
     color: $text;
 
     @include rwd-min('tablet') {
       max-width: 530px;
-      margin-bottom: 80px;
     }
 
     @include rwd-min('pc') {
       max-width: $column;
     }
 
+    // 段落之間空一行
     p {
-      margin: 0 0 1em;
+      margin: 0 0 2em;
 
       &:last-child {
         margin-bottom: 0;

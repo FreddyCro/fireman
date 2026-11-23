@@ -91,8 +91,9 @@ const update = () => {
   else if (media[0] && media[0].node.getBoundingClientRect().top > mid) active.value = null;
   // 中線落在素材間距或已過最後一個：維持上一個 active（最後一張停在放大狀態一起往上收）
 
-  // 退場：下緣離開視窗底後綁捲動淡出
-  const fade = (vh - rect.bottom) / (vh * 0.5);
+  // 退場：最後一張素材過了視窗中線才綁捲動淡出
+  const last = media.at(-1)?.node.getBoundingClientRect();
+  const fade = last ? (mid - last.bottom) / mid : 0;
   el.style.opacity = fade > 0 ? String(Math.max(0, 1 - fade)) : '';
 };
 

@@ -43,7 +43,7 @@ const meifuPhotos = MEIFU_PHOTOS.map((src, i) => ({ src, alt: str.meifu.alt[i] ?
       pin
     />
     <PinText>
-      <div class="sec-no-trapped__text sec-no-trapped__text--pin">
+      <div class="sec-no-trapped__text sec-no-trapped__text--pin sec-no-trapped__text--wide">
         <p>{{ str.dilemma }}</p>
       </div>
     </PinText>

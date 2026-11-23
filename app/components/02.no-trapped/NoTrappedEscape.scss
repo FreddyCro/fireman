@@ -4,10 +4,10 @@ $serif: 'Noto Serif TC', 'Songti TC', 'PMingLiU', serif;
 
 .no-trapped-escape {
   // 滿版：抵銷 .sec-no-trapped 的左右 padding
-  margin: 0 -26px 64px;
+  margin: 0 -26px 40px;
 
   @include rwd-min('tablet') {
-    margin: 0 -40px 96px;
+    margin: 0 -40px 80px;
   }
 
   &__caption {
