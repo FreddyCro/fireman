@@ -64,12 +64,20 @@ let dockSt: ScrollTrigger | null = null;
 const finale = ref<HTMLElement | null>(null);
 const finaleSupport = ref(false);
 let finaleSt: ScrollTrigger | null = null;
+const FINALE_RUN_VH = FINALE.moveVh + FINALE.holdVh + FINALE.fadeVh + FINALE.afterVh;
 const finaleStyle = {
-  '--track': FINALE.trackVh,
-  '--finale-w-mob': `${FINALE.w.mob}px`,
-  '--finale-w-pad': `${FINALE.w.pad}px`,
-  '--finale-w-pc': `${FINALE.w.pc}px`,
-  '--finale-scale-mob': FINALE.mobScale,
+  '--track': 100 + FINALE_RUN_VH,
+  '--finale-ratio': FINALE.ratio,
+  ...Object.fromEntries(
+    BPS.flatMap((bp) => {
+      const s = FINALE.start[bp];
+      return [
+        [`--finale-top0-${bp}`, `${s.top}px`],
+        [`--finale-w0-${bp}`, s.w === null ? '100%' : `${s.w}px`],
+        [`--finale-w1-${bp}`, `${FINALE.w[bp]}px`],
+      ];
+    }),
+  ),
 };
 
 let ctx: gsap.Context | null = null;
@@ -89,9 +97,12 @@ onBeforeUnmount(() => fireIo?.disconnect());
 onMounted(() => {
   gsap.registerPlugin(ScrollTrigger);
   // 減少動態時也要看得到導購，所以不受 reduced-motion 影響
+  const setFinaleM = gsap.quickSetter(finale.value, '--finale-m');
   const setFinaleP = gsap.quickSetter(finale.value, '--finale-p');
   const applyFinale = (self: ScrollTrigger) => {
-    const p = gsap.utils.clamp(0, 1, (self.progress - (FINALE.switchAt - FINALE.fadeSpan)) / (FINALE.fadeSpan * 2));
+    const vh = self.progress * FINALE_RUN_VH;
+    const p = gsap.utils.clamp(0, 1, (vh - FINALE.moveVh - FINALE.holdVh) / FINALE.fadeVh);
+    setFinaleM(gsap.utils.clamp(0, 1, vh / FINALE.moveVh));
     setFinaleP(p);
     finaleSupport.value = p >= 0.5;
   };

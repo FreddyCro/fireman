@@ -1,5 +1,5 @@
 $red: #ca2528;
-$text: #efefef;
+$text: #f0f0f0;
 
 .sec-ending {
   position: relative; // 量大圖定位起點用的 offsetParent
@@ -108,26 +108,36 @@ $text: #efefef;
     height: 100svh;
   }
 
-  // --finale-p：0＝照片、1＝導購，由 Ending.vue 依捲動寫入
+  // 由 Ending.vue 依捲動寫入：--finale-m 照片從起點移到中央（0→1），--finale-p 照片→導購（0→1）
   &__finale {
+    --finale-m: 0;
     --finale-p: 0;
   }
 
+  // mob：滿版、離上方 20px，隨 --finale-p 縮到 260 並移到畫面中央
+  // 從拼貼下方的起點，隨 --finale-m 移到畫面中央並變成定位寬度
   &__finale-photo {
+    --top0: var(--finale-top0-mob);
+    --w0: var(--finale-w0-mob);
+    --w1: var(--finale-w1-mob);
+    --w: calc(var(--w0) + (var(--w1) - var(--w0)) * var(--finale-m));
     grid-area: 1 / 1;
-    width: var(--finale-w-mob);
-    margin: 0;
+    align-self: start;
+    width: var(--w);
+    margin: calc(var(--top0) + ((100svh - var(--w) * var(--finale-ratio)) / 2 - var(--top0)) * var(--finale-m)) 0 0;
     opacity: calc(1 - var(--finale-p));
-    transform: scale(calc(1 + (var(--finale-scale-mob) - 1) * (1 - var(--finale-p))));
-    will-change: opacity, transform;
+    will-change: opacity;
 
     @include rwd-min('tablet') {
-      width: var(--finale-w-pad);
-      transform: none;
+      --top0: var(--finale-top0-pad);
+      --w0: var(--finale-w0-pad);
+      --w1: var(--finale-w1-pad);
     }
 
     @include rwd-min('pc') {
-      width: var(--finale-w-pc);
+      --top0: var(--finale-top0-pc);
+      --w0: var(--finale-w0-pc);
+      --w1: var(--finale-w1-pc);
     }
   }
 
@@ -145,8 +155,12 @@ $text: #efefef;
     max-width: 260px;
     margin: 0 auto;
     text-align: center;
-    opacity: var(--finale-p);
     pointer-events: none;
+
+    // 透明度設在子元素：區塊本身半透明會自成一層，火焰影片的 screen 碰不到後面的照片，黑底會整塊露出來
+    > * {
+      opacity: var(--finale-p);
+    }
   }
 
   &__finale--support &__support {
@@ -168,10 +182,10 @@ $text: #efefef;
     width: 100%;
     margin: 0;
     padding-bottom: 16px;
-    font-size: 24px;
-    font-weight: 500;
-    line-height: 1.4;
-    letter-spacing: 0.03em;
+    font-size: 25px;
+    font-weight: 400;
+    line-height: 42px;
+    color: $text;
 
     @include rwd-min('tablet') {
       border-bottom: 2px solid $red;
@@ -181,7 +195,7 @@ $text: #efefef;
   &__body {
     margin: 12px 0 16px;
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 400;
     line-height: 25px;
     color: $text;
     text-align: justify;
@@ -195,8 +209,9 @@ $text: #efefef;
     min-width: 120px;
     height: 37px;
     padding: 0 18px;
-    font-size: 15px;
-    font-weight: 700;
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 25px;
     color: $text;
     text-decoration: none;
     border: 2px solid $text;
