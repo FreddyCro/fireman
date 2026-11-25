@@ -3,8 +3,9 @@
 // 下方文字（__after）在跑道之外，跑道走完才接著捲上來。
 .pin-chart {
   width: 100%;
-  max-width: 620px; // pad 稿 620、pc 稿 700
+  max-width: 620px;
   margin: 0 auto;
+  color: #f0f0f0;
 
   // 手機圖比容器寬，橫移看沒被遮的那半；圖放大時上下間距跟著加大
   --pan: 1.6;
@@ -12,10 +13,6 @@
 
   @include rwd-min('tablet') {
     --pan: 1;
-  }
-
-  @include rwd-min('pc') {
-    max-width: 700px;
   }
 
   &__track {
@@ -47,26 +44,28 @@
 
   // mob 稿標題 28、圖例 20；pad 稿 30、22
   &__title {
-    margin: 0 0 8px;
-    font-size: 28px;
-    font-weight: 700;
-    line-height: 1.45;
+    margin: 0 0 5px;
+    font-size: 30px;
+    font-weight: 400;
+    line-height: 40px;
 
     @include rwd-min('tablet') {
-      font-size: 30px;
+      line-height: 50px;
     }
   }
 
   &__legend {
     display: flex;
-    flex-wrap: wrap;
-    gap: 4px 20px;
+    flex-direction: column;
+    gap: 5px;
     margin: 0;
-    font-size: 20px;
-    line-height: 1.6;
+    font-size: 25px;
+    line-height: 35px;
 
     @include rwd-min('tablet') {
-      font-size: 22px;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 4px 20px;
     }
   }
 
@@ -130,36 +129,28 @@
     margin: var(--gap) 0 0;
     font-size: 15px;
     line-height: 22px;
-    color: #999;
+    color: #979797;
     text-align: justify;
   }
 
   // 圖表下方的文字段落：pad 稿 530 欄置中、18/36
   &__after {
-    padding-top: 32px;
-    font-size: 14px;
-    line-height: 1.8;
-    color: #ccc;
+    padding-top: 40px;
+    font-size: 18px;
+    line-height: 36px;
     text-align: justify;
 
     @include rwd-min('tablet') {
       max-width: 530px;
       margin: 0 auto;
-      padding-top: 40px;
-      font-size: 18px;
-      line-height: 2;
-      color: #f0f0f0;
     }
 
     @include rwd-min('pc') {
       max-width: none;
-      font-size: 15px;
-      line-height: 1.8;
-      color: #ccc;
     }
 
     p {
-      margin: 0 0 1.5em;
+      margin: 0 0 36px;
 
       &:last-child {
         margin-bottom: 0;

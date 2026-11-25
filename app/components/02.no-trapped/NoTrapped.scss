@@ -8,7 +8,7 @@ $column: 620px;
 
 // mob 稿內文欄 362＝414 − 26×2，左右留 26
 .sec-no-trapped {
-  padding: 64px 26px;
+  padding: 40px 26px;
   color: #fff;
   background: #000;
   // 擋 scrapbook 旋轉素材撐出橫向捲軸。用 clip 而不是 hidden：hidden 會把 section 變成
@@ -29,14 +29,9 @@ $column: 620px;
     font-family: $serif;
     font-size: 30px;
     font-weight: 700;
-    line-height: 1.55;
+    line-height: 50px;
     letter-spacing: 0.1em;
-    color: #f5f5f5;
-
-    @include rwd-min('tablet') {
-      font-size: 30px;
-      line-height: 50px;
-    }
+    color: $text;
   }
 
   &__intro-lead {
@@ -49,22 +44,22 @@ $column: 620px;
   // ── 內文段落：pad 稿多數段落 530 寬，pc 620 ──
   &__text {
     max-width: $column;
-    margin: 0 auto 64px;
+    margin: 0 auto 40px;
     font-size: 18px;
     line-height: 2;
     color: $text;
 
     @include rwd-min('tablet') {
       max-width: 530px;
-      margin-bottom: 80px;
     }
 
     @include rwd-min('pc') {
       max-width: $column;
     }
 
+    // 段落之間空一行
     p {
-      margin: 0 0 1em;
+      margin: 0 0 2em;
 
       &:last-child {
         margin-bottom: 0;
@@ -156,7 +151,8 @@ $column: 620px;
   }
 
   &__priorities-lead {
-    margin: 0 0 40px;
+    max-width: 441px;
+    margin: 0 auto 40px;
     font-size: 18px;
     line-height: 2;
 
@@ -247,22 +243,19 @@ $column: 620px;
     margin: 0 auto;
     padding: 0;
     font-family: $serif;
-    font-size: 30px;
+    font-size: 25px;
     font-weight: 700;
-    line-height: 1.5;
+    line-height: 40px;
     letter-spacing: 0.1em;
-    color: #f5f5f5;
+    color: $text;
     text-align: center;
 
     @include rwd-min('tablet') {
       max-width: 530px;
-      font-size: 30px;
-      line-height: 50px;
     }
 
     @include rwd-min('pc') {
       max-width: 532px;
-      line-height: 40px;
     }
 
     p {
@@ -290,12 +283,13 @@ $column: 620px;
     display: grid;
     gap: 10px;
     max-width: $column;
-    margin: 0 auto 15px;
+    margin: 0 auto 10px;
 
     @include rwd-min('tablet') {
       grid-template-columns: 1fr 1fr;
       gap: 10px;
       max-width: none;
+      margin-bottom: 15px;
     }
 
     @include rwd-min('pc') {
@@ -321,6 +315,15 @@ $column: 620px;
   &__gallery-caption {
     max-width: $column;
     margin: 0 auto;
+
+    @include rwd-min('tablet') {
+      max-width: 530px;
+    }
+
+    @include rwd-min('pc') {
+      max-width: $column;
+    }
+
     font-size: 15px;
     line-height: 22px;
     color: $text;

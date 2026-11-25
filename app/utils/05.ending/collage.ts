@@ -32,14 +32,24 @@ export const PHOTOS: CollagePhoto[] = [
 export const FINALE = {
   id: 'gear',
   src: '/img/ending/photo-jingpeng-gear.jpg',
+  /** 一開始接在拼貼下方的位置與寬度（mob 寬度 null＝滿版） */
+  start: {
+    mob: { top: 20, w: null },
+    pad: { top: 37, w: 103 },
+    pc: { top: 62, w: 171 },
+  },
+  /** 移到畫面中央後的寬度 */
   w: { mob: 260, pad: 171, pc: 171 },
-  /** mob 一開始放大到滿版 */
-  mobScale: 414 / 260,
-  trackVh: 200,
-  /** 交叉淡入淡出的中點（跑道進度） */
-  switchAt: 0.5,
-  /** 中點前後各多少進度做漸變 */
-  fadeSpan: 0.15,
+  /** 高 / 寬 */
+  ratio: 436 / 342,
+  /** 從起點移到畫面中央的捲動距離 */
+  moveVh: 60,
+  /** 在中央停多久才開始淡出 */
+  holdVh: 100,
+  /** 淡出到導購的捲動距離 */
+  fadeVh: 60,
+  /** 導購出現後再停多久才鬆開 */
+  afterVh: 40,
 };
 
 export interface CollageRect {
