@@ -63,6 +63,8 @@
     flex: none;
     width: min(317px, 100%, calc((100svh - 300px) * 317 / 353));
     aspect-ratio: 317 / 353;
+    // 分隊標籤的字級用 cqw 跟著地圖寬度等比縮放（設計稿以 317 寬為準），mob 地圖縮小時文字也不超出
+    container-type: inline-size;
 
     @include rwd-min('tablet') {
       width: 317px;
@@ -113,6 +115,25 @@
     transition-delay: 0.8s;
   }
 
+  // TODO 暫時：分鏡編號（溝通用，定稿後移除）
+  &__debug {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    z-index: 1;
+    margin: 0 0 8px;
+    padding: 2px 8px;
+    font: 700 14px/20px monospace;
+    color: #000;
+    background: #ff0;
+    white-space: nowrap;
+  }
+
+  // 分隊之間移動的小圓點（opacity 由 JS 依位置給，停在端點時為 0）
+  &__flow-dot {
+    fill: #ececec;
+  }
+
   // 縣市標籤：屏東市西側、往左推出去；英文版縮小到 10/15
   &__place {
     position: absolute;
@@ -138,17 +159,19 @@
     opacity: 0;
   }
 
-  // 分隊標籤：點的正上方；名稱 18/40、人數 35/40 橘色
+  // 分隊標籤（設計稿 2423:6251，以 317 寬為準換算 cqw）：名稱 18/40、人數 Bold 35/40 橘色，底緣貼在點上方
+  // 左緣固定在點往左 38.5（設計稿 77 寬標籤置中時的左緣），不用 -50%，避免增減標註、位數變化改變寬度時整塊位移
   &__station {
     position: absolute;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     margin: 0;
     font-family: $mp-sans;
     white-space: nowrap;
     opacity: 0;
-    transform: translate(-50%, calc(-100% - 10px));
+    // 底緣往上 10.5（依設計稿截圖：人數字底在點中心上方約 16）
+    transform: translate(-12.15cqw, calc(-100% - 3.3cqw));
     transition: opacity $mp-fade-slow;
     pointer-events: none;
   }
@@ -159,35 +182,25 @@
   }
 
   &__station-name {
-    font-size: 15px;
-    line-height: 26px;
+    font-size: 6.62cqw; // 約 21 / 317
+    line-height: 12.62cqw; // 40 / 317
     color: $mp-text;
+  }
 
-    @include rwd-min('tablet') {
-      font-size: 18px;
-      line-height: 40px;
+  // 人數增減標註，如 (+18)、(-9)；英文名稱後空一格
+  &__station-delta {
+    &:lang(en) {
+      margin-left: 0.25em;
     }
   }
 
-  // 建國分隊 0 人時字級 23，有人後放大到 35
+  // 人數字級固定 35（不隨數字變化）
   &__station-count {
-    font-size: 23px;
-    line-height: 36px;
+    font-size: 11.04cqw; // 35 / 317
+    font-weight: 700;
+    line-height: 12.62cqw; // 40 / 317
     color: $mp-accent;
     font-variant-numeric: tabular-nums;
-    transition: font-size $mp-fade-slow;
-
-    @include rwd-min('tablet') {
-      line-height: 40px;
-    }
-
-    &--grown {
-      font-size: 28px;
-
-      @include rwd-min('tablet') {
-        font-size: 35px;
-      }
-    }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -195,8 +208,7 @@
     &__town,
     &__dot,
     &__place,
-    &__station,
-    &__station-count {
+    &__station {
       transition: none;
     }
   }

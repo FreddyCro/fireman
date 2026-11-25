@@ -5,7 +5,7 @@
   "titleSvgNarrow": "/img/manpower/title0101_en_pad.svg",
   "titleSvgMob": "/img/manpower/title0101_en_mob.svg",
   "pingtung": {
-    "_pingtung": "屏東地圖 scrollytelling：steps 依序對應三個狀態，分隊人數放 utils/04.manpower/stations.ts，以 id 對應 stations",
+    "_pingtung": "屏東地圖 scrollytelling：steps 是三段文字，捲動分鏡（每段文字對應哪幾格、人數、增減）放 utils/04.manpower/stations.ts 的 PINGTUNG_BEATS，以 id 對應 stations",
     "steps": [
       "After the 2023 Launch Technologies fire claimed the lives of four firefighters, the Pingtung County Council began considering a third fire station in Pingtung City in early 2024 to address staffing shortages and the heavy demand for emergency medical services among the city’s 190,000 residents.",
       "Councilors questioned whether the new Pingsan Fire Station would simply draw personnel from nearby stations—Pingtung, with 37 firefighters, and Gongguan, with 20. Without an increase in total staffing, opening another station could weaken each crew’s response capacity and stretch personnel even thinner.",

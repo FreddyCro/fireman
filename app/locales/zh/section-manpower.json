@@ -6,7 +6,7 @@
   "titleSvgNarrow": "/img/manpower/title0101_pad.svg",
   "titleSvgMob": "",
   "pingtung": {
-    "_pingtung": "屏東地圖 scrollytelling：steps 依序對應三個狀態，分隊人數放 utils/04.manpower/stations.ts，以 id 對應 stations",
+    "_pingtung": "屏東地圖 scrollytelling：steps 是三段文字，捲動分鏡（每段文字對應哪幾格、人數、增減）放 utils/04.manpower/stations.ts 的 PINGTUNG_BEATS，以 id 對應 stations",
     "steps": [
       "2023年明揚大火造成4位消防員殉職後，屏東縣政府為解決屏東市19萬人口龐大救護量，縣議會於2024年初研議，在屏東市增設第三個消防隊以補足人力",
       "遭議員質疑，屏三分隊的人力是從其他分隊（鄰近的屏東分隊37人、公館分隊20人）拆解成立，若員額母數沒有增加，新設分隊反而削弱各分隊戰力",
