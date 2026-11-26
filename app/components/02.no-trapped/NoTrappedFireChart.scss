@@ -1,0 +1,204 @@
+// 02 重大火災 vs 殉職人數 pc 捲動動畫（NoTrappedFireChart.vue）。只在 pc 出現（NoTrapped.scss 切換）。
+// 舞台內是 1280×720 的設計座標（absolute），整塊依視窗等比縮放；字級、色號照設計稿 2726:218165。
+.no-trapped-fire-chart {
+  $text: #f0f0f0;
+  $muted: #979797;
+
+  color: $text;
+
+  &__track {
+    height: calc(var(--track) * 1vh);
+  }
+
+  &__stage {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100svh;
+  }
+
+  // 設計 frame：置中後等比縮放（section 左右有 padding，1280 寬會超出內容欄，靠 section 的 overflow-x: clip 擋）
+  &__frame {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(var(--scale, 1));
+  }
+
+  &__canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  &__compare,
+  &__chart {
+    position: absolute;
+    inset: 0;
+    will-change: opacity;
+  }
+
+  &__chart {
+    inset: auto;
+    height: 540px;
+  }
+
+  // ── 設計稿 1、2 ──
+  &__title {
+    position: absolute;
+    left: 50%;
+    margin: 0;
+    font-size: 30px;
+    line-height: 50px;
+    white-space: nowrap;
+    transform: translateX(-50%);
+  }
+
+  // 兩個年份疊在同一格交叉淡換
+  &__period {
+    position: absolute;
+    left: 50%;
+    display: grid;
+    margin: 0;
+    font-size: 20px;
+    line-height: 35px;
+    white-space: nowrap;
+    transform: translateX(-50%);
+
+    span {
+      grid-area: 1 / 1;
+      text-align: center;
+    }
+  }
+
+  &__label {
+    position: absolute;
+    margin: 0;
+    font-size: 25px;
+    line-height: 35px;
+    text-align: center;
+    white-space: nowrap;
+    transform: translateX(-50%);
+  }
+
+  // 差額（-20851）：淡入時寬度跟著展開，數字行才一直保持置中
+  &__diff {
+    display: inline-block;
+    max-width: calc(var(--diff, 0) * 6em);
+    overflow: hidden;
+    vertical-align: bottom;
+    white-space: pre;
+  }
+
+  // ── 設計稿 5 ──
+  &__chart-title {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 0;
+    font-size: 30px;
+    line-height: 50px;
+    white-space: nowrap;
+  }
+
+  &__legend {
+    position: absolute;
+    left: 0;
+    display: flex;
+    gap: 20px;
+    margin: 0;
+    font-size: 20px;
+    line-height: 30px;
+    white-space: nowrap;
+  }
+
+  &__legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    &::before {
+      content: '';
+      flex: none;
+    }
+
+    &--line::before {
+      width: 14px;
+      height: 2px;
+      background: #fff;
+    }
+
+    &--bar::before {
+      width: 10px;
+      height: 10px;
+      background: #f60;
+    }
+  }
+
+  // 座標軸：數字＋刻度短線（刻度 11.6 寬，左軸在數字右邊、右軸在數字左邊）
+  &__tick {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 14px;
+    line-height: 17px;
+    color: $muted;
+    white-space: nowrap;
+    transform: translateY(-50%);
+
+    &::after,
+    &::before {
+      width: 11.6px;
+      height: 1px;
+      background: $muted;
+    }
+
+    &--left {
+      right: calc(100% - 50.6px);
+
+      &::after {
+        content: '';
+      }
+    }
+
+    &--right {
+      left: 590px;
+      gap: 9px;
+
+      &::before {
+        content: '';
+      }
+    }
+  }
+
+  // 年份斜放（-49.75°），以文字中心定位
+  &__year {
+    position: absolute;
+    font-size: 14px;
+    line-height: 10px;
+    color: $muted;
+    white-space: nowrap;
+    transform: translate(-50%, -50%) rotate(-49.75deg);
+  }
+
+  &__note {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    margin: 0;
+    font-size: 15px;
+    line-height: 22px;
+    color: $muted;
+  }
+
+  &__sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}

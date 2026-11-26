@@ -30,6 +30,28 @@
     "note": "Note: On January 1, 2017, the National Fire Agency revised its fire classification standard and broadened the scope of statistics. A1: fires causing deaths. A2: fires causing injuries, involving disputes or arson, or with causes under investigation.",
     "source": "Source: National Fire Agency statistical yearbooks"
   },
+  "fireChart": {
+    "_fireChart": "待編輯確認：title、chartTitle 為暫譯（用語沿用英文稿的 Major Fires／Line-of-Duty Deaths）",
+    "title": "Fewer Major Fires, More Firefighter Deaths",
+    "periods": [
+      "2004–2014",
+      "2015–2025"
+    ],
+    "fires": {
+      "label": "Major Fires",
+      "count": "{n}"
+    },
+    "deaths": {
+      "label": "Line-of-Duty Deaths",
+      "count": "{n}"
+    },
+    "diff": " ({d})",
+    "chartTitle": "20 Years: Fewer Fires, No Fewer Deaths",
+    "legend": {
+      "fires": "Major Fires",
+      "deaths": "Line-of-Duty Deaths"
+    }
+  },
   "cases": {
     "taichung": {
       "date": "October 3, 2019",

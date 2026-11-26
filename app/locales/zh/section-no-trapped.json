@@ -31,6 +31,28 @@
     "note": "註：內政部消防署在 2017年1月1日正式修改「火災認定標準」並擴大統計範圍。A1：造成人員死亡的火災案件。A2：造成人員受傷、涉及糾紛、縱火案件或起火原因待查的火災案件。",
     "source": "資料來源：內政部消防統計年報"
   },
+  "fireChart": {
+    "_fireChart": "pc 版捲動動畫（02.no-trapped/NoTrappedFireChart）；平板、手機仍用上面的 chart。註解與資料來源沿用 chart.note / chart.source；數字在 utils/02.no-trapped/fireChart.ts。{n}、{d} 由元件代入",
+    "title": "近10年重大火災減少 殉職人數卻增加了",
+    "periods": [
+      "2004-2014年",
+      "2015-2025年"
+    ],
+    "fires": {
+      "label": "重大火災件數",
+      "count": "{n}件"
+    },
+    "deaths": {
+      "label": "消防員殉職數",
+      "count": "{n}人"
+    },
+    "diff": " ({d})",
+    "chartTitle": "20年間殉職數並未因為重大火災數下降而減少",
+    "legend": {
+      "fires": "重大火災件數",
+      "deaths": "殉職人數"
+    }
+  },
   "cases": {
     "taichung": {
       "date": "2019.10.3",

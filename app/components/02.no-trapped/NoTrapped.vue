@@ -1,6 +1,6 @@
 <!--
   02 無人受困的火場。順序照設計稿 section2：
-  導言（pin）→ pin 圖表 → 過場（pin）→ blur 大標 → 「做與不做都兩難」（pin）→ 台中案例 → 張賢龢留學故事 → 受訪者卡 → 3 項應變順序 → 段落 → 引言（pin＋blur）→ 超哥故事捲動動畫 → 美福倉儲段落＋照片
+  導言（pin）→ pin 圖表（pc 為捲動動畫 NoTrappedFireChart）→ 過場（pin）→ blur 大標 → 「做與不做都兩難」（pin）→ 台中案例 → 張賢龢留學故事 → 受訪者卡 → 3 項應變順序 → 段落 → 引言（pin＋blur）→ 超哥故事捲動動畫 → 美福倉儲段落＋照片
 -->
 <script setup lang="ts">
 import { CASES } from '~/utils/02.no-trapped/cases';
@@ -25,7 +25,13 @@ const meifuPhotos = MEIFU_PHOTOS.map((src, i) => ({ src, alt: str.meifu.alt[i] ?
       </header>
     </PinText>
 
-    <PinChart :layout="CHART" :copy="str.chart" />
+    <!-- 重大火災 vs 殉職：pc 是捲動動畫，平板、手機沿用 pin 圖表 -->
+    <div class="sec-no-trapped__chart-pc">
+      <NoTrappedFireChart :copy="str.fireChart" :alt="str.chart.alt" :note="str.chart.note" :source="str.chart.source" />
+    </div>
+    <div class="sec-no-trapped__chart-narrow">
+      <PinChart :layout="CHART" :copy="str.chart" />
+    </div>
 
     <PinText>
       <div class="sec-no-trapped__text sec-no-trapped__text--pin">

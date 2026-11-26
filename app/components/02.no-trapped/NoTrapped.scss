@@ -19,6 +19,21 @@ $column: 620px;
     padding: 96px 40px;
   }
 
+  // 重大火災 vs 殉職圖表：pc 用捲動動畫（NoTrappedFireChart），以下用 PinChart
+  &__chart-pc {
+    display: none;
+
+    @include rwd-min('pc') {
+      display: block;
+    }
+  }
+
+  &__chart-narrow {
+    @include rwd-min('pc') {
+      display: none;
+    }
+  }
+
   &__intro {
     max-width: $column;
     margin: 0 auto;
